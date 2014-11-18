@@ -1,1 +1,5 @@
+useDynLib(LMest)
+
 exportPattern("^[[:alpha:]]+")
+
+import("MASS", "MultiLCIRT", "stats")

@@ -5,11 +5,10 @@
 
 \title{Compute the observable log-likelihood of the LM model}
 
-\description{Function that computes the observable log-likelihood of the LM model 
-(not used in this version).}
+\description{Function that computes the observable log-likelihood of the LM model.}
 
 \usage{
-lk_obs(th, Am, Bm, Cm, b, k, S, yv, T, r, mod)
+lk_obs(th, Am, Bm, Cm, b, k, S, yv, TT, r, mod)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -22,7 +21,7 @@ lk_obs(th, Am, Bm, Cm, b, k, S, yv, T, r, mod)
   \item{k}{number of states}
   \item{S}{matrix of distinct response configurations}
   \item{yv}{corresponding vector of frequencies}
-  \item{T}{number of times occasions}
+  \item{TT}{number of times occasions}
   \item{r}{number of response variabels}
   \item{mod}{type of model}
 }
@@ -32,4 +31,4 @@ lk_obs(th, Am, Bm, Cm, b, k, S, yv, T, r, mod)
   \item{sc}{score vector}
 }
 
-\author{Francesco Bartolucci, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}

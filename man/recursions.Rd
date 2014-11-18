@@ -4,7 +4,7 @@
 \title{Recursions used by est_lm_basic}
 \description{Implementation of the recursions to compute manifest probability of the responses and 
 	posterior distribution of the latent states (internal function).}
-\usage{recursions(S, yv, Psi, piv, Pi, k, lth, Am, Bm, Cm, b)}
+\usage{recursions(S, yv, Psi, piv, Pi, k, lth, Am, Bm, Cm, b, mod)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{matrix of distinct response configurations}
@@ -18,6 +18,7 @@
   \item{Bm}{internal argument}
   \item{Cm}{internal argument}
   \item{b}{internal argument}
+  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (T-1) partial homog. of that order)}
 }
 \value{
   \item{lk}{log-likelihood}
@@ -31,4 +32,4 @@
 A maximization technique occurring in the statistical analysis of probabilistic functions 
 of Markov chains. Annals of Mathematical Statistics, 41, 164-171.}
 
-\author{Francesco Bartolucci, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}

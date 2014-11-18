@@ -25,12 +25,13 @@ long2wide(data, nameid, namet, colx, coly, aggr = T, full = 999)
   \item{freq}{vector of the corresponding frequencies}
 }
 
-\author{Francesco Bartolucci, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
 
 \examples{
 # Example based on criminal data
 # load criminal data
-data = data(data_criminal)
+data = data(data_criminal_sim)
 # consider only the first 1000 records to shorten time
-out = long2wide(data_criminal[1:1000,],"id","time","sex",c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=TRUE,full=0)	
+out = long2wide(data_criminal_sim[1:1000,],"id","time","sex",
+	c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=TRUE,full=0)	
 }

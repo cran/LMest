@@ -30,7 +30,7 @@
   \item{sePi }{standard errors for the transition probability matrices}
 }
 
-\author{Francesco Bartolucci, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
 
 \examples{
 \dontrun{

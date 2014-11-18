@@ -15,7 +15,7 @@
 }
 
 \value{
-  \item{p}{vector of joint probabiltie}
+  \item{p}{vector of joint probabilties}
 }
 
-\author{Francesco Bartolucci, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}

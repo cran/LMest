@@ -1,17 +1,17 @@
-\name{data_criminal}
+\name{data_criminal_sim}
 
-\alias{data_criminal}
+\alias{data_criminal_sim}
 
 \docType{data}
 
 \title{Criminal dataset}
 
-\description{Dataset about crimes committed by a cohort of subjects in Galles and Wales.}
+\description{Simulated dataset about crimes committed by a cohort of subjects.}
 
-\usage{data(data_criminal)}
+\usage{data(data_criminal_sim)}
 
 \format{
-  A data frame with 17947 observations on the following 13 variables.
+  A data frame with 10000 observations on the following 13 variables.
   \describe{
     \item{\code{id}}{subject id}
     \item{\code{sex}}{gender of the subject}
@@ -33,6 +33,6 @@
 detecting patterns of criminal activity, Journal of the Royal Statistical Society, series A, 
 170, pp. 115-132.}
 
-\examples{data(data_criminal)}
+\examples{data(data_criminal_sim)}
 
 \keyword{datasets}

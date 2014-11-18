@@ -1,15 +1,14 @@
 Package: LMest
 Type: Package
 Title: Fit Latent Markov models in basic versions
-Version: 1.0
-Date: 2012-11-27
-Author: Francesco Bartolucci, University of Perugia (IT),
-        http://www.stat.unipg.it/bartolucci
+Version: 2.0
+Date: 2013-04-16
+Author: Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT) -, and Fulvia Pennoni - University of Milano Bicocca
 Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
-Description: Fit certain versions of the Latent Markov model for
-        longitudinal categorical data.
+Description: Fit certain versions of the Latent Markov model for longitudinal categorical data.
 License: GPL (>= 2)
-Depends: MASS, Matrix
-Packaged: 2012-11-27 21:41:11 UTC; francescobartolucci
+Depends: R (>= 2.0.0), MASS, MultiLCIRT, stats
+Packaged: 2014-11-17 15:13:54 UTC; utente
+NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2012-11-28 07:17:00
+Date/Publication: 2014-11-18 11:28:26

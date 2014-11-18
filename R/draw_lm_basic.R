@@ -9,11 +9,11 @@ function(piv,Pi,Psi,n){
 	k = length(piv)
 	dd = dim(Psi)
 	c = dim(Psi)[1]
-	T = dim(Pi)[3]
+	TT = dim(Pi)[3]
 	if(length(dd)>2) r = dd[3]
 	else r = 1
 # For each subject
-    Y = matrix(0,n,T*r)
+    Y = matrix(0,n,TT*r)
     cat("------------|\n")
     cat(" sample unit|\n")
     cat("------------|\n")
@@ -25,7 +25,7 @@ function(piv,Pi,Psi,n){
     		ind = ind+1
 	    	Y[i,ind] = c-sum(runif(1)<cumsum(Psi[,u,j]))		
     	}
-   		for(t in 2:T){
+   		for(t in 2:TT){
     		u = k+1-sum(runif(1)<cumsum(Pi[u,,t]))
 	    	for(j in 1:r){
     			ind = ind+1
@@ -36,7 +36,7 @@ function(piv,Pi,Psi,n){
     cat("------------|\n")
 	out = aggr_data(Y)
     S = out$data_dis; yv = out$freq
-    S = array(t(S),c(r,T,length(yv)))
+    S = array(t(S),c(r,TT,length(yv)))
     S = aperm(S)
     if(r==1) S = S[,,1] 
     out = list(Y=Y,S=S,yv=yv)

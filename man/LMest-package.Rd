@@ -3,22 +3,23 @@
 \alias{LMest}
 \docType{package}
 \title{Fit latent Markov models}
-\description{Set of functions to fit latent Markov models in the basic version.}
+\description{Set of functions to fit latent Markov models in the basic version and in the extended version with individual covariates.}
 \details{
 \tabular{ll}{
 Package: \tab LMest\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2012-11-27\cr
+Version: \tab 2.0\cr
+Date: \tab 2014-11-16\cr
 License: \tab Unlimited\cr
 }
 The most important functions is \code{est_lm_basic} which estimates the basic LM model 
 }
 \author{
-Francesco Bartolucci, University of Perugia(IT), http://www.stat.unipg.it/bartolucci\cr
-Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
+Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)
+Maintainer: Francesco Bartolucci <bart@stat.unipg.it>, Silvia Pandolfi <pandolfi@stat.unipg.it>
 }
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2010), An overview of latent Markov models for longitudinal categorical data, http://arxiv.org/abs/1003.2804.}
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
+	Chapman and Hall/CRC press.}
 %~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
 \keyword{ package }
 %\seealso{
