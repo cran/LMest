@@ -3,9 +3,9 @@
 \alias{draw_lm_basic}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Draws samples from LM model}
+\title{Draw samples from the basic LM model}
 
-\description{Function that draws samples from the LM model with specific parameters.}
+\description{Function that draws samples from the basic LM model with specific parameters.}
 
 \usage{
 draw_lm_basic(piv, Pi, Psi, n)
@@ -25,7 +25,7 @@ draw_lm_basic(piv, Pi, Psi, n)
   \item{yv }{corresponding vector of frequencies}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
 # draw a sample for 1000 units and only one response variable

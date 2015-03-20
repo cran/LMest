@@ -4,7 +4,7 @@
 
 \title{Compute multinomial probabilities}
 
-\description{The function compute multinomial probabilities (internal function).}
+\description{The function computes multinomial probabilities (internal function).}
 
 \usage{prob_multilogit(Xdis,be,label,fort=TRUE,der=FALSE)}
 %- maybe also 'usage' for other objects documented here.
@@ -29,7 +29,7 @@
 
 }
 
-\author{Francesco Bartolucci - University of Perugia (IT)}
+\author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}
 
 %\note{
 %%%  ~~further notes~~

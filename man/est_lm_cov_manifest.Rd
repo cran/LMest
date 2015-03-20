@@ -12,9 +12,9 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x T x r)}
-  \item{X}{array (np x npar x n x T) of covariates with eventually includes lagged response (np = number of marginal logits, npar = number of covariates)}
-  \item{lev}{vector containing the number of levels of each variable}
+  \item{S}{array of available configurations (n x TT)}
+  \item{X}{array (n x TT x nc) of covariates with eventually includes lagged response (nc = number of covariates)}
+  \item{lev}{number of levels of the variable}
   \item{k}{number of latent states}
   \item{q}{number of support points for AR}
   \item{mod}{model (0 = LM with stationary transition, 1 = finite mixture)}
@@ -29,11 +29,11 @@
  \item{la}{starting value for la (optional)}
  \item{PI}{starting value for PI (optional)}
  \item{output}{to return additional output (PRED0, PRED1)}
- \item{out_se}{TRUE for computing information matrix and standard error}
+ \item{out_se}{TRUE for computing information matrix and standard errors}
 }
 
 \value{
-	\item{mu }{vector of cuptpoints}
+	\item{mu }{vector of cutpoints}
 	\item{al }{support points for the latent states}
 	\item{be }{estimate of the vector of regression parameters}
 	\item{si }{sigma of the AR process}
@@ -41,7 +41,7 @@
 	\item{la }{vector of initial probabilities}
 	\item{PI }{transition matrix}
  	\item{lk }{maximum log-likelihood}
- 	\item{npa }{number of parameters}
+ 	\item{np }{number of parameters}
  	\item{aic }{value of AIC index}
  	\item{bic }{value of BIC index}
  	\item{PRED0 }{prediction of latent state}
@@ -52,10 +52,9 @@
 	\item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
-	Chapman and Hall/CRC press.
-	Bartolucci, F., Bacci, S. and Pennoni, F. (2013), Longitudinal analysis of the self-reported health status by mixture 
-	latent autoregressive models, Journal of the Royal Statistical Society - series C, in press}
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data, Chapman and Hall/CRC press.
+	
+Bartolucci, F., Bacci, S. and Pennoni, F. (2014), Longitudinal analysis of the 	self-reported health status by mixture latent autoregressive models, Journal of the Royal Statistical Society - series C, 63, pp. 267-288}
 \author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}
 
 \examples{
@@ -64,28 +63,22 @@
 # Example based on self-rated health status (SRHS) data
 
 # load SRHS data
-data(data_SRHS)
-data = as.matrix(data_SRHS)
+data(data_SRHS_long)
+data = data_SRHS_long
+head(data)
+lev = 5 		# number of response categories for the response variable
 
-n = nrow(data); T = 8
-r = 1	 		# number of response variables
-lev = 5 		# number of response categories for each response variable
-np = sum(lev)-r	# number of marginal logits
-npar = 6      # number of covariates 
-# *** design matrices X
-X = array(0,c(np,npar,n,T))
-for(i in 1:n) for(t in 1:T){
-   X[,,i,t] = rep(1,4)\%o\%c(data[i,9]-1,(data[i,10]==2||data[i,10]==3),
-   data[i,11]==4,data[i,11]==5,data[i,11+t]-50,(data[i,11+t]-50)^2)
-}
+res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
+data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
 
-S = 5-data[,1:T]
+X =res$XX
+S = 5-res$YY
 
 # *** fit stationary LM model
-res0 = vector("list",10); tol = 10^-5;
+res0 = vector("list",10); tol = 10^-6;
 for(k in 1:10){
   res0[[k]] = est_lm_cov_manifest(S,X,lev,k,1,mod=0,tol)
-   save.image("example_SRHS3_temp.RData")
+   save.image("example_SRHS.RData")
 }
 
 # *** fit the mixture latent auto-regressive model
@@ -93,7 +86,7 @@ tol = 0.005
 res = vector("list",4)
 k=1
 q = 51
-res[[k]]=est_lm_cov_manifest(S,X,lev,k,q,mod=1,tol,outp=T)
+res[[k]]=est_lm_cov_manifest(S,X,lev,k,q,mod=1,tol,output=T)
 for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,lev,k,q=61,mod=1,tol,output=T)
 }
 }

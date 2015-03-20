@@ -8,15 +8,15 @@
 \tabular{ll}{
 Package: \tab LMest\cr
 Type: \tab Package\cr
-Version: \tab 2.0\cr
-Date: \tab 2014-11-16\cr
+Version: \tab 2.1\cr
+Date: \tab 2015-03-19\cr
 License: \tab Unlimited\cr
 }
-The most important functions is \code{est_lm_basic} which estimates the basic LM model 
+The most important functions are \code{est_lm_basic}, \code{est_lm_cov_manifest}, and\code{est_lm_cov_latent} which estimate the basic LM model and its extensions including covariates
 }
 \author{
 Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)
-Maintainer: Francesco Bartolucci <bart@stat.unipg.it>, Silvia Pandolfi <pandolfi@stat.unipg.it>
+Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
 }
 \references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
 	Chapman and Hall/CRC press.}
@@ -36,7 +36,7 @@ yv = data_drug[,6]
 n = sum(yv)
 # fit of the Basic LC model
 k = 3
-out1 = est_lm_basic(S,yv,k,mod=1)
+out1 = est_lm_basic(S,yv,k,mod=1,out_se=TRUE)
 \dontrun{
 out2 = bootstrap_lm_basic(out1$piv,out1$Pi,out1$Psi,n,mod=1,B=1000)
 }

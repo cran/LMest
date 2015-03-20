@@ -11,7 +11,7 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available response configurations (n x T x r)}
+  \item{S}{array of available response configurations (n x TT x r)}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k1}{number of latent classes}
   \item{k2}{number of latent states}

@@ -3,19 +3,19 @@
 \alias{complk}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
-\title{Complete log-likelhood of the basic latent Markov model}
+\title{Complete log-likelihood of the basic latent Markov model}
 
-\description{Function that computes complete log-likelhood of the latent Markov model
+\description{Function that computes complete log-likelihood of the latent Markov model
 (internal use).}
 
 \usage{complk(S, yv, piv, Pi, Psi, k)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{matrix of distinct response configurations}
+  \item{S}{matrix of distinct response configurations (n x TT x r)}
   \item{yv}{corresponding vector of frequencies}
   \item{piv}{vector of initial probabilities}
   \item{Pi}{transition probability matrix}
-  \item{Psi}{conditional response probabilities}
+  \item{Psi}{conditional response probabilities }
   \item{k}{number of latent classes}
 }
 
@@ -31,4 +31,4 @@ A maximization technique occurring in the statistical analysis of probabilistic 
 of Markov chains. Annals of Mathematical Statistics, 41, 164-171.}
 
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

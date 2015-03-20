@@ -2,18 +2,23 @@ est_lm_cov_latent <-
 function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
                        Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,fixPsi=FALSE){
 
-# X = array of time-varying covariates organized as S
-# these covariates affect initial and transition probabilities
-# be = parameters on the initial probabilities
+# Fit the LM model with individual covariates in the distribution of the latent process
+#
+# INPUT:
+# S = array of available configurations (n x TT x r)
+# X1 = matrix of covariates affecting the initial probabilities
+# X2 = array of covariates affecting the transition probabilities
+# Psi = conditional response probabilities
+# Be = parameters on the initial probabilities
+# Ga = parameters on the transition probabilities
 # start = initialization (0 = deterministic, 1 = random, 2 = initial values in input)
-#         if start=0 or start=1, but an argument is given in input, then it is not updated anymore
 # param = type of parametrization for the transition probabilities:
 #         multilogit = standard multinomial logit for every row of the transition matrix
 #         difflogit  = multinomial logit based on the difference between two sets of parameters
-# for   = fortran use (FALSE for not use fortran)
-# X1    = design matrix for the initial probabilities (n by n.cov.)
-# X2    = design matrix for the initial probabilities (n by TT-1 by n.cov.)
+# fort   = fortran use (FALSE for not use fortran)
+# output = to return additional output
 # out_se  = TRUE for computing the information and standard errors
+# fixPsi = TRUE if Psi is given in input and is not updated anymore 
 
 # Preliminaries
     check_der = FALSE # to check score and info
@@ -21,11 +26,12 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
    	sS = dim(S)
   	ns = sS[1]
   	TT = sS[2]
-		n = sum(yv)
+	n = sum(yv)
   	if(length(sS)==2) r = 1
   	else r = sS[3]
 	Sv = matrix(S,ns*TT,r)
 	if(r==1){
+		if(is.matrix(S)) S = array(S,c(dim(S),1))
 		b = max(S); mb = b; sb = b
 	    Co = cbind(-diag(b),diag(b))
 	 	Ma = cbind(lower.tri(matrix(1,b,b), diag = TRUE),rep(0,b))
@@ -43,8 +49,9 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	}
 	th = NULL; sc = NULL
 	J = NULL
-	  		
+  		
 # Covariate structure and related matrices: initial probabilities
+	if(is.vector(X1)) X1 = matrix(X1,n,1)
 	nc1 = dim(X1)[2] # number of covariates on the initial probabilities
 	nameBe = colnames(X1)
 	if(k == 2) GBe = as.matrix(c(0,1)) else{
@@ -52,6 +59,7 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	}
 	out = aggr_data(X1,fort=fort)
 	Xdis = out$data_dis
+	if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
 	Xlab = out$label
 	Xndis = max(Xlab)
 	XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
@@ -61,11 +69,15 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	}
 
 # for the transition probabilities
+	if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
+	if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
     nc2 = dim(X2)[3] # number of covariates on the transition probabilities
     nameGa = colnames(aperm(X2,c(1,3,2)))
 	Z = NULL
 	for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
+	if(nc2==1) Z = as.vector(X2)
 	out = aggr_data(Z,fort=fort); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+	if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
 	if(param=="multilogit"){
     	ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
 	    for(h in 1:k){
@@ -111,19 +123,19 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	    	for(t in 1:TT){
 	      	for(j in 1:r){
 		        	for(y in 0:b[j]){
-		        		if(r==1) ind = which(S[,t]==y) else ind = which(S[,t,j]==y)
+		        		ind = which(S[,t,j]==y)
 		  		        P[y+1,j] = P[y+1,j]+sum(yv[ind])
 				}
 	   		}
 	    }
 	    Psi = P/(n*TT)
 	    pm = rep(1,ns)
-	    for(t in 1:TT) for(j in 1:r) if (r==1) pm = pm*Psi[S[,t]+1,j] else pm = pm*Psi[S[,t,j]+1,j]
+	    for(t in 1:TT) for(j in 1:r)  pm = pm*Psi[S[,t,j]+1,j]
+	    #if (r==1) pm = pm*Psi[S[,t]+1,j] else pm = pm*Psi[S[,t,j]+1,j]
 	    lk = sum(yv*log(pm))
 		if(r==1) np = k*mb*r else np = k*sum(b)
 	    aic = -2*lk+np*2
 	    bic = -2*lk+np*log(n)
-#    	out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,aic=aic,bic=bic,lkv=NULL,J=NULL,V=NULL,th=NULL,sc=NULL)
 		out = list(lk=lk,Piv=Piv,Pi=Pi,Psi=Psi,np=np,aic=aic,bic=bic,lkv=NULL,V=NULL,call=match.call())
 		class(out)="LMlatent"
 	    return(out)
@@ -136,8 +148,8 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	        for(t in 1:TT){
 	            for(j in 1:r){
 	           	    for(y in 0:b[j]){
-		           	    if(r==1) ind = which(S[,t]==y) else ind = which(S[,t,j]==y)
-	        			    P[y+1,j] = P[y+1,j]+sum(yv[ind])
+		           	    ind = which(S[,t,j]==y)
+		           	  	P[y+1,j] = P[y+1,j]+sum(yv[ind])
 	           			}
 	           		 }
 	        }
@@ -236,14 +248,13 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 ###### standard EM #####
    	out = lk_comp_latent(S,yv,Piv,PI,Psi,k,fort=fort)    	
    	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
-   	if(is.nan(lk)) browser()
+  # 	if(is.nan(lk)) browser()
 	it = 0; lko = lk-10^10; lkv = NULL
 	par = c(as.vector(Piv),as.vector(PI),as.vector(Psi)); paro = par
 # Iterate until convergence
-t0 = proc.time()
-# display output
+# display output	
 
-	cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
+cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
     cat("      k     |    start    |     step    |     lk      |    lk-lko   | discrepancy |\n");
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
   	cat(sprintf("%11g",c(k,start,0,lk)),"\n",sep=" | ")
@@ -295,7 +306,6 @@ t0 = proc.time()
        	if(it/10 == floor(it/10)){
        		#cat("",sprintf("%11g",c(it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
        		cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
-           	#print(proc.time()-t0)
        	}
    		lkv = c(lkv,lk)
 	}
@@ -353,7 +363,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
     	sc = out$dlk; dlL = out$dlL; dlPhi = out$dlPhi; dlL2 = out$dlL2; dlpv = out$dlpv
     	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     	sc2 = sc; 
-        if(is.nan(lk)) browser()
+  #      if(is.nan(lk)) browser()
   		it = 0; lko = lk-10^10; lkv = NULL; dev = NULL
 # backward recursion
         out = prob_post_cov(S,yv,Psi,Piv,PI,Phi,L,pv,der=TRUE,fort=fort,dlPhi=dlPhi,dlPiv,

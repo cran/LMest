@@ -3,9 +3,9 @@
 \alias{lk_comp_latent}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
-\title{Complete log-likelhood of the latent Markov model with covariates }
+\title{Complete log-likelihood of the latent Markov model with covariates }
 
-\description{Function that computes complete log-likelhood of the latent Markov model with covariates
+\description{Function that computes complete log-likelihood of the latent Markov model with covariates
 in the distribution of the latent process (internal use).}
 
 \usage{lk_comp_latent(S,yv,Piv,PI,Psi,k,fort=TRUE,der=FALSE,
@@ -14,9 +14,9 @@ in the distribution of the latent process (internal use).}
 \arguments{
   \item{S}{matrix of distinct response configurations}
   \item{yv}{corresponding vector of frequencies}
-  \item{Piv}{initial probabilities matrix}
+  \item{Piv}{initial probability matrix}
   \item{PI}{transition probability matrices}
-  \item{Psi}{conditional response probabilities}
+  \item{Psi}{conditional response probability matrix}
   \item{k}{number of latent classes}
   \item{fort}{to use fortran routine when possible}
   \item{der}{to compute derivatives}
@@ -42,4 +42,4 @@ A maximization technique occurring in the statistical analysis of probabilistic 
 of Markov chains. Annals of Mathematical Statistics, 41, 164-171.}
 
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

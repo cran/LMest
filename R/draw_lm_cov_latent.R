@@ -9,7 +9,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 # X2    = design matrix for the initial probabilities (n by TT-1 by n.cov.)
 
 # Preliminaries
-  	n = nrow(X1)
+  	n = nrow(X2)
   	TT = dim(X2)[2]+1
     dPsi = dim(Psi)
   	if(length(dPsi)==2) r = 1
@@ -17,14 +17,15 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
   	if(length(dPsi)==1) k = 1
   	else k = dPsi[2]
     if(length(dPsi)==2) Psi = array(Psi,c(dPsi,1))
-    
-# Covariate structure and related matrices: initial probabilities
+    # Covariate structure and related matrices: initial probabilities
+	if(is.vector(X1)) X1 = matrix(X1,n,1)
 	nc1 = dim(X1)[2] # number of covariates on the initial probabilities
 	if(k == 2) GBe = as.matrix(c(0,1)) else{
 		GBe = diag(k); GBe = GBe[,-1]
 	}
 	out = aggr_data(X1)
 	Xdis = out$data_dis
+	if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
 	Xlab = out$label
 	Xndis = max(Xlab)
 	XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
@@ -34,9 +35,11 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 	}
 
 # for the transition probabilities
+  if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
   nc2 = dim(X2)[3] # number of covariates on the transition probabilities
 	Z = NULL
 	for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
+	if(nc2==1) Z = as.vector(X2)
 	out = aggr_data(Z); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
 	if(param=="multilogit"){
     ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))

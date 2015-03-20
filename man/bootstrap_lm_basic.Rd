@@ -17,7 +17,7 @@
   \item{n }{sample size}
   \item{B }{number of bootstrap samples}
   \item{start}{type of starting values (0 = deterministic, 1 = random)}
-  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., 2-(T-1) partial homog. of that order)}
+  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., 2-(TT-1) partial homog. of that order)}
   \item{tol}{tolerance level for convergence}
 }
 
@@ -30,7 +30,7 @@
   \item{sePi }{standard errors for the transition probability matrices}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
 \dontrun{
@@ -43,7 +43,7 @@ yv = data_drug[,6]
 n = sum(yv)
 # fit of the Basic LC model
 k = 3
-out1 = est_lm_basic(S,yv,k,mod=1)
+out1 = est_lm_basic(S,yv,k,mod=1,out_se=T)
 out2 = bootstrap_lm_basic(out1$piv,out1$Pi,out1$Psi,n,mod=1,B=1000)
 }
 }

@@ -3,9 +3,9 @@
 \alias{lk_obs}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
-\title{Compute the observable log-likelihood of the LM model}
+\title{Compute the observable log-likelihood of the basic LM model}
 
-\description{Function that computes the observable log-likelihood of the LM model.}
+\description{Function that computes the observable log-likelihood of the basic LM model.}
 
 \usage{
 lk_obs(th, Am, Bm, Cm, b, k, S, yv, TT, r, mod)
@@ -31,4 +31,4 @@ lk_obs(th, Am, Bm, Cm, b, k, S, yv, TT, r, mod)
   \item{sc}{score vector}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

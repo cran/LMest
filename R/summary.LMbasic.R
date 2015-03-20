@@ -1,5 +1,6 @@
 summary.LMbasic<-function(object,...){ 
 piv = cbind(Est_piv = object$piv)
+k = length(piv)
 cat("Call:\n")
 print(object$call)
 cat("\nCoefficients:\n")
@@ -11,10 +12,10 @@ if(is.null(object$sepiv)==FALSE){
 }
 TT = dim(object$Pi)[3]
 cat("\nTransition probabilities:\n")
-print(round(object$Pi[,,2:TT],4))
+if(k==1) print(object$Pi) else print(round(object$Pi[,,2:TT],4))
 if(is.null(object$sePi)==FALSE){
 	cat("\nStandard errors for the transition probabilities:\n")
-	print(round(object$sePi[,,2:TT],4))
+	if(k==1) print(object$Pi) else print(round(object$sePi[,,2:TT],4))
 }	
 cat("\nConditional Response probabilities:\n")
 print(round(object$Psi,4))

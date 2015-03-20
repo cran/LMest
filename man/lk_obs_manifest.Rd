@@ -32,4 +32,4 @@ lk_obs_manifest(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE)
   \item{s}{score of the observable log-likelihood}
   }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

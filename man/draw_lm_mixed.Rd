@@ -27,7 +27,7 @@ draw_lm_mixed(la, Piv, Pi, Psi, n, TT)
   \item{yv }{corresponding vector of frequencies}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
 # draw a sample for 1000 units and only one response variable and 5 time occasions

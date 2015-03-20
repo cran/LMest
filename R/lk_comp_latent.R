@@ -8,23 +8,16 @@ lk_comp_latent <- function(S,yv,Piv,PI,Psi,k,fort=TRUE,der=FALSE,dlPsi=NULL,dlPi
   	TT = sS[2]
   	l = max(S)+1
   	if(length(sS)==2) r = 1 else r = sS[3]
+  	if(r==1) if(is.matrix(S)) S = array(S,c(dim(S),1))
 # Compute log-likelihood
 	Phi = array(1,c(ns,k,TT)); L = array(0,c(ns,k,TT))
 	if(fort){
-        if(r==1){
-	       for(t in 1:TT) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1]
-	    }else{
             o = .Fortran("for_mult",as.integer(TT),as.integer(r),as.integer(k),as.integer(ns),as.integer(l),as.integer(S),Psi,Piv,PI,Phi=Phi,LL=array(0,c(ns,k,TT)))
             Phi = o$Phi; L = o$LL
-	    }
 	}else{
-		if(r==1){
-	        for(t in 1:TT) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1]
-	    }else{
-	        for(t in 1:TT) for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
-	    }
+	   		for(t in 1:TT) for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
 	}  	
-    if(r==1 || fort==F){
+   	if(fort==F){
       	L[,,1] = Phi[,,1]*Piv
 		for(t in 2:TT){	
   			for(i in 1:ns)	L[i,,t] = L[i,,t-1]%*%PI[,,i,t]
@@ -40,11 +33,7 @@ lk_comp_latent <- function(S,yv,Piv,PI,Psi,k,fort=TRUE,der=FALSE,dlPsi=NULL,dlPi
   		npar = nal+nbe+nga
   		indal = 1:nal; indbe = nal+(1:nbe); indga = nal+nbe+(1:nga)
         dlPhi = array(0,c(ns,k,TT,nal)); dlL = array(0,c(ns,k,TT,nal+nbe+nga))
-		if(r==1){
-	        for(t in 1:TT) dlPhi[,,t,] = dlPsi[S[,t]+1,,1,]
-	    }else{
-	        for(t in 1:TT) for(j in 1:r) dlPhi[,,t,] = dlPhi[,,t,]+dlPsi[S[,t,j]+1,,j,]
-	    }
+	    for(t in 1:TT) for(j in 1:r) dlPhi[,,t,] = dlPhi[,,t,]+dlPsi[S[,t,j]+1,,j,]
 	    dlL[,,1,indal] = dlPhi[,,1,]; dlL[,,1,indbe] = dlPiv
 		dlL2 = array(0,c(ns,k,k,t,npar))
 		for(t in 2:TT){

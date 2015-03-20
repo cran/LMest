@@ -11,11 +11,11 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x T x r)}
+  \item{S}{array of available configurations (n x TT x r)}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random)}
-  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (T-1) partial homog. of that order)}
+  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations for convergence}
   \item{out_se}{to compute the information matrix and standard errors}
@@ -39,7 +39,7 @@
 
 \references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
 	Chapman and Hall/CRC press.}
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
 # Example of drug consumption data

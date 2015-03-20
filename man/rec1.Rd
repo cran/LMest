@@ -19,4 +19,4 @@
 A maximization technique occurring in the statistical analysis of probabilistic functions 
 of Markov chains. Annals of Mathematical Statistics, 41, 164-171.}
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

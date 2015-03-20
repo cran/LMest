@@ -12,9 +12,9 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x T x r)}
-  \item{X1}{design matrix for the initial probabilities (n x nc1)}
-  \item{X2}{design matrix for the transition probabilities (n x T-1 x nc2)}
+  \item{S}{array of available configurations (n x TT x r)}
+  \item{X1}{matrix of covariates affecting the initial probabilities (n x nc1)}
+  \item{X2}{array of covariates affecting the transition probabilities (n x TT-1 x nc2)}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
@@ -58,34 +58,34 @@
 \dontrun{
 # Example based on self-rated health status (SRHS) data
 # load SRHS data
-data(data_SRHS)
-data = as.matrix(data_SRHS)
+data(data_SRHS_long)
+data = data_SRHS_long
 
-n = nrow(data); T = 8 
+TT = 8 
+head(data)
+res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
+data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
+
 # matrix of responses (with ordered categories from 0 to 4)
-S = 5-data[,1:T]
+S = 5-res$YY
+
 # matrix of covariates (for the first and the following occasions)
 # colums are: gender,race,educational level (2 columns),age,age^2)
-t = 1
-X1 = cbind(data[,9]-1,data[,10]==2|data[,10]==3,data[,11]==4,
-data[,11]==5,data[,11+t]-50,(data[,11+t]-50)^2/100)
-X2 = array(0,c(n,6,T-1))
-for(t in 2:T){
-  X2[,,t-1] = cbind(data[,9]-1,data[,10]==2|data[,10]==3,data[,11]==4,
-  data[,11]==5,data[,11+t]-50,(data[,11+t]-50)^2/100)
-}
-X2 = aperm(X2,c(1,3,2))
+X1 =res$XX[,1,]
+X2 =res$XX[,2:TT,]
+
 # estimate the model
 est2f = est_lm_cov_latent(S,X1,X2,k=2,output=TRUE,out_se=TRUE)
-# matrice probabilita' media
-PI = round(apply(est2f$PI[,,,2:8],c(1,2),mean),4)
+
+# average transition probability matrix
+PI = round(apply(est2f$PI[,,,2:TT],c(1,2),mean),4)
 
 # Transition probability matrix for white females with high educational level
-ind1 = (data[,9]==2 & data[,10]==1 & data[,11]==5)
-PI1 = round(apply(est2f$PI[,,ind1,2:8],c(1,2),mean),4)
+ind1 = (X1[,1]==1 & X1[,2]==0 & X1[,4]==1)
+PI1 = round(apply(est2f$PI[,,ind1,2:TT],c(1,2),mean),4)
 
 # Transition probability matrix for non-white male, low educational level
-ind2 = (data[,9]==1 & data[,10]>1 & data[,11]<4)
-PI2 = round(apply(est2f$PI[,,ind2,2:8],c(1,2),mean),4)
+ind2 = (X1[,1]==0 & X1[,2]==1& X1[,3]==0 & X1[,4]==0)
+PI2 = round(apply(est2f$PI[,,ind2,2:TT],c(1,2),mean),4)
 }
 }

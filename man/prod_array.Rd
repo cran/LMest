@@ -5,7 +5,7 @@
 
 \title{Compute the product of array and vector}
 
-\description{Function that compute product of each matrix in X by the vector y  (internal funtion).}
+\description{Function that compute the product of each matrix in X by the vector y  (internal funtion).}
 
 \usage{prod_array(X,y)}
 
@@ -19,4 +19,4 @@
 \item{Z}{the resulting matrix}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

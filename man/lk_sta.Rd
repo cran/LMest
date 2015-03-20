@@ -6,7 +6,7 @@
 \title{Compute the stationary log-likelihood}
 
 \description{Function that computes the stationary log-likelihood  
-(not used in this version).}
+(internal use).}
 
 \usage{
 lk_sta(tau,u,V,G2,outl=TRUE)

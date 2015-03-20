@@ -39,7 +39,7 @@ lk_obs_mixed <- function(th,nla,nPiv,nPi,nPsi,S,yv,r,k1,k2){
 	fm = pmax(fm,10^-300)
 	lk = sum(yv*log(fm))	
 	W = (Fj1/matrix(fm,ns,k1))*yv
-# compute score
+# compute score
 # E-step update row-weights
 	WZ1 = array(W,c(ns,k1,k2))*Fc2
 	WZ2 = array(W,c(ns,k1,k2,k2))*Fc3

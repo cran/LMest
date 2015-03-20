@@ -34,7 +34,7 @@
 \item{Fi}{information matrix}
 }
 
-\author{Francesco Bartolucci - University of Perugia (IT)}
+\author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}
 
 %\note{
 %%%  ~~further notes~~

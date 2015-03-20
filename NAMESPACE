@@ -1,5 +1,18 @@
 useDynLib(LMest)
 
-exportPattern("^[[:alpha:]]+")
 
 import("MASS", "MultiLCIRT", "stats")
+
+export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "decoding","draw_lm_basic", 
+       "draw_lm_cov_latent", "draw_lm_mixed", "est_lm_basic", "est_lm_cov_latent",
+       "est_lm_cov_manifest", "est_lm_mixed", "long2matrices", "long2wide")
+
+# S3methods
+S3method(print, LMbasic)
+S3method(print, LMlatent)
+S3method(print, LMmanifest)
+S3method(print, LMmixed)
+S3method(summary, LMbasic)
+S3method(summary, LMlatent)
+S3method(summary, LMmanifest)
+S3method(summary, LMmixed)

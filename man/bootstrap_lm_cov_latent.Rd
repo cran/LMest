@@ -3,7 +3,7 @@
 \alias{bootstrap_lm_cov_latent}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
-\title{Parametric bootstrap for the LM model with individual covariates in the latent model}
+\title{Parametric bootstrap for LM models with individual covariates in the latent model}
 
 \description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
 
@@ -12,7 +12,7 @@
 
 \arguments{
   \item{X1 }{matrix of the initial probabilities (n x nc1)}
-  \item{X2 }{array of the transition probabilities (n x T-1 x nc2)}
+  \item{X2 }{array of the transition probabilities (n x TT-1 x nc2)}
   \item{param }{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
   \item{Psi }{matrix of conditional response probabilities}
   \item{Be }{parameters affecting the logit for the initial probabilities}
@@ -35,28 +35,26 @@
 \examples{
 \dontrun{
 # Example based on self-rated health status (SRHS) data
-fort = TRUE 
 # load SRHS data
-data = data(data_SRHS)
-	
-data = as.matrix(data)
-n = nrow(data); T = 8 
+data(data_SRHS_long)
+data = data_SRHS_long
+
+TT = 8 
+head(data)
+res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
+data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
+
 # matrix of responses (with ordered categories from 0 to 4)
-S = 5-data[,1:T]
+S = 5-res$YY
+
 # matrix of covariates (for the first and the following occasions)
 # colums are: gender,race,educational level (2 columns),age,age^2)
-t = 1
-X1 = cbind(data[,9]-1,data[,10]==2|data[,10]==3,data[,11]==4,
-data[,11]==5,data[,11+t]-50,(data[,11+t]-50)^2/100)
-X2 = array(0,c(n,6,T-1))
-for(t in 2:T){
-  X2[,,t-1] = cbind(data[,9]-1,data[,10]==2|data[,10]==3,data[,11]==4,
-  data[,11]==5,data[,11+t]-50,(data[,11+t]-50)^2/100)
-}
-X2 = aperm(X2,c(1,3,2))
-# estimate the model
-out1 = est_lm_cov_latent(S,X1,X2,k=2,fort=fort,output=TRUE,info=TRUE)
+X1 =res$XX[,1,]
+X2 =res$XX[,2:TT,]
 
-out2 = bootstrap_lm_cov_latent(X1,X2,out1$Psi,out1$Be,out1$Ga,B=1000,fort=fort)
+# estimate the model
+out1 = est_lm_cov_latent(S,X1,X2,k=2,output=TRUE,out_se=TRUE)
+
+out2 = bootstrap_lm_cov_latent(X1,X2,Psi=out1$Psi,Be=out1$Be,Ga=out1$Ga,B=1000)
 }
 }

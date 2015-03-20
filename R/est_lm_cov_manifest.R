@@ -1,15 +1,14 @@
 est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
                                   be=NULL,si=NULL,rho=NULL,la=NULL,PI=NULL,output=FALSE,out_se=FALSE){
 
-#        [est,lk,npa,aic,bic,PRED0,PRED1,se,J1] = est_LM_cov_manifest(S,X,lev,k,q,mod,tol,start,mu,al,be,si,rho,la,PI)
 #
 # Fit the model of Bacci, Bartolucci and Pennoni (2014) with global logits
 # (when mod = 1)
 #
 # INPUT:
 # S:     array of available configurations (n x TT x r)
-# X:     array (np x npar x n x T) of covariates with eventually includes lagged
-#        response (np = number of marginal logits, npar = number of parameters)
+# X:     array (n x TT x nc) of covariates with eventually includes lagged
+#        response
 # lev:   vector containing the number of levels of each variable
 # k:     number of latent states
 # q:     number of support points for AR
@@ -36,7 +35,7 @@ est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=
 #        la:    vector of initial probabilities
 #        PI:    transition matrix
 # lk:    maximum log-likelihood
-# npa:   number of parameters
+# np:   number of parameters
 # aic:   AIC index
 # bic:   BIC index
 # sebe:  standard errors for the regression parameters be
@@ -49,11 +48,22 @@ est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=
 
 # *** organize response matrix ***
 nt = prod(lev)
+n = nrow(S); TT = ncol(S)
+if(is.array(S)) S = matrix(S,n,TT)
 Y0 = S+1
 S = array(0,c(nt,n,TT))
 for(i in 1:n) for(t in 1:TT){
    ind = Y0[i,t]
    S[ind,i,t] = 1
+}
+if(is.matrix(X)) X = array(X,c(n,TT,1))
+nc = dim(X)[3]
+ne = lev-1
+
+XX = X
+X = array(0,c(ne,nc,n,TT))
+for(i in 1:n) for(t in 1:TT){
+   X[,,i,t] = rep(1,ne)%o%XX[i,t,]
 }
 
 opt = list(TolFun=10^-6,TolX=10^-6)
@@ -65,9 +75,7 @@ Hm = rbind(rep(0,lev-1),diag(lev-1))
 GHt = t(Gm)%*%t(Hm)
 lm = c(1,rep(0,lev-1))
 Lm = rbind(rep(0,lev-1),diag(lev-1))-rbind(diag(lev-1),rep(0,lev-1))
-out = dim(X)
-ne = out[1]; npar = out[2]; n = out[3]; TT = out[4]
-np = lev-1
+
 if(q==1) sup = 0 else{
  # lim = min(sqrt(q),5);
    lim = 5;
@@ -101,9 +109,9 @@ if(is.null(mu)){
   Eta = Eta%x%matrix(1,1,TT)
   eta = as.vector(Eta)
   Z = matrix(aperm(X,c(1,4,3,2)),n*ne*TT,dim(X)[2])
-  Z = cbind(matrix(1,n*TT,1)%x%diag(np),Z)
+  Z = cbind(matrix(1,n*TT,1)%x%diag(ne),Z)
   par = ginv(t(Z)%*%Z)%*%t(Z)%*%eta
-  mu = par[1:np]; par = par[-(1:np)]; be = par
+  mu = par[1:ne]; par = par[-(1:ne)]; be = par
   if(k==1) al = NULL else{
     if(start==1) al = rnorm(k)*k else al = seq(-k,k,2*k/(k-1))
     mu = mu+al[1]
@@ -145,25 +153,25 @@ t0 = proc.time()
 
 # DA FARE IN FORTRAN
 # find non-redundant X configurations (may be very slow)
-# Xd = array(X,c(ne,npar,n*TT))
+# Xd = array(X,c(ne,nc,n*TT))
 # indn = matrix(1:(n*TT),n,TT)
 # for(jd in 1:nd) INDN[[jd]]$ind = jd
-X1 = matrix(X,ne*npar,n*TT)
+X1 = matrix(X,ne*nc,n*TT)
 out1 = t(unique(t(X1)))
 nd = ncol(out1)
 indn = rep(0,n*TT)
 INDN = vector("list",nd)
-tmp = ne*npar
+tmp = ne*nc
 for(jd in 1:nd){
 	ind = which(colSums(X1 == out1[,jd])==tmp)
 	indn[ind] = jd
 	INDN[[jd]]$ind = ind
 }
 indn = matrix(indn,n,TT)
-Xd = array(out1,c(ne,npar,nd))
+Xd = array(out1,c(ne,nc,nd))
 #for(jd in 1:nd) INDN[[jd]]$ind = which(indn==jd)
 cat(c("n. distinct covariate conf. = ",nd))
-Xd = Xd[,,1:nd]
+#Xd = Xd[,,1:nd]  #commentato per consentire 1 covariata
 LLm1 = array(t(Lm),c(ncol(Lm),nrow(Lm),nd))
 # alternate between EM and NR
 itg = 0; cont = 1;
@@ -172,8 +180,8 @@ while(cont && itg<5){
 	
   cont = 0; itg = itg+1;
   # compute initial log-likelihood
-  I = diag(np)
-  one = matrix(1,np,1)
+  I = diag(ne)
+  one = matrix(1,ne,1)
   Pio = array(0,c(n,k*q,TT))
   par0 = par[1:(lev-1+k)]
   Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
@@ -270,8 +278,8 @@ while(cont && itg<5){
         Pit1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pit1 = pmin(pmax(Pit1,10^-100),1-10^-100)
         QQv1 = Qv1*(1-Qv1)
         DPv1 = 1/Pit1
-        RRtc1 = array(0,c(np,lev,nd))
-        for(j1 in 1:np) for(j2 in 1:lev) RRtc1[j1,j2,] = QQv1[j1,]*DPv1[j2,]
+        RRtc1 = array(0,c(ne,lev,nd))
+        for(j1 in 1:ne) for(j2 in 1:lev) RRtc1[j1,j2,] = QQv1[j1,]*DPv1[j2,]
         RRtc1 = RRtc1*LLm1
         XXRi1 = array(0,c(dim(D)[1],dim(D)[2]+dim(Xd)[2],nd))
         for(h2 in 1:nd) XXRi1[,,h2] = cbind(D,Xd[,,h2])
@@ -305,7 +313,7 @@ while(cont && itg<5){
     mdpar = max(abs(dpar))
     if(mdpar>1) dpar = dpar/mdpar
     par = par+dpar
-    si = par[np+k]
+    si = par[ne+k]
     # compute new log-likelihood
     par0 = par[1:(lev-1+k)]
     Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
@@ -411,24 +419,23 @@ while(cont && itg<5){
     tol = tol/2;
   }   
 }
-
 # separate parameters and compute aic and bic
-mu = par[1:np]
+mu = par[1:ne]
 al = 0
-if(k>1) al = c(al,par[(np+1):(np+k-1)])
+if(k>1) al = c(al,par[(ne+1):(ne+k-1)])
 mu = mu+al%*%la
 al = al-al%*%la
-be = par[(np+k+1):length(par)]
-if(mod==0 || mod==2) npa = k*(k-1)
-if(mod==1) npa = k-1
-npa = npa + (np+(k-1)+npar) + ((k+1)*(q>1))
+be = par[(ne+k+1):length(par)]
+if(mod==0 || mod==2) np = k*(k-1)
+if(mod==1) np = k-1
+np = np + (ne+(k-1)+nc) + ((k+1)*(q>1))
 if(q==1){
 	si=NULL; rho = NULL
 }
 
 # compute aic, bic and prediction of latent structure
-aic = -2*lk+2*(npa)
-bic = -2*lk+log(n)*(npa)
+aic = -2*lk+2*(np)
+bic = -2*lk+log(n)*(np)
 # prediction
 if(output){
   out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
@@ -470,12 +477,12 @@ if(out_se){
   	lrho = se1[1:k]
   	se1 = se1[-(1:k)]
   }
-  #se = list(lrho=lrho, be = se1[(np+k+1):length(se1)])
+  #se = list(lrho=lrho, be = se1[(ne+k+1):length(se1)])
   selrho = lrho
-  sebe = se1[(np+k+1):length(se1)]
+  sebe = se1[(ne+k+1):length(se1)]
 }
 
-out = list(mu=mu,al=al,be=be,si=si,rho=rho,la=la,PI=PI,lk=lk,npa=npa,aic=aic,bic=bic,call=match.call())
+out = list(mu=mu,al=al,be=be,si=si,rho=rho,la=la,PI=PI,lk=lk,np=np,aic=aic,bic=bic,call=match.call())
 if(out_se){
 	out$selrho=selrho
 	out$sebe = sebe

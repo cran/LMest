@@ -2,7 +2,7 @@
 \alias{long2wide}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{From data in the long format to data in the wide format}
-\description{Function that transfroms data in the long format to data in the wide format.}
+\description{Function that transforms data in the long format to data in the wide format.}
 \usage{
 long2wide(data, nameid, namet, colx, coly, aggr = T, full = 999)
 }
@@ -25,7 +25,7 @@ long2wide(data, nameid, namet, colx, coly, aggr = T, full = 999)
   \item{freq}{vector of the corresponding frequencies}
 }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
 # Example based on criminal data

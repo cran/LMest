@@ -45,7 +45,7 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE){
 	    }
 	    Psi = P/(n*TT)
 	    pm = rep(1,ns)
-	    for(t in 1:TT) for(j in 1:r) pm = pm*Psi[S[,t,j]+1,j]
+	    for(t in 1:TT) for(j in 1:r) if(r==1) pm = pm*Psi[S[,t]+1,j] else pm = pm*Psi[S[,t,j]+1,j]
 	    lk = sum(yv*log(pm))
 	    np = r*b
 	    aic = -2*lk+np*2

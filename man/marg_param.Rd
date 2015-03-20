@@ -17,5 +17,5 @@ marg_param(lev,type)
   \item{G}{corresponding design matrix for the corresponding log-linear model}
  }
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 

@@ -5,7 +5,7 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 # k1 = number of latent classes
 # k2 = number of latent states
 # start = 0 for deterministic initialization, 1 for stochastic initialization
-# tol = tollerance level to stop
+# tol = tollerance level to stop
 
 # preliminaries
 	k2 = as.integer(k2)
@@ -32,7 +32,7 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
     	}
 		E = Co%*%log(Ma%*%P)
   	   	Psi = array(0,c(b+1,k2,r)); Eta = array(0,c(b,k2,r))
-       	grid = seq(-k2,k2,2*k2/(k2-1))
+       	if(k2 == 1) grid = k2 else grid = seq(-k2,k2,2*k2/(k2-1))
        	for(c in 1:k2) for(j in 1:r){
      		etac = E[,j]+grid[c]
        		Eta[,c,j] = etac
@@ -127,7 +127,7 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 		Vv = matrix(aperm(PV,c(1,3,2)),ns*TT,k2)
 		for(j in 1:r) for(y in 0:b) {
 			ind = which(Sv[,j]==y)
-			Y1[y+1,,j] = colSums(Vv[ind,])				
+			if(k2==1) Y1[y+1,,j] = sum(Vv[ind,]) else Y1[y+1,,j] = colSums(Vv[ind,])				
 		}
 		for(j in 1:r) for(c in 1:k2) Psi[,c,j] = Y1[,c,j]/sum(Y1[,c,j]) 
 

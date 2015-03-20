@@ -9,7 +9,7 @@
 \arguments{
   \item{S}{matrix of distinct response configurations}
   \item{yv}{corresponding vector of frequencies}
-  \item{Psi}{matrix of conditional response probabiltiies}
+  \item{Psi}{matrix of conditional response probabilties}
   \item{piv}{initial probability vector}
   \item{Pi}{transition probability matrices}
   \item{k}{number of latent states}
@@ -18,7 +18,7 @@
   \item{Bm}{internal argument}
   \item{Cm}{internal argument}
   \item{b}{internal argument}
-  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (T-1) partial homog. of that order)}
+  \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
 }
 \value{
   \item{lk}{log-likelihood}
@@ -32,4 +32,4 @@
 A maximization technique occurring in the statistical analysis of probabilistic functions 
 of Markov chains. Annals of Mathematical Statistics, 41, 164-171.}
 
-\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
+\author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}

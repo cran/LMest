@@ -36,7 +36,7 @@ draw_lm_mixed <- function(la,Piv,Pi,Psi,n,TT){
     cat("------------|\n")
 	out = aggr_data(Y)
     S = out$data_dis; yv = out$freq
-    S = array(t(S),c(r,T,length(yv)))
+    S = array(t(S),c(r,TT,length(yv)))
     S = aperm(S)
     if(r==1) S = S[,,1] 
     out = list(Y=Y,S=S,yv=yv)
