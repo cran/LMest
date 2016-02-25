@@ -7,7 +7,7 @@
 
 \description{Function to compute the logit function with respect to a reference category.}
 
-\usage{logit1(p,ref=1)}
+\usage{logit1(p, ref = 1)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{

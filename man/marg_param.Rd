@@ -4,7 +4,7 @@
 \title{Compute marginal parametrization}
 \description{Function that creates matrices C and M for the marginal parametrization of the probability vector for a vector of categorical variables}
 \usage{
-marg_param(lev,type)
+marg_param(lev, type)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -81,7 +81,7 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
   if(outp){
   	
     if(k>1){
-      if(mod==0 || mod ==2){ ##SP: sistemare mod==2 
+      if(mod==0){
       	out = stationary(tau,k,G2,IPI)
         d21 = out$d0; d22 = out$d1 
         Mar = diag(k)%x%matrix(1,1,q)
@@ -136,7 +136,10 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
         for(j1 in 1:np) for(j2 in 1:lev) RRtc1[j1,j2,] = QQv1[j1,]*DPv1[j2,]
         RRtc1 = RRtc1*LLm1
         XXRi1 = array(0,c(dim(D)[1],dim(D)[2]+dim(Xd)[2],nd))
-        for(h2 in 1:nd) XXRi1[,,h2] = cbind(D,Xd[,,h2])
+        for(h2 in 1:nd){
+        		if(lev==2) XXRi1[,,h2] = c(D, Xd[,, h2])
+        		else XXRi1[,,h2] = cbind(D,Xd[,,h2])        	
+        } 
         XXRi1 = aperm(XXRi1,c(2,1,3)) 
         pc = U[,j,]; pc = as.vector(pc)
         nt = dim(Y)[1]
@@ -145,7 +148,8 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
         for(jd in 1:nd){
           ind = INDN[[jd]]$ind
           pci = pc[ind]
-          XRi = (XXRi1[,,jd]%*%RRtc1[,,jd])%*%GHt
+          if(lev==2) XRi = (XXRi1[, , jd] %o% RRtc1[, , jd]) %*% GHt
+          else XRi = (XXRi1[,,jd]%*%RRtc1[,,jd])%*%GHt
           if(length(ind)==1){
             s4 = s4+XRi%*%(YGP[,ind]*pci)
           }else{

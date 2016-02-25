@@ -5,10 +5,10 @@
 
 \title{Compute the observable log-likelihood of the mixed LM model}
 
-\description{Function that computes the observable log-likelihood of the mixed LM model with discrete random effect in the latent model.}
+\description{Function that computes the observable log-likelihood of the mixed LM model with discrete random effect in the latent model (internal use).}
 
 \usage{
-lk_obs_mixed(th,nla,nPiv,nPi,nPsi,S,yv,r,k1,k2)
+lk_obs_mixed(th, nla, nPiv, nPi, nPsi, S, yv, r, k1, k2)
 }
 
 %- maybe also 'usage' for other objects documented here.

@@ -11,10 +11,11 @@ function(S,yv,Psi,Piv,PI,Phi,L,pv,der=FALSE,fort=TRUE,
     k = ncol(Piv)
 # use backward recursion for potesterior probabilities	
     if(fort){
+    	Psi[is.na(Psi)]=0
       o = .Fortran("back",as.integer(TT),as.integer(r),as.integer(k),as.integer(ns),as.integer(mb+1),as.integer(S),Psi,Piv,PI,Phi,L,U=array(0,c(k,k,ns,TT)),V=array(0,c(ns,k,TT)))
       U = o$U; V1 = o$V; V = V1
       if(any(yv>1)) for(i in 1:ns){
-          U[,,i,] = U[,,i,]*yv[i]; V[,,i] = V[,,i,]*yv[i]
+      	U[,,i,] = U[,,i,]*yv[i]; V[i,,] = V[i,,]*yv[i]
       }    		
     }else{
     	V = array(0,c(ns,k,TT)); U = array(0,c(k,k,ns,TT))

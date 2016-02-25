@@ -12,7 +12,7 @@ function(piv,Pi,Psi,n,B=100,start=0,mod=0,tol=10^-6){
 # Reparametrize
     mPsi = 0; mpiv = 0; mPi = 0
     m2Psi = 0; m2piv = 0; m2Pi = 0
-    mth = 0; m2th = 0;
+#    mth = 0; m2th = 0;
     for(b in 1:B){
 	    	out = draw_lm_basic(piv,Pi,Psi,n)
 	    	Sb = out$S; yvb = out$yv
@@ -23,7 +23,7 @@ function(piv,Pi,Psi,n,B=100,start=0,mod=0,tol=10^-6){
 	    	mth = mth+out$th/B; m2th = m2th+out$th/B
     }
     sePsi = sqrt(m2Psi-mPsi^2); sepiv = sqrt(m2piv-mpiv^2); sePi = sqrt(m2Pi-mPi^2)
-    seth = sqrt(m2th-mth^2)
-    out = list(mPsi=mPsi,mpiv=mpiv,mPi=mPi,sePsi=sePsi,sepiv=sepiv,sePi=sePi,seth=seth)
+#    seth = sqrt(m2th-mth^2)
+    out = list(mPsi=mPsi,mpiv=mpiv,mPi=mPi,sePsi=sePsi,sepiv=sepiv,sePi=sePi)
 
 }

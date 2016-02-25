@@ -1,5 +1,5 @@
 est_lm_cov_latent <-
-function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
+function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
                        Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,fixPsi=FALSE){
 
 # Fit the LM model with individual covariates in the distribution of the latent process
@@ -9,8 +9,8 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 # X1 = matrix of covariates affecting the initial probabilities
 # X2 = array of covariates affecting the transition probabilities
 # Psi = conditional response probabilities
-# Be = parameters on the initial probabilities
-# Ga = parameters on the transition probabilities
+# Be = parameters on the initial probabilities (if start=2)
+# Ga = parameters on the transition probabilities (if start=2)
 # start = initialization (0 = deterministic, 1 = random, 2 = initial values in input)
 # param = type of parametrization for the transition probabilities:
 #         multilogit = standard multinomial logit for every row of the transition matrix
@@ -29,7 +29,28 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	n = sum(yv)
   	if(length(sS)==2) r = 1
   	else r = sS[3]
+  	if(min(S,na.rm=TRUE)>0){
+  		cat("|------------------- WARNING -------------------|\n")
+  		cat("|The first response category must be coded as 0 |\n")
+  		cat("|-----------------------------------------------|\n")	
+ 	} 
+  	if(is.data.frame(S)){
+  		warning("Data frame not allowed for S")
+  	}
+  	if(ns!=length(yv)) stop("dimensions mismatch between S and yv")
+   	if(any(is.na(X1)) | any(is.na(X2))) stop("missing data not allowed in X1 or X2")
+  	miss = any(is.na(S))
+	if(miss){
+         cat("Missing data in the dataset, treated as missing at random\n")
+         R = 1 * (!is.na(S))
+         S[is.na(S)] = 0
+	}else{
+		R = NULL
+	}
+  	
 	Sv = matrix(S,ns*TT,r)
+	if(miss) Rv = matrix(R,ns*TT,r)
+	
 	if(r==1){
 		if(is.matrix(S)) S = array(S,c(dim(S),1))
 		b = max(S); mb = b; sb = b
@@ -51,8 +72,10 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	J = NULL
   		
 # Covariate structure and related matrices: initial probabilities
-	if(is.vector(X1)) X1 = matrix(X1,n,1)
+	if(is.vector(X1)) X1 = matrix(X1,ns,1)
 	nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+	if(ns!= dim(X1)[1]) stop("dimension mismatch between S and X1")
+ 
 	nameBe = colnames(X1)
 	if(k == 2) GBe = as.matrix(c(0,1)) else{
 		GBe = diag(k); GBe = GBe[,-1]
@@ -69,9 +92,11 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	}
 
 # for the transition probabilities
-	if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
-	if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
+	if(TT==2) X2 = array(X2,c(ns,1,dim(X2)[2]))
+	if(is.matrix(X2)) X2 = array(X2,c(ns,TT-1,1))
     nc2 = dim(X2)[3] # number of covariates on the transition probabilities
+    if(ns!= dim(X2)[1]) stop("dimension mismatch between S and X2")
+
     nameGa = colnames(aperm(X2,c(1,3,2)))
 	Z = NULL
 	for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
@@ -121,7 +146,7 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 		Piv = rep(1,n); Pi = 1
    	 	P = matrix(0,mb+1,r)
 	    	for(t in 1:TT){
-	      	for(j in 1:r){
+	      		for(j in 1:r){
 		        	for(y in 0:b[j]){
 		        		ind = which(S[,t,j]==y)
 		  		        P[y+1,j] = P[y+1,j]+sum(yv[ind])
@@ -130,8 +155,9 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 	    }
 	    Psi = P/(n*TT)
 	    pm = rep(1,ns)
-	    for(t in 1:TT) for(j in 1:r)  pm = pm*Psi[S[,t,j]+1,j]
-	    #if (r==1) pm = pm*Psi[S[,t]+1,j] else pm = pm*Psi[S[,t,j]+1,j]
+	    if (miss) for(t in 1:TT) for(j in 1:r)  pm = pm*(Psi[S[,t,j]+1,j]*R[,t,j]+(1-R[,t,j]))
+	    else for(t in 1:TT) for(j in 1:r)  pm = pm*Psi[S[,t,j]+1,j]
+	    
 	    lk = sum(yv*log(pm))
 		if(r==1) np = k*mb*r else np = k*sum(b)
 	    aic = -2*lk+np*2
@@ -144,23 +170,21 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 # Starting values: deterministic initialization
 	if(start == 0){
 		if(fixPsi==FALSE){
-			P = matrix(0,mb+1,r)
-	        for(t in 1:TT){
-	            for(j in 1:r){
-	           	    for(y in 0:b[j]){
-		           	    ind = which(S[,t,j]==y)
-		           	  	P[y+1,j] = P[y+1,j]+sum(yv[ind])
-	           			}
-	           		 }
+			P = matrix(NA,mb+1,r)
+			for(j in 1:r) P[1:(b[j]+1),j] = 0
+	        for(t in 1:TT) for(j in 1:r) for(y in 0:mb){
+	        	ind = which(S[,t,j]==y)
+		        if(miss) P[y+1,j] = P[y+1,j]+sum(t(R[ind,t,j])%*%yv[ind])
+		        else P[y+1,j] = P[y+1,j]+sum(yv[ind])
 	        }
 	       	if(r==1) E = Co%*%log(Ma%*%P) else{
-	       		E = matrix(0,mb,r)
+	       		E = matrix(NA,mb,r)
 	    		for(j in 1:r){
 	    			Co = Matr[[j]]$Co; Ma = Matr[[j]]$Ma
 	    			E[1:b[j],j] = Co%*%log(Ma%*%P[1:(b[j]+1),j])
 				}   		
 	       	}
-		  	Psi = array(0,c(mb+1,k,r)); Eta = array(0,c(mb,k,r))
+		  	Psi = array(NA,c(mb+1,k,r)); Eta = array(NA,c(mb,k,r))
 	        grid = seq(-k,k,2*k/(k-1))
 	        for(c in 1:k){
 	         	for(j in 1:r){
@@ -195,10 +219,11 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 # random initialization
   	if(start==1){
   		if(fixPsi==FALSE){
-		    Psi = array(0,c(mb+1,k,r)) 
+		    Psi = array(NA,c(mb+1,k,r)) 
+		   # for(j in 1:r) Psi[1:(b[j]+1),,j] = 0
 		    for(j in 1:r){
 			    Psi[1:(b[j]+1),,j] = matrix(runif((b[j]+1)*k),b[j]+1,k) 
-			    for(c in 1:k) Psi[,c,j] = Psi[,c,j]/sum(Psi[,c,j])
+			    for(c in 1:k) Psi[1:(b[j]+1),c,j] = Psi[1:(b[j]+1),c,j]/sum(Psi[1:(b[j]+1),c,j])
 		    }
 	    }
 # parameters on initial probabilities
@@ -208,7 +233,9 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
        	Piv = out$P; Pivdis = out$Pdis
 # parameters on transition probabilities
         if(param=="multilogit"){
-    		Ga = matrix(-abs(rnorm((nc2+1)*(k-1),k)),(nc2+1)*(k-1),k)/2
+    	#	Ga = matrix(-abs(rnorm((nc2+1)*(k-1),k)),(nc2+1)*(k-1),k)/2
+    		Ga = matrix(0,(nc2+1)*(k-1),k)
+    		Ga[1+(0:(k-2))*(nc2+1),] = -abs(rnorm((k-1)))   
 	    	PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
 		    for(h in 1:k){
 			    out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
@@ -230,6 +257,7 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
        	Piv = out$P; Pivdis = out$Pdis
 # parameters on transition probabilities
         if(param=="multilogit"){
+        	if(is.list(Ga)) stop("invalid mode (list) for Ga")
     		Ga = matrix(Ga,(nc2+1)*(k-1),k)
 	    	PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
 		    for(h in 1:k){
@@ -237,7 +265,8 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
 			    PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
 		    }
 		}else if(param=="difflogit"){
-            Ga = c(as.vector(t(Ga[[1]])),as.vector(Ga[[2]]))
+			if(is.list(Ga)) Ga = c(as.vector(t(Ga[[1]])),as.vector(Ga[[2]]))
+            if(length(Ga)!=k*(k-1)+(k-1)*nc2) stop("invalid dimensions for Ga")
             PI = array(0,c(k,k,ns,TT))
             out = prob_multilogit(ZZdis,Ga,Zlab,fort)
    		    PIdis = out$Pdis; PI[,,,2:TT] = array(as.vector(t(out$P)),c(k,k,ns,TT-1))
@@ -246,14 +275,15 @@ function(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
     }
   
 ###### standard EM #####
-   	out = lk_comp_latent(S,yv,Piv,PI,Psi,k,fort=fort)    	
+   	out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,fort=fort)    	
    	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   # 	if(is.nan(lk)) browser()
 	it = 0; lko = lk-10^10; lkv = NULL
-	par = c(as.vector(Piv),as.vector(PI),as.vector(Psi)); paro = par
+	par = c(as.vector(Piv),as.vector(PI),as.vector(Psi))
+	if(any(is.na(par))) par = par[-which(is.na(par))]
+	paro = par
 # Iterate until convergence
 # display output	
-
 cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
     cat("      k     |    start    |     step    |     lk      |    lk-lko   | discrepancy |\n");
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
@@ -270,13 +300,27 @@ cat("------------|-------------|-------------|-------------|-------------|------
 # ---- M-step ----
 # Update Psi
        	if(fixPsi==FALSE){
-    		Y1 = array(0,c(mb+1,k,r))
+    		Y1 = array(NA,c(mb+1,k,r))
+    		for(j in 1:r) Y1[1:(b[j]+1)] = 0
 	    	Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
 		    for(j in 1:r) for(jb in 0:b[j]) {
 	    		ind = which(Sv[,j]==jb)
-	    		Y1[jb+1,,j] = colSums(Vv[ind,])				
+	    		if(length(ind)==1){
+	    			if(miss) Y1[jb+1,,j] = Vv[ind,]*Rv[ind,j]
+	    				else Y1[jb+1,,j] = Vv[ind,]
+	    		}
+	    		if(length(ind)>1){
+	    				if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
+	    				else Y1[jb+1,,j] = colSums(Vv[ind,])
+	    		}
+
+	    						
 	    	}
-	    	for(c in 1:k) for(j in 1:r) Psi[,c,j] = Y1[,c,j]/sum(Y1[,c,j])
+	    	for(j in 1:r) for(c in 1:k){
+				tmp = Y1[1:(b[j]+1),c,j]
+				tmp = pmax(tmp/sum(tmp),10^-10)
+				Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
+			}
 		}
 # Update piv
 		out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis,fort=fort)
@@ -287,7 +331,7 @@ cat("------------|-------------|-------------|-------------|-------------|------
 		    	UU = NULL
 		    	for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
 		    	out = est_multilogit(UU,ZZdis[,,,h],Zlab,Ga[,h],PIdis[,,h],fort=fort)
-		    	PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = t(out$P); Ga[,h] = out$be
+		    	PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1)); Ga[,h] = out$be
 	   	 	}
 		}else if(param=="difflogit"){
 		    Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
@@ -298,9 +342,10 @@ cat("------------|-------------|-------------|-------------|-------------|------
 	    	PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3)) 
         }
 # Compute log-likelihood
-   		paro = par; par = c(as.vector(Piv),as.vector(PI),as.vector(Psi));
+   		paro = par; par = c(as.vector(Piv),as.vector(PI),as.vector(Psi))
+   		if(any(is.na(par))) par = par[-which(is.na(par))]
    		lko = lk;
-   		out = lk_comp_latent(S,yv,Piv,PI,Psi,k,fort=fort)
+   		out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,fort=fort)
    		lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
 # Display output
        	if(it/10 == floor(it/10)){
@@ -312,12 +357,13 @@ cat("------------|-------------|-------------|-------------|-------------|------
 if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
 #### compute infomation matrix ####
 	if(out_se){
-		dlPsi = array(0,c(mb+1,k,r,k*sb))
+		dlPsi = array(NA,c(mb+1,k,r,k*sb))
+		for(j in 1:r) dlPsi[1:(b[j]+1),,j,] = 0
    		count = 0
 		for(c in 1:k) for(j in 1:r){
 	  		ind = count+(1:b[j])
-			temp = pmax(Psi[,c,j],10^-50)
-			dlPsi[,c,j,ind] = (diag(b[j]+1)-rep(1,b[j]+1)%o%temp)%*%Am[[j]]
+			temp = pmax(Psi[1:(b[j]+1),c,j],10^-50)
+			dlPsi[1:(b[j]+1),c,j,ind] = (diag(b[j]+1)-rep(1,b[j]+1)%o%temp)%*%Am[[j]]
 			count = count+b[j]
 			th = c(th,log(temp[-1]/temp[1]))
 		}
@@ -328,6 +374,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 	    	for(i in which(Xlab==j)) dlPiv[i,,] = Temp
         }
         th = c(th,be)
+       
         count = 0
         if(param=="multilogit"){
         	dlPI = array(0,c(k,k,ns*TT,(1+nc2)*(k-1)*k))
@@ -338,7 +385,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 		    		temp = pmax(PIdis[j,,h],10^-50)
            	        Temp = (Temp0-temp0%o%temp)%*%ZZdis[,,j,h]
            	        for(i in which(Zlab==j)) dlPI[h,,ns+i,ind] = Temp
-		    	}
+           	   	}
 		    	count = count+((1+nc2)*(k-1))
                 th = c(th,Ga[,h])		    
 		    }
@@ -359,7 +406,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 		
 # Compute log-likelihood
 		lk2 = lk
-    	out = lk_comp_latent(S,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
+    	out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
     	sc = out$dlk; dlL = out$dlL; dlPhi = out$dlPhi; dlL2 = out$dlL2; dlpv = out$dlpv
     	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     	sc2 = sc; 
@@ -372,18 +419,31 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 # ---- M-step ----
 # score and info Psi
        	sc = NULL
-   		Y1 = array(0,c(mb+1,k,r))
+   		Y1 = array(NA,c(mb+1,k,r))
+   		for(j in 1:r) Y1[1:(b[j]+1),,j] = 0
     	Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
 	    for(j in 1:r) for(jb in 0:b[j]) {
 	    	ind = which(Sv[,j]==jb)
-	    	Y1[jb+1,,j] = colSums(Vv[ind,])				
+	    	if(length(ind)==1){
+	    		if(miss) Y1[jb+1,,j] = Vv[ind,]*Rv[ind,j]
+	    			else Y1[jb+1,,j] = Vv[ind,]
+	    	}
+	    	if(length(ind)>1){
+	    		if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
+	    			else Y1[jb+1,,j] = colSums(Vv[ind,])
+	    	}
+	    					
 	    }
 	    for(c in 1:k) for(j in 1:r){
-	    	sc = c(sc,t(Am[[j]])%*%(Y1[,c,j]-sum(Y1[,c,j])*Psi[,c,j]))
-	        Psi[,c,j] = Y1[,c,j]/sum(Y1[,c,j])
-   	        temp = pmax(Psi[,c,j],10^-50)
+	    	sc = c(sc,t(Am[[j]])%*%(Y1[1:(b[j]+1),c,j]-sum(Y1[1:(b[j]+1),c,j])*Psi[1:(b[j]+1),c,j]))
+	    	#Psi[,c,j] = Y1[,c,j]/sum(Y1[,c,j])
+	    	tmp = Y1[1:(b[j]+1),c,j]
+			tmp = pmax(tmp/sum(tmp),10^-10)
+			Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
+			
+	        temp = pmax(Psi[1:(b[j]+1),c,j],10^-50)
             Op = diag(temp)-temp%o%temp
-	        Temp  = sum(Y1[,c,j])*t(Am[[j]])%*%Op%*%Am[[j]]
+	        Temp  = sum(Y1[1:(b[j]+1),c,j])*t(Am[[j]])%*%Op%*%Am[[j]]
             if(j==1 & c==1) Fi = Temp else Fi = blkdiag(Fi,Temp)
 	    }
 # score and info piv
@@ -408,19 +468,27 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
    		nal = dim(dlPhi)[4]; nbe = dim(dlPiv)[3]; nga = dim(dlPI)[5]
 		npar = nal+nbe+nga
 		Cor = matrix(0,npar,npar)
-		dY1 = array(0,c(mb+1,k,r,npar))
+		dY1 = array(NA,c(mb+1,k,r,npar))
+		for(j in 1:r) dY1[1:(b[j]+1),,j,] = 0
 		dV = array(V,c(ns,k,TT,npar))*dlV
     	dVv = array(aperm(dV,c(1,3,2,4)),c(ns*TT,k,nal+nbe+nga))
 		for(j in 1:r) for(jb in 0:b[j]) {
 			ind = which(Sv[,j]==jb)
-			for(h in 1:(nal+nbe+nga)) dY1[jb+1,,j,h] = colSums(dVv[ind,,h])
+			if(length(ind)==1){
+				if(miss) for(h in 1:(nal+nbe+nga)) dY1[jb+1,,j,h] = dVv[ind,,h]*Rv[ind,j]
+				else for(h in 1:(nal+nbe+nga)) dY1[jb+1,,j,h] = dVv[ind,,h]
+			}
+			if(length(ind)>1){
+				if(miss) for(h in 1:(nal+nbe+nga)) dY1[jb+1,,j,h] = colSums(dVv[ind,,h]*Rv[ind,j])
+				else for(h in 1:(nal+nbe+nga)) dY1[jb+1,,j,h] = colSums(dVv[ind,,h])
+			}	
 		}
 		for(h in 1:(npar)){
 			count = 0
 			for(c in 1:k) for(j in 1:r){
 				count = count+1
 				ind = (count-1)*mb+(1:mb)
-				Cor[h,ind] = t(Am[[j]])%*%(dY1[,c,j,h]-sum(dY1[,c,j,h])*Psi[,c,j])
+				Cor[h,ind] = t(Am[[j]])%*%(dY1[1:(b[j]+1),c,j,h]-sum(dY1[1:(b[j]+1),c,j,h])*Psi[1:(b[j]+1),c,j])
 			}
 		}
 		for(h in 1:(npar)){
@@ -452,19 +520,20 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
  # check score and information
 		if(check_der){
 			lk0 = lk
-			out = lk_obs_latent(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort)
+			out = lk_obs_latent(th,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort)
 			print(lk-out$lk)
 			sc1 = out$sc
        		lth = length(th)
         	scn = rep(0,lth); Fn = matrix(0,lth,lth)
    	    	for(h in 1:lth){
    		    	thh = th; thh[h] = thh[h]+10^-6
-           		outh = lk_obs_latent(thh,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=fort)
+           		outh = lk_obs_latent(thh,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=fort)
            		scn[h] = (outh$lk-lk)*10^6
            		Fn[,h] = -(outh$sc-sc)*10^6
    	 		}
 	     	print(round(cbind(sc,sc1,scn,sc-scn),4))
    		    print(round(cbind(diag(Fi-Cor),diag(Fn),diag(Fi-Cor-Fn)),4))
+   		    browser()
 		}
 # Information matrix and standard errors
     	Fi = Fi-Cor
@@ -497,14 +566,15 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
     		sePsi = aperm(array(sePsi,c(b+1,r,c)),c(1,3,2))
     		dimnames(sePsi)=list(category=0:b,state=1:k)
     	}else{
-    		sePsi = array(0,dim(Psi))
+    		sePsi = array(NA,dim(Psi))
+    		for(j in 1:r) sePsi[1:(b[j]+1)]=0
     		ind = 0
     		for(c in 1:k) for(j in 1:r){
 				Tmp = iFi[ind+(1:b[j]),ind+(1:b[j])]
     			ind = ind+b[j]
-    			psi = Psi[,c,j]
+    			psi = Psi[1:(b[j]+1),c,j]
     			Tmp1 = matrix((diag(psi)-psi%o%psi)[,-1],b[j]+1,b[j])
-    			sePsi[,c,j] = sqrt(diag(Tmp1%*%Tmp%*%t(Tmp1)))
+    			sePsi[1:(b[j]+1),c,j] = sqrt(diag(Tmp1%*%Tmp%*%t(Tmp1)))
     			dimnames(sePsi)=list(category=0:mb,state=1:k,item=1:r)
     		}
     	}

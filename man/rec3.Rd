@@ -4,7 +4,7 @@
 \title{Recursions used by est_lm_cov_manifest}
 \description{Implementation of the backward recursions to compute  
 	posterior distribution of the latent states (internal function).}
-\usage{rec3(Q,PI,Pio,pim)}
+\usage{rec3(Q, PI, Pio, pim)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Q}{posterior probabilities from the forward recursion} 

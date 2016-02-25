@@ -1,5 +1,5 @@
 lk_obs_latent <-
-function(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
+function(th,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
 	
 # preliminaries
    	sS = dim(S)
@@ -20,12 +20,13 @@ function(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
   	sb = sum(b)
 # separate parameters
 # conditional response probabilities
-  	Psi = array(0,c(mb+1,k,r))
+  	Psi = array(NA,c(mb+1,k,r))
+  	for(j in 1:r) Psi[1:(b[j]+1),,j] = 0 
   	count = 0
     for(c in 1:k) for(j in 1:r){
     	ind = count+(1:b[j])
     	temp = exp(Am[[j]]%*%th[ind])
-    	Psi[,c,j] = temp/sum(temp)
+    	Psi[1:(b[j]+1),c,j] = temp/sum(temp)
     	count = count+b[j]
 	}
 # parameters on initial probabilities
@@ -54,12 +55,13 @@ function(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
    		count = count+(k*(k-1)+(k-1)*nc2)
 	}
 # compute corresponding derivatives
-    dlPsi = array(0,c(mb+1,k,r,k*sb))
+    dlPsi = array(NA,c(mb+1,k,r,k*sb))
+    for(j in 1:r) dlPsi[1:(b[j]+1),,j,] = 0
     count = 0
 	for(c in 1:k) for(j in 1:r){
 		ind = count+(1:b[j])
-	    temp = pmax(Psi[,c,j],10^-50)
-	 	dlPsi[,c,j,ind] = (diag(b[j]+1)-rep(1,b[j]+1)%o%temp)%*%Am[[j]]
+	    temp = pmax(Psi[1:(b[j]+1),c,j],10^-50)
+	 	dlPsi[1:(b[j]+1),c,j,ind] = (diag(b[j]+1)-rep(1,b[j]+1)%o%temp)%*%Am[[j]]
 	   	count = count+b[j]
 	#   	th = c(th,log(temp[-1]/temp[1]))
 	}
@@ -98,7 +100,7 @@ function(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
             dlPI = aperm(dlPI,c(2,1,3,4,5))
 	}
 # compute log-likelihood
-   	out = lk_comp_latent(S,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
+   	out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
 	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv; sc = out$dlk
 # output
     out = list(lk=lk,sc=sc,Psi=Psi,be=be,Ga=Ga,Piv=Piv,PI=PI,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)

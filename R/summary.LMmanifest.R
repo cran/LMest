@@ -2,7 +2,7 @@ summary.LMmanifest<-function(object,...){
 	cat("Call:\n")
 	print(object$call)
 	cat("\nCoefficients:\n")
-	cat("\n  Vector of cutpoints:\n")
+	cat("\n  Vector of cut-points:\n")
 	print(round(object$mu,digits=4))
 	cat("\n Support points for the latent states:\n")
 	print(round(object$al,digits=4))

@@ -7,18 +7,22 @@
 
 \description{Main function for estimating the basic LM model.}
 
-\usage{est_lm_basic(S, yv, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000, out_se=FALSE)}
+\usage{est_lm_basic(S, yv, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000, 
+	   out_se=FALSE, piv=NULL, Pi=NULL, Psi = NULL)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x TT x r)}
+  \item{S}{array of available configurations (n x TT x r) with categories starting from 0 (use NA for missing responses)}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k}{number of latent states}
-  \item{start}{type of starting values (0 = deterministic, 1 = random)}
+  \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
   \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
   \item{tol}{tolerance level for convergence}
-  \item{maxit}{maximum number of iterations for convergence}
+  \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors}
+  \item{piv }{initial value of the initial probability vector (if start=2)}
+  \item{Pi }{initial value of the transition probability matrices (if start=2)}
+  \item{Psi }{initial value of the conditional response probabilities (if start=2)}
 }
 
 \value{
@@ -48,7 +52,6 @@ data(data_drug)
 data_drug = as.matrix(data_drug)
 S = data_drug[,1:5]-1
 yv = data_drug[,6]
-n = sum(yv)
 # fit of the Basic LC model
 k = 3
 out = est_lm_basic(S,yv,k,mod=1)
@@ -57,15 +60,11 @@ out = est_lm_basic(S,yv,k,mod=1)
 # Example based on criminal data
 # load criminal data
 data(data_criminal_sim)
-data = as.matrix(data_criminal_sim)
 out = long2wide(data_criminal_sim,"id","time","sex",
-c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=0)	
+c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=999)	
 XX = out$XX
 YY = out$YY
 freq = out$freq
-n1 = sum(freq[XX[,1]==1])
-n2 = sum(freq[XX[,1]==2])
-n = sum(freq)
 # fit basic LM model with increasing number of states to select the most suitable
 Res0 = vector("list",7)
 for(k in 1:7){

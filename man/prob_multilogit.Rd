@@ -6,7 +6,7 @@
 
 \description{The function computes multinomial probabilities (internal function).}
 
-\usage{prob_multilogit(Xdis,be,label,fort=TRUE,der=FALSE)}
+\usage{prob_multilogit(Xdis, be, label, fort = TRUE,der = FALSE)}
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{

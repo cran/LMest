@@ -4,7 +4,7 @@
 \title{Recursions used by est_lm_cov_manifest}
 \description{Implementation of the forward recursions to compute  
 	posterior distribution of the latent states (internal function).}
-\usage{rec1(Pio,las,PI)}
+\usage{rec1(Pio, las, PI)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Pio}{matrix of manifest probabilities }

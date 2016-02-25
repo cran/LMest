@@ -7,7 +7,8 @@
 
 \description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
 
-\usage{bootstrap_lm_cov_latent(X1,X2,param="multilogit",Psi,Be,Ga,B=100,fort=TRUE)}
+\usage{bootstrap_lm_cov_latent(X1, X2, param = "multilogit", Psi, Be, Ga, B = 100, 
+	   fort = TRUE)}
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{
@@ -37,12 +38,14 @@
 # Example based on self-rated health status (SRHS) data
 # load SRHS data
 data(data_SRHS_long)
-data = data_SRHS_long
+dataSRHS = data_SRHS_long
 
 TT = 8 
-head(data)
-res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
-data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
+head(dataSRHS)
+res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
+dataSRHS$race==2|dataSRHS$race==3, dataSRHS$education==4,
+dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
+Y=dataSRHS$srhs)
 
 # matrix of responses (with ordered categories from 0 to 4)
 S = 5-res$YY

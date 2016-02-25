@@ -5,10 +5,10 @@
 
 \title{Compute the observable log-likelihood of the LM model with covariates in the measurement model}
 
-\description{Function that computes the observable log-likelihood of the LM model with covariates in the measurement model.}
+\description{Function that computes the observable log-likelihood of the LM model with covariates in the measurement model (internal use).}
 
 \usage{
-lk_obs_manifest(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE)
+lk_obs_manifest(par, Y, Xd, indn, lev, k, sup, G2, IPI, mod, outp = FALSE)
 }
 
 %- maybe also 'usage' for other objects documented here.

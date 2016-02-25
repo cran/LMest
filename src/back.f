@@ -1,6 +1,6 @@
       subroutine back(TT,r,k,ns,l,S,Psi,Piv,PI,Phi,LL,U,V)
 
-      integer t,TT,j,r,i,ns,l,c,k,S(ns,TT,k)
+      integer t,TT,j,r,i,ns,l,c,k,S(ns,TT,r)
       double precision Psi(l,k,r),Phi(ns,k,TT)
       double precision Piv(ns,k),LL(ns,k,TT),PI(k,k,ns,TT)
       double precision U(k,k,ns,TT),V(ns,k,TT),pv(ns)

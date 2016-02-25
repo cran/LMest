@@ -6,8 +6,8 @@
 
 \description{The function performs maximum likelihood estimation of the multilogit model (internal function).}
 
-\usage{est_multilogit(Y, Xdis, label = 1:n, be = NULL, Pdis = NULL, 
-		 			  dis = FALSE, fort = TRUE, ex = FALSE)}
+\usage{est_multilogit(Y, Xdis, label = 1:n, be = NULL, Pdis = NULL, dis = FALSE,
+	   fort = TRUE, ex = FALSE)}
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{

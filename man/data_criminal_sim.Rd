@@ -11,21 +11,21 @@
 \usage{data(data_criminal_sim)}
 
 \format{
-  A data frame with 10000 observations on the following 13 variables.
+  A data frame with 60000 observations on the following 13 variables.
   \describe{
-    \item{\code{id}}{subject id}
-    \item{\code{sex}}{gender of the subject}
-    \item{\code{time}}{occasion of observation}
-    \item{\code{y1}}{crime of type 1}
-    \item{\code{y2}}{crime of type 2}
-    \item{\code{y3}}{crime of type 3}
-    \item{\code{y4}}{crime of type 4}
-    \item{\code{y5}}{crime of type 5}
-    \item{\code{y6}}{crime of type 6}
-    \item{\code{y7}}{crime of type 7}
-    \item{\code{y8}}{crime of type 8}
-    \item{\code{y9}}{crime of type 9}
-    \item{\code{y10}}{crime of type 10}
+    \item{\code{id}		}{subject id}
+    \item{\code{sex} 	}{gender of the subject}
+    \item{\code{time} 	}{occasion of observation}
+    \item{\code{y1} 		}{crime of type 1}
+    \item{\code{y2} 		}{crime of type 2}
+    \item{\code{y3} 		}{crime of type 3}
+    \item{\code{y4} 		}{crime of type 4}
+    \item{\code{y5} 		}{crime of type 5}
+    \item{\code{y6} 		}{crime of type 6}
+    \item{\code{y7} 		}{crime of type 7}
+    \item{\code{y8} 		}{crime of type 8}
+    \item{\code{y9} 		}{crime of type 9}
+    \item{\code{y10} 	}{crime of type 10}
   }
 }
 

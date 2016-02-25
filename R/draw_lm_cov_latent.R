@@ -95,6 +95,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
  
 # parameters on transition probabilities
     if(param=="multilogit"){
+    	  if(is.list(Ga)) stop("invalid mode (list) for Ga")
       Ga = matrix(Ga,(nc2+1)*(k-1),k)
       PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,n,TT))
       for(h in 1:k){
@@ -102,7 +103,8 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
         PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,n,TT-1))
       }
     }else if(param=="difflogit"){
-      Ga = c(as.vector(t(Ga[[1]])),as.vector(Ga[[2]])) 
+    	  if(is.list(Ga)) Ga = c(as.vector(t(Ga[[1]])),as.vector(Ga[[2]]))
+      if(length(Ga)!=k*(k-1)+(k-1)*nc2) stop("invalid dimensions for Ga")
       PI = array(0,c(k,k,n,TT))
       out = prob_multilogit(ZZdis,Ga,Zlab,fort)
       Tmp = array(out$P,c(k,n,TT-1,k))

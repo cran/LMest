@@ -7,19 +7,20 @@
 
 \description{Main function for estimating LM model with covariates in the latent model.}
 
-\usage{est_lm_cov_latent(S,X1,X2,yv=rep(1,ns),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
-                       Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,fixPsi=FALSE)}
+\usage{est_lm_cov_latent(S, X1, X2, yv = rep(1,nrow(S)), k, start = 0, tol = 10^-8, 
+	   maxit = 1000, param = "multilogit", Psi, Be, Ga, fort = TRUE, output = FALSE, 
+	   out_se = FALSE, fixPsi = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x TT x r)}
+  \item{S}{array of available configurations (n x TT x r) with categories starting from 0 (use NA for missing responses)}
   \item{X1}{matrix of covariates affecting the initial probabilities (n x nc1)}
   \item{X2}{array of covariates affecting the transition probabilities (n x TT-1 x nc2)}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
   \item{tol}{tolerance level for checking convergence of the algorithm}
-  \item{maxit}{maximum number of iterations for convergence of the algorithm}
+  \item{maxit}{maximum number of iterations of the algorithm}
   \item{param}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
  \item{Psi}{intial value of the matrix of the conditional response probabilities}
  \item{Be}{intial value of the parameters affecting the logit for the initial probabilities (if start=2)}
@@ -42,7 +43,7 @@
   \item{bic }{value of BIC for model selection}
   \item{lkv }{log-likelihood trace at every step}
   \item{V }{array containing the posterior distribution of the latent states for each response configuration and time occasion}
-  \item{Ul }{matrix containing the predicted sequence of latent states by the local deconding method}
+  \item{Ul }{matrix containing the predicted sequence of latent states by the local decoding method}
   \item{sePsi}{standard errors for the conditional response matrix}
   \item{seBe}{standard errors for Be}
   \item{seGa}{standard errors for Ga}
@@ -59,16 +60,18 @@
 # Example based on self-rated health status (SRHS) data
 # load SRHS data
 data(data_SRHS_long)
-data = data_SRHS_long
+dataSRHS = data_SRHS_long
 
 TT = 8 
-head(data)
-res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
-data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
+head(dataSRHS)
+res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
+dataSRHS$race==2|dataSRHS$race==3, dataSRHS$education==4,
+dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
+Y=dataSRHS$srhs)
 
 # matrix of responses (with ordered categories from 0 to 4)
 S = 5-res$YY
-
+n = dim(S)[1]
 # matrix of covariates (for the first and the following occasions)
 # colums are: gender,race,educational level (2 columns),age,age^2)
 X1 =res$XX[,1,]

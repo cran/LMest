@@ -1,4 +1,4 @@
-est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
+est_lm_cov_manifest <- function(S,X,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
                                   be=NULL,si=NULL,rho=NULL,la=NULL,PI=NULL,output=FALSE,out_se=FALSE){
 
 #
@@ -9,7 +9,6 @@ est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=
 # S:     array of available configurations (n x TT x r)
 # X:     array (n x TT x nc) of covariates with eventually includes lagged
 #        response
-# lev:   vector containing the number of levels of each variable
 # k:     number of latent states
 # q:     number of support points for AR
 # mod:   model (0 = LM with stationary transition, 1 = finite mixture)
@@ -47,9 +46,22 @@ est_lm_cov_manifest <- function(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=
 
 
 # *** organize response matrix ***
+lev = max(S)+1
+if(min(S)>0){
+  		cat("|------------------- WARNING -------------------|\n")
+  		cat("|The first response category must be coded as 0 |\n")
+  		cat("|-----------------------------------------------|\n")	
+ } 
 nt = prod(lev)
 n = nrow(S); TT = ncol(S)
-if(is.array(S)) S = matrix(S,n,TT)
+if(is.array(S)){
+	r = dim(S)[3]
+	if(!is.na(r) & r>1) warning("multivariate data are not allowed; only the first response variable is considered")
+	S = matrix(S,n,TT)
+} 
+if(is.data.frame(S)) warning("Data frame not allowed for S")
+if(n!= dim(X)[1]) stop("dimension mismatch between S and X")
+
 Y0 = S+1
 S = array(0,c(nt,n,TT))
 for(i in 1:n) for(t in 1:TT){
@@ -63,7 +75,8 @@ ne = lev-1
 XX = X
 X = array(0,c(ne,nc,n,TT))
 for(i in 1:n) for(t in 1:TT){
-   X[,,i,t] = rep(1,ne)%o%XX[i,t,]
+   if(lev==2) X[,,i,t] = XX[i, t, ]
+   else X[,,i,t] = rep(1,ne)%o%XX[i,t,]
 }
 
 opt = list(TolFun=10^-6,TolX=10^-6)
@@ -89,10 +102,11 @@ if(mod==0 & q>1){
 }  
 G2 = NULL; H2 = NULL; IPI = NULL
 if(k>1){
-  if(mod==0 || mod==2){ #rivedere con k=2
+  if(mod==0){ 
     for(c in 1:k){
       G2c = diag(k)[,-c]   
-      H2c = diag(k)[-c,]; if (k==2) H2c[c]=-1 else H2c[,c]= -1
+      H2c = diag(k)[-c,]
+      if (k==2) H2c[c]=-1 else H2c[,c]= -1
       if(is.null(G2)) G2 = G2c else if(k==2) G2 = blkdiag(matrix(G2,ncol=1),matrix(G2c,ncol=1)) else G2 = blkdiag(G2,G2c) 
       if(is.null(H2)) H2 = H2c else if(k==2) H2 = blkdiag(matrix(H2,nrow=1),matrix(H2c,nrow=1))else H2 = blkdiag(H2,H2c)
       IPI = c(IPI,c+seq(0,k*(k-1),k))
@@ -104,6 +118,7 @@ if(k>1){
   }
 }
 # starting values
+mu_inp=mu
 if(is.null(mu)){
   Pim = apply(S,c(1,2),sum)+0.05*TT; Eta = Cm%*%log(Mm%*%Pim)
   Eta = Eta%x%matrix(1,1,TT)
@@ -118,7 +133,10 @@ if(is.null(mu)){
     al = al[-1]-al[1]
   }
   if(k==1) PI = 1 else{
-  	if(mod==0 || mod==2){PI = matrix(1,k,k)+9*diag(k); PI = diag(1/rowSums(PI))%*%PI}
+  	if(mod==0){
+  		PI = matrix(1,k,k)+9*diag(k) 
+  		PI = diag(1/rowSums(PI))%*%PI
+  	}
     if(mod==1) PI = diag(k)
   }
   if(start==1){
@@ -126,14 +144,39 @@ if(is.null(mu)){
     rho = 2*matrix(runif(k),k,1)-1
     si = runif(1)*5
   }else{
-    la = matrix(1,k,1)/k;
-    rho = matrix(0,k,1);
-    si = 3;
+    la = matrix(1,k,1)/k
+    rho = matrix(0,k,1)
+    si = 3
   }
+}  
+if(start==2){
+	if(is.null(mu_inp)) stop("initial value of the cut-points (mu) must be given in input")
+	mu=mu_inp
+	if(is.null(be)) stop("initial value of the regression parameters (be) must be given in input")
+	be=be
+	if(is.null(al)) stop("initial value of the support points (al) must be given in input")
+	
+	mu = mu+al[1]
+	al=al[-1]-al[1]
+	if(is.null(la)) stop("initial value of the initial probabilities (la) must be given in input")
+	la=la
+	if(is.null(PI)) stop("initial value of the transition probabilities (PI) must be given in input")
+	PI=PI
+	if(mod==0){
+		rho = matrix(0,k,1)
+		si = 0
+	}
+	if(mod==1){
+		rho = rho
+		si = si
+	}
+	
 }
+
 par = c(mu,al,si,be)
+
 if(k==1) tau = NULL else{
-	if(mod==0 || mod==2) tau = H2%*%log(PI[IPI]) else tau = H2%*%log(la)
+	if(mod==0) tau = H2%*%log(PI[IPI]) else tau = H2%*%log(la)
 }
 wei = dnorm(sup); wei = wei/sum(wei)
 las = as.vector(la%x%wei)
@@ -151,7 +194,7 @@ PIs = (PI%x%matrix(1,q,q))*WEI
 
 t0 = proc.time()
 
-# DA FARE IN FORTRAN
+# to do in Fortran
 # find non-redundant X configurations (may be very slow)
 # Xd = array(X,c(ne,nc,n*TT))
 # indn = matrix(1:(n*TT),n,TT)
@@ -171,7 +214,7 @@ indn = matrix(indn,n,TT)
 Xd = array(out1,c(ne,nc,nd))
 #for(jd in 1:nd) INDN[[jd]]$ind = which(indn==jd)
 cat(c("n. distinct covariate conf. = ",nd))
-#Xd = Xd[,,1:nd]  #commentato per consentire 1 covariata
+#Xd = Xd[,,1:nd]  #to allow for one covariate
 LLm1 = array(t(Lm),c(ncol(Lm),nrow(Lm),nd))
 # alternate between EM and NR
 itg = 0; cont = 1;
@@ -206,7 +249,7 @@ while(cont && itg<5){
   # start EM
   t0 = proc.time()[1]; tdisp = 5;
   cat("\nEM step:\n")
-  if(mod==0 || mod==2){
+  if(mod==0){
   	cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
     cat("      k     |    start    |     step    |     lk      |    lk-lko   | discrepancy |\n");
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
@@ -219,7 +262,7 @@ while(cont && itg<5){
   	}
   	
   # iterate until convergence
-  it = 0; lko = lk-10^10; dis = 0;
+  it = 0; lko = lk-10^10; dis = 0
   #	while((dis>tol || lk-lko>tol || it ==0) && it <5000){
     while((lk-lko)/abs(lk)>tol & it<maxit){
   	it = it+1
@@ -229,18 +272,13 @@ while(cont && itg<5){
     U = out$U; V = out$V
     # M-step: latent parameters
     if(k>1){
-      if(mod==0 || mod==2){
+      if(mod==0){
         u1 = Mar%*%rowSums(U[,,1])
         V1 = Mar%*%V%*%t(Mar)
-        if(mod==0){
-        	out = optim(tau,lk_sta,gr=NULL,as.vector(u1),V1,G2,outl=FALSE,method = "BFGS") 
-        	tau = out$par
-      		out = lk_sta(tau,as.vector(u1),V1,G2,outl=TRUE)			
-        	flk = out$flk; la = out$la; PI = out$PI
-      	}else if(mod==2){
-      		la=u1/n 
-      		PI = diag(1/rowSums(V))%*%V
-      	}
+        out = optim(tau,lk_sta,gr=NULL,as.vector(u1),V1,G2,outl=FALSE,method = "BFGS") 
+      	tau = out$par
+      	out = lk_sta(tau,as.vector(u1),V1,G2,outl=TRUE)			
+        flk = out$flk; la = out$la; PI = out$PI
       }
       if(mod==1){
         u1 = Mar%*%rowSums(U[,,1])
@@ -282,7 +320,10 @@ while(cont && itg<5){
         for(j1 in 1:ne) for(j2 in 1:lev) RRtc1[j1,j2,] = QQv1[j1,]*DPv1[j2,]
         RRtc1 = RRtc1*LLm1
         XXRi1 = array(0,c(dim(D)[1],dim(D)[2]+dim(Xd)[2],nd))
-        for(h2 in 1:nd) XXRi1[,,h2] = cbind(D,Xd[,,h2])
+        for(h2 in 1:nd){
+        	if(lev==2) XXRi1[,,h2] = c(D, Xd[,, h2])
+        	else XXRi1[,,h2] = cbind(D,Xd[,,h2])
+        }
         XXRi1 = aperm(XXRi1,c(2,1,3))
         pc = U[,j,]; pc = as.vector(pc)
         nt = dim(S)[1]
@@ -298,7 +339,8 @@ while(cont && itg<5){
         for(jd in 1:nd){
           ind = INDN[[jd]]$ind
           pci = pc[ind]
-          XRi = (XXRi1[,,jd]%*%RRtc1[,,jd])%*%GHt
+          if(lev==2) XRi = (XXRi1[, , jd] %o% RRtc1[, , jd]) %*% GHt
+          else XRi = (XXRi1[,,jd]%*%RRtc1[,,jd])%*%GHt
           if(length(ind)==1){
             s = s+XRi%*%(YGP[,ind]*pci)
           }else{
@@ -337,7 +379,7 @@ while(cont && itg<5){
 #    if((proc.time()[1]-t0)>tdisp){
 	#Display output
 	if(it/10 == floor(it/10)){
-		if(mod==0 || mod==2){
+		if(mod==0){
 			cat(sprintf("%11g",c(k,start,it,lk,lk-lko,dis)),"\n",sep=" | ")
 		}else{
     	cat(sprintf("%9g",c(k,q,max(rho),si,it,lk,lk-lko,round(dis,7))),"\n",sep=" | ")
@@ -426,7 +468,7 @@ if(k>1) al = c(al,par[(ne+1):(ne+k-1)])
 mu = mu+al%*%la
 al = al-al%*%la
 be = par[(ne+k+1):length(par)]
-if(mod==0 || mod==2) np = k*(k-1)
+if(mod==0) np = k*(k-1)
 if(mod==1) np = k-1
 np = np + (ne+(k-1)+nc) + ((k+1)*(q>1))
 if(q==1){
@@ -436,6 +478,8 @@ if(q==1){
 # compute aic, bic and prediction of latent structure
 aic = -2*lk+2*(np)
 bic = -2*lk+log(n)*(np)
+
+
 # prediction
 if(output){
   out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
@@ -467,9 +511,9 @@ if(out_se){
   J1 = D
   J1 = -(J1+t(J1))/2 
   print(c("rcond of information = ",rcond(J1)))
-  se1 = sqrt(diag(ginv(J1)));
+  se1 = sqrt(diag(ginv(J1)))
   if(k>1){
-  	if(mod==0 || mod==2) se1 = se1[-(1:(k*(k-1)))]
+  	if(mod==0) se1 = se1[-(1:(k*(k-1)))]
   	if(mod==1) se1 = se1[-(1:(k-1))]
   }
   if(q==1) lrho = NULL
@@ -493,7 +537,7 @@ if(output){
 	out$PRED0 = PRED0
 	out$PRED1 = PRED1
 }
- if(mod==0 || mod==2){	
+ if(mod==0){	
  	cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
  }else{
  	cat("----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|\n");

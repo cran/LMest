@@ -1,14 +1,16 @@
-lk_obs <-
-function(th,Am,Bm,Cm,b,k,S,yv,TT,r,mod){
+lk_obs <- function(th,m,Bm,Cm,bv,k,S,R,yv,TT,r,mod){
 	
 # copute corresponding parameters
+	miss=!is.null(R)
+	b = max(bv)
     ns = dim(S)[1]
     n = sum(yv)
-	Psi = array(0,c(b+1,k,1))
-	dim(Psi)
-	for(u in 1:k){
-		th1 = th[1:b]; th = th[-(1:b)]
-		Psi[,u,1] = exp(Am%*%th1); Psi[,u,1] = Psi[,u,1]/sum(Psi[,u,1])				
+	Psi = array(NA,c(b+1,k,r))
+	for(j in 1:r) Psi[1:(bv[j]+1),,j] = 0 
+	for(u in 1:k) for(j in 1:r){
+		indj = 1:(bv[j]+1)
+		th1 = th[1:bv[j]]; th = th[-(1:bv[j])]
+		Psi[indj,u,j] = exp(m[[j]]$Am%*%th1); Psi[indj,u,j] = Psi[indj,u,j]/sum(Psi[indj,u,j])				
 	}
 	th1 = th[1:(k-1)]; th = th[-(1:(k-1))]
 	piv = exp(Bm%*%th1); piv = as.vector(piv/sum(piv))
@@ -48,7 +50,7 @@ function(th,Am,Bm,Cm,b,k,S,yv,TT,r,mod){
 	}
 	Pi[,,1] = 0
 # compute log-likelihood
-    out = complk(S,yv,piv,Pi,Psi,k)
+    out = complk(S,R=R,yv,piv,Pi,Psi,k)
   	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   	sc = NULL
 # ---- E-step ----
@@ -69,19 +71,26 @@ function(th,Am,Bm,Cm,b,k,S,yv,TT,r,mod){
 # Update Psi
    	Y = array(0,c(b+1,TT,k,r))
    	for(j in 1:r) for(t in 1:TT) for(jb in 0:b){
-    	if(r==1) ind = which(S[,t]==jb) else ind = which(S[,t,j]==jb)
-    	#ind = which(S[,t,j]==jb)
+    	ind = which(S[,t,j]==jb)
    		li = length(ind)
-    	if(li==1) Y[jb+1,t,,j] = V[ind,,t]
-		if(li>1) Y[jb+1,t,,j] = colSums(V[ind,,t])
+   		if(miss){
+   			if(li==1) Y[jb+1,t,,j] = V[ind,,t]*R[ind,t,j]
+			if(li>1) Y[jb+1,t,,j] = colSums(V[ind,,t]*R[ind,t,j])
+   		}else{
+    		if(li==1) Y[jb+1,t,,j] = V[ind,,t]
+			if(li>1) Y[jb+1,t,,j] = colSums(V[ind,,t])
+		}
 	}
  	Y1 = apply(Y,c(1,3,4),sum)
- 	if(r==1) for(u in 1:k) sc = c(sc,t(Am)%*%(Y1[,u,1]-sum(Y1[,u,1])*Psi[,u,1]))
+ 	#if(r==1) for(u in 1:k) sc = c(sc,t(Am)%*%(Y1[,u,1]-sum(Y1[,u,1])*Psi[,u,1]))
+ 	for(u in 1:k) for(j in 1:r){
+ 		indj = 1:(bv[j]+1)
+ 		sc = c(sc,t(m[[j]]$Am)%*%(Y1[indj,u,j]-sum(Y1[indj,u,j])*Psi[indj,u,j]))
+ 	}
 # Update piv and Pi
 	sc = c(sc,t(Bm)%*%(colSums(V[,,1])-n*piv))
 	if(mod==0) {
 	   	for(t in 2:TT) for(u in 1:k) sc = c(sc,t(Cm[,,u])%*%(U[u,,t]-sum(U[u,,t])*Pi[u,,t]))
-
 	}
 	if(mod==1){
 	   	Ut = apply(U[,,2:TT],c(1,2),sum)

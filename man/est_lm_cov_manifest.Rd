@@ -7,20 +7,20 @@
 
 \description{Main function for estimating LM model with covariates in the measurement model based on a cumulative logit parameterization.}
 
-\usage{est_lm_cov_manifest(S,X,lev,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
-                     be=NULL,si=NULL,rho=NULL,la=NULL,PI=NULL,output=FALSE,out_se=FALSE)}
+\usage{est_lm_cov_manifest(S, X, k, q, mod, tol = 10^-8, maxit = 1000, start = 0, 
+       mu = NULL, al = NULL, be = NULL, si = NULL, rho = NULL,
+       la = NULL, PI = NULL, output = FALSE, out_se = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available configurations (n x TT)}
+  \item{S}{array of available configurations (n x TT) with categories starting from 0}
   \item{X}{array (n x TT x nc) of covariates with eventually includes lagged response (nc = number of covariates)}
-  \item{lev}{number of levels of the variable}
   \item{k}{number of latent states}
   \item{q}{number of support points for AR}
   \item{mod}{model (0 = LM with stationary transition, 1 = finite mixture)}
   \item{tol}{tolerance for the convergence (optional) and tolerance of conditional probability if tol>1 then return}
-  \item{maxit}{maximum number of iterations for convergence of the algorithm}
-  \item{start}{equal to 1 for random starting values (optional)}
+  \item{maxit}{maximum number of iterations of the algorithm}
+  \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
  \item{mu}{starting value for mu (optional)}
  \item{al}{starting value for al (optional)}
  \item{be}{starting value for be (optional)}
@@ -64,12 +64,13 @@ Bartolucci, F., Bacci, S. and Pennoni, F. (2014), Longitudinal analysis of the 	
 
 # load SRHS data
 data(data_SRHS_long)
-data = data_SRHS_long
-head(data)
-lev = 5 		# number of response categories for the response variable
+dataSRHS = data_SRHS_long
+head(dataSRHS)
 
-res = long2matrices(data$id,cbind(data$gender-1,data$race==2|data$race==3,
-data$education==4,data$education==5,data$age-50,(data$age-50)^2/100),data$srhs)
+res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
+dataSRHS$race==2|dataSRHS$race==3,dataSRHS$education==4,
+dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
+Y=dataSRHS$srhs)
 
 X =res$XX
 S = 5-res$YY
@@ -77,7 +78,7 @@ S = 5-res$YY
 # *** fit stationary LM model
 res0 = vector("list",10); tol = 10^-6;
 for(k in 1:10){
-  res0[[k]] = est_lm_cov_manifest(S,X,lev,k,1,mod=0,tol)
+  res0[[k]] = est_lm_cov_manifest(S,X,k,1,mod=0,tol)
    save.image("example_SRHS.RData")
 }
 
@@ -86,7 +87,7 @@ tol = 0.005
 res = vector("list",4)
 k=1
 q = 51
-res[[k]]=est_lm_cov_manifest(S,X,lev,k,q,mod=1,tol,output=T)
-for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,lev,k,q=61,mod=1,tol,output=T)
+res[[k]]=est_lm_cov_manifest(S,X,k,q,mod=1,tol,output=T)
+for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,k,q=61,mod=1,tol,output=T)
 }
 }

@@ -7,17 +7,18 @@
 
 \description{Main function for estimating the mixed LM model with discrete random effect in the latent model.}
 
-\usage{est_lm_mixed(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,out_se=FALSE)}
+\usage{est_lm_mixed(S, yv = rep(1,nrow(S)), k1, k2, start = 0, tol = 10^-8, maxit = 1000, 
+	   out_se = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{S}{array of available response configurations (n x TT x r)}
+  \item{S}{array of available response configurations (n x TT x r) with categories starting from 0}
   \item{yv}{vector of frequencies of the available configurations}
   \item{k1}{number of latent classes}
   \item{k2}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random)}
   \item{tol}{tolerance level for convergence}
-   \item{maxit}{maximum number of iterations for convergence of the algorithm}
+   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute standard errors}
 }
 
@@ -42,9 +43,8 @@
 # Example based of criminal data
 # load data
 data(data_criminal_sim)
-data = as.matrix(data_criminal_sim)
-out = long2wide(data,"id","time","sex",
-	 c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=0)	
+out = long2wide(data_criminal_sim,"id","time","sex",
+	 c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=999)	
     XX = out$XX
     YY = out$YY
     freq = out$freq

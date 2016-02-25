@@ -22,7 +22,7 @@
   }
 }
 
-\references{Bartolucci, F., Bacci, S. and Pennoni, F. (2013), Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, Journal of the Royal Statistical Society - series C, in press (previous technical report: http://arxiv.org/abs/1108.1498)}
+\references{Bartolucci, F., Bacci, S. and Pennoni, F. (2014), Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, Journal of the Royal Statistical Society - series C, 63, pp. 267-288}
 
 \examples{data(data_SRHS_long)}
 

@@ -13,10 +13,31 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
    	sS = dim(S)
   	ns = sS[1]
   	TT = sS[2]
+  	if(is.data.frame(S)) warning("Data frame not allowed for S")
+  
+  	if(min(S)>0){
+  		cat("|------------------------------------------ WARNING -----------------------------------------|\n")
+  		cat("|The first response category must be coded as 0                                              |\n")
+  		cat("|------------------------------------------ WARNING -----------------------------------------|\n")
+ 	} 
+  	
+    if(ns!=length(yv)) stop("dimensions mismatch between S and yv")    
   	if(length(sS)==2) r = 1
   	else r = sS[3]
+  	if(r==1) {
+  		if(is.matrix(S)) S = array(S,c(dim(S),1))
+  	}	
 	Sv = matrix(S,ns*TT,r)
+	
   	b = max(S)
+    flag = FALSE
+    for (j in 1:r) if (length(table(Sv[, j])) < b) flag = TRUE
+    if(flag){
+   		cat("|------------------------------------------ WARNING -----------------------------------------|\n")
+        cat("| Response variables must have the same number of categories                                 |\n")
+		cat("|------------------------------------------ WARNING -----------------------------------------|\n")
+    }
+    
     Co = cbind(-diag(b),diag(b))
   	Ma = cbind(lower.tri(matrix(1,b,b), diag = TRUE),rep(0,b))
   	Ma = rbind(Ma,1-Ma)
@@ -27,8 +48,9 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 		Pi = array(Pi,c(k2,k2,k1))
    		P = matrix(0,b+1,r)
        	for(t in 1:TT) for(j in 1:r) for(y in 0:b){
-			if(r==1) ind = which(S[,t]==y) else ind = which(S[,t,j]==y)
-    		P[y+1,j] = P[y+1,j]+sum(yv[ind])
+			#if(r==1) ind = which(S[,t]==y) else ind = which(S[,t,j]==y)
+			 ind = which(S[,t,j]==y)
+    			P[y+1,j] = P[y+1,j]+sum(yv[ind])
     	}
 		E = Co%*%log(Ma%*%P)
   	   	Psi = array(0,c(b+1,k2,r)); Eta = array(0,c(b,k2,r))
@@ -80,7 +102,8 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 	PP1 = array(0,c(ns,k1,k2,TT))
 	Phi = array(1,c(ns,k2,TT))
 	for(t in 1:TT){
-  		if(r==1) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1] else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
+  		#if(r==1) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1] else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
+  		for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
 	}
 	for(i in 1:ns) for(u in 1:k1){
 	    o = .Fortran("BWforback", TT, k2, Phi[i,,], Piv[,u], Pi[,,u], lk=0, Pp1=matrix(0,k2,TT), 
@@ -136,8 +159,9 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 # # conditional distribution of any row given the row effect and corresponding joint
 		Phi = array(1,c(ns,k2,TT))
 		for(t in 1:TT){
-	  		if(r==1) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1]
-	  		else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
+	  		#if(r==1) Phi[,,t] = Phi[,,t]*Psi[S[,t]+1,,1]
+	  		#else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
+	  		for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[S[,t,j]+1,,j]
 		}
 		for(i in 1:ns) for(u in 1:k1){
 		    o = .Fortran("BWforback", TT, k2, Phi[i,,], Piv[,u], Pi[,,u], lk=0, Pp1=matrix(0,k2,TT), 
@@ -150,7 +174,6 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 		fm = pmax(fm,10^-300)
 		lk = yv%*%log(fm)
 		W = (Fj1/matrix(fm,ns,k1))*yv
-
 # display output	
 		if(it/10 == floor(it/10)) cat(sprintf("%11g",c(k1,k2,start,it,lk,lk-lko)),"\n",sep=" | ")
 	}

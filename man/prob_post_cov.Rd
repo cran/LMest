@@ -7,8 +7,8 @@
 
 \description{Function that uses backward recursion to compute posterior probabilities (internal funtion).}
 
-\usage{prob_post_cov(S,yv,Psi,Piv,PI,Phi,L,pv,der=FALSE,fort=TRUE,
-                          dlPhi=NULL,dlPiv=NULL,dlPI=NULL,dlL=NULL,dlL2=NULL,dlpv=NULL)}
+\usage{prob_post_cov(S, yv, Psi, Piv, PI, Phi, L, pv, der = FALSE, fort = TRUE,
+       dlPhi = NULL, dlPiv = NULL, dlPI = NULL, dlL = NULL, dlL2 = NULL, dlpv = NULL)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -1,7 +1,7 @@
 decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	
 	# Provide local decoding on the basis of the output of
-	# est_lm_basic, est_lm_cov_latent, est_lm_cov_manifest (to be done, in this case the covariates are only in X1)
+	# est_lm_basic, est_lm_cov_latent, est_lm_cov_manifest (in this case the covariates are only in X1)
 	# and est_lm_mixed
 	
 	# est = output from one of these function
@@ -12,16 +12,29 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	
 # est_lm_basic	   
 	if(class(est)=="LMbasic"){
+		miss = any(is.na(Y))
+		if(miss){
+        	R = 1 * (!is.na(Y))
+         	Y[is.na(Y)] = 0
+		}else{
+			R = NULL
+		}
 		if(dim(est$Psi)[3]==1){
-			if(is.vector(Y)) Y = t(Y)		
+			if(is.vector(Y)){
+				Y = t(Y)
+				if(miss) R = t(R)
+			} 		
 			n = nrow(Y); TT = ncol(Y)
 		}else{
-			if(is.matrix(Y)) Y = array(Y,c(1,dim(Y)))
+			if(is.matrix(Y)){ 
+				Y = array(Y,c(1,dim(Y)))
+				if(miss) R = array(R,c(1,dim(R)))
+			}
 			n = dim(Y)[1]; TT = dim(Y)[2]; r = dim(Y)[3]
 		}
 		piv = est$piv; Pi = est$Pi; Psi = est$Psi
 		k = length(est$piv)
-	    out = complk(Y,rep(1,n),piv,Pi,Psi,k)
+	    out = complk(Y,R,rep(1,n),piv,Pi,Psi,k)
 	    Phi = out$Phi; L = out$L; pv = out$pv
 	   	V = array(0,c(n,k,TT))
    		Yvp = matrix(1/pv,n,k)
@@ -49,9 +62,17 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 # est_lm_cov_latent
 	if(class(est)=="LMlatent"){
 		param = est$param
+		miss = any(is.na(Y))
+		if(miss){
+        	R = 1 * (!is.na(Y))
+         	Y[is.na(Y)] = 0
+		}else{
+			R = NULL
+		}
 		if(dim(est$Psi)[3]==1){
 			if(is.vector(Y)){
 				Y = t(Y)
+				if(miss) R = t(R)
 				if(is.vector(X1)) X1 = t(X1) 		
 				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2))) 
 				if(is.vector(X2)) X2 = array(X2,c(1,length(X2),1))
@@ -60,6 +81,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		}else{
 			if(is.matrix(Y)){ 
 				Y = array(Y,c(1,dim(Y)))
+				if(miss) R = array(R,c(1,dim(R)))
 				if(is.vector(X1)) X1 = t(X1)		
 				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2)))	
 				if(is.vector(X2)) X2 = array(X2,c(1,length(X2),1))
@@ -140,9 +162,9 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
    		    Tmp = array(out$P,c(k,n,TT-1,k))
 	    	PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3)) 
 		}
-		
-		out = lk_comp_latent(Y,rep(1,n),Piv,PI,Psi,k,fort=fort)
+		out = lk_comp_latent(Y,R,rep(1,n),Piv,PI,Psi,k,fort=fort)
 		Phi = out$Phi; L = out$L; pv = out$pv
+
 		out = prob_post_cov(Y,rep(1,n),Psi,Piv,PI,Phi,L,pv,fort=fort)
 		V = out$V
 
@@ -162,8 +184,9 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 # est_lm_mixed
 	if(class(est)=="LMmixed"){
 		if(dim(est$Psi)[3]==1){
-			if(is.vector(Y)) Y = t(Y)		
-			n = nrow(Y); TT = ncol(Y)
+			if(is.vector(Y)) Y = t(Y)
+			if(is.matrix(Y)) Y =  array(Y,c(dim(Y),1))	
+			n = nrow(Y); TT = ncol(Y); r=1
 		}else{
 			if(is.matrix(Y)) Y = array(Y,c(1,dim(Y)))
 			n = dim(Y)[1]; TT = dim(Y)[2]; r = dim(Y)[3]
@@ -175,8 +198,9 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		PP1 = array(0,c(n,k1,k2,TT))
 		Phi = array(1,c(n,k2,TT))
 		for(t in 1:TT){
-  			if(r==1) Phi[,,t] = Phi[,,t]*Psi[Y[,t]+1,,1] 
-  			else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[Y[,t,j]+1,,j]
+  			#if(r==1) Phi[,,t] = Phi[,,t]*Psi[Y[,t]+1,,1] 
+  			#else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[Y[,t,j]+1,,j]
+  			for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[Y[,t,j]+1,,j]
 		}
 		for(i in 1:n) for(u in 1:k1){
 	   		 o = .Fortran("BWforback", TT, k2, Phi[i,,], Piv[,u], Pi[,,u], lk=0, Pp1=matrix(0,k2,TT), 
@@ -188,7 +212,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		fm = rowSums(Fj1)
 		fm = pmax(fm,10^-300)
 		W = (Fj1/matrix(fm,n,k1))*yv
-			U1 = apply(W,1,which.max)
+		U1 = apply(W,1,which.max)
 		PV = array(W,c(n,k1,k2,TT))*PP1
 # local decoding
    		Ul = matrix(0,n,TT)

@@ -33,10 +33,12 @@ function(data,nameid,namet,colx,coly,aggr=T,full=999){
 	colnames(data_wide) = namev_wide
 # if aggregate data are required
 	if(aggr){
+		if(is.na(full)) data_wide[is.na(data_wide)]=999
 		out = aggr_data(data_wide[,2:(1+TT*(nx+ny))])
 		S = out$data_dis
 		S = array(t(S),c(nx+ny,TT,length(out$freq)))
 		S = aperm(S)
+		if(is.na(full)) S[S==999]=NA
 		XX = S[,,1:nx]
 		YY = S[,,(nx+1):(nx+ny)]
 		freq = out$freq

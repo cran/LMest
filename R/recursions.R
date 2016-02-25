@@ -1,11 +1,20 @@
-recursions <-
-function(S,yv,Psi,piv,Pi,k,lth,Am,Bm,Cm,b,mod){
+recursions <- function(S,R,yv,Psi,piv,Pi,k,lth,matr,Bm,Cm,bv,mod){
+	
 	
 # forward recursion
-ns = dim(S)[1]
-TT = dim(S)[2]
-M = array(0,c(k,TT,ns))
-for(i in 1:ns) for(t in 1:TT) M[,t,i] = Psi[S[i,t]+1,,1]
+sS = dim(S)
+ns = sS[1]
+TT = sS[2]
+if(length(sS)==2){ 
+	r = 1
+	S = array(S,c(ns,TT,r))
+}else r = sS[3]
+b = max(bv)
+miss = !is.null(R)
+M = array(1,c(k,TT,ns))
+if(miss) for(i in 1:ns) for(t in 1:TT) for(j in 1:r) M[,t,i] = M[,t,i]*(Psi[S[i,t,j]+1,,j]*R[i,t,j]+(1-R[i,t,j]))
+else for(i in 1:ns) for(t in 1:TT) for(j in 1:r) M[,t,i] = M[,t,i]*Psi[S[i,t,j]+1,,j]
+
 Q = array(0,c(k,TT,ns))
 pv = rep(0,ns)
 for(i in 1:ns){
@@ -39,16 +48,19 @@ F2 = array(0,c(k,k,TT,ns))
 QbM = Qb*M
 for(i in 1:ns) for(t in 2:TT) F2[,,t,i] = Pi[,,t]*(Q[,t-1,i]%o%QbM[,t,i])/pv[i]
 
+
 #derivative of the forward recursion
 ind = 0
 #derivative of Psi
-Psid = array(0,c(b+1,k,lth))
-for(u in 1:k){
-	Om = diag(Psi[,u,1])-Psi[,u,1]%o%Psi[,u,1]
-	D = Om%*%Am
-	for(j in 1:b){
+Psid = array(NA,c(b+1,k,r,lth))
+for(j in 1:r) Psid[1:(bv[j]+1),,j,] = 0
+for(u in 1:k) for(j in 1:r){
+	indj = 1:(bv[j]+1)
+	Om = diag(Psi[indj,u,j])-Psi[indj,u,j]%o%Psi[indj,u,j]
+	D = Om%*%matr[[j]]$Am
+	for(h in 1:bv[j]){
 		ind = ind+1
-		Psid[,u,ind] = D[,j]
+		Psid[indj,u,j,ind] = D[,h]
 	}		
 }
 #derivative of piv
@@ -104,26 +116,31 @@ if(mod>1){
 
 #derivative of the forward recursion
 Md = array(0,c(k,TT,ns,lth))
-for(i in 1:ns) for(t in 1:TT) Md[,t,i,] = Psid[S[i,t]+1,,]
+for(i in 1:ns) for(t in 1:TT) for(j in 1:r){
+	if(miss) Md[,t,i,] = Md[,t,i,]+(Psid[S[i,t,j]+1,,j,]*R[i,t,j])*M[,t,i]/(Psi[S[i,t,j]+1,,j]*R[i,t,j]+(1-R[i,t,j]))
+	else Md[,t,i,] = Md[,t,i,]+Psid[S[i,t,j]+1,,j,]*M[,t,i]/Psi[S[i,t,j]+1,,j]
+} 
+
 Qd = array(0,c(k,TT,ns,lth))
 pvd = matrix(0,ns,lth)
-for(j in 1:lth){
-	for(i in 1:ns){
-		qd = Md[,1,i,j]*piv+M[,1,i]*pivd[,j]
-		Qd[,1,i,j] = qd
-		for(t in 2:TT){
-			q = Q[,t-1,i]
-			if(mod==0) qd = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,t,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
-			if(mod==1) qd = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
+for(i in 1:ns){
+	Qd[,1,i,] = Md[,1,i,]*piv+M[,1,i]*pivd
+	for(t in 2:TT){
+		q = Q[,t-1,i]
+		if(mod==0) Qd[,t,i,] = Md[,t,i,]*as.vector(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pi[,,t])%*%Qd[,t-1,i,])
+		for(j in 1:lth){
+			qd = Qd[,t-1,i,j]
+			if(mod==0) Qd[,t,i,j] = Qd[,t,i,j]+M[,t,i]*(t(Pid[,,t,j])%*%q)
+			if(mod==1) Qd[,t,i,j] = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
 			if(mod>1){
-				if(t<=mod) qd = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,1,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
-				if(t>mod) qd = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,2,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
+				if(t<=mod) Qd[,t,i,j] = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,1,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
+				if(t>mod) Qd[,t,i,j] = Md[,t,i,j]*(t(Pi[,,t])%*%q)+M[,t,i]*(t(Pid[,,2,j])%*%q)+M[,t,i]*(t(Pi[,,t])%*%qd)
 			}
-			Qd[,t,i,j] = qd	
 		}
-		pvd[i,j] = sum(qd)	
-	}	
+	}
+	for(j in 1:lth) pvd[i,j] = sum(Qd[,TT,i,j])	
 }
+
 
 #score
 sc = (yv/pv)%*%pvd
@@ -147,13 +164,14 @@ for(j in 1:lth){
 	}	
 }
 
+
 # posterior probabilities
 F1d = array(0,c(k,TT,ns,lth))
 F1t = Q*Qb
 for(j in 1:lth){
 	F1dj = Qd[,,,j]*Qb+Q*Qbd[,,,j]
 	for(i in 1:ns) F1d[,,i,j] = F1dj[,,i]/pv[i]-F1t[,,i]*pvd[i,j]/pv[i]^2
-	}
+}
 F2d = array(0,c(k,k,TT,ns,lth))
 for(j in 1:lth){
 	QbMdj = Qbd[,,,j]*M+Qb*Md[,,,j]
@@ -170,6 +188,7 @@ for(j in 1:lth){
 		}
 	} 
 }
-out = list(lk=lk,sc=sc,F1=F1,F2=F2,F1d=F1d,F2d=F2d)
+
+out = list(lk=lk,sc=sc,F1=F1,F2=F2,F1d=F1d,F2d=F2d,M=M,Q=Q,pv=pv)
 
 }

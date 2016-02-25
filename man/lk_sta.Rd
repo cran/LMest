@@ -9,7 +9,7 @@
 (internal use).}
 
 \usage{
-lk_sta(tau,u,V,G2,outl=TRUE)
+lk_sta(tau, u, V, G2, outl = TRUE)
 }
 
 %- maybe also 'usage' for other objects documented here.

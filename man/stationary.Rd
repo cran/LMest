@@ -4,7 +4,7 @@
 \title{Stationary}
 
 \description{Function that computes the derivatives of the log-likelihood of a stationary model (internal function).}
-\usage{stationary(tau,k,G2,IPI)}
+\usage{stationary(tau, k, G2, IPI)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tau}{regression parameters}

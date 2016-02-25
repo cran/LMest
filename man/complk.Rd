@@ -8,10 +8,11 @@
 \description{Function that computes complete log-likelihood of the latent Markov model
 (internal use).}
 
-\usage{complk(S, yv, piv, Pi, Psi, k)}
+\usage{complk(S, R, yv, piv, Pi, Psi, k)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{matrix of distinct response configurations (n x TT x r)}
+  \item{R}{matrix of missing response configurations}
   \item{yv}{corresponding vector of frequencies}
   \item{piv}{vector of initial probabilities}
   \item{Pi}{transition probability matrix}

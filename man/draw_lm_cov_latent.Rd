@@ -8,7 +8,7 @@
 \description{Function that draws samples from the LM model with individual covariates with specific parameters.}
 
 \usage{
-draw_lm_cov_latent(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE)
+draw_lm_cov_latent(X1, X2, param = "multilogit", Psi, Be, Ga, fort = TRUE)
 }
 
 %- maybe also 'usage' for other objects documented here.

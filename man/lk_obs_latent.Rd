@@ -5,16 +5,17 @@
 
 \title{Compute the observable log-likelihood of the LM model with covariates in the latent model}
 
-\description{Function that computes the observable log-likelihood of the LM model with covariates in the latent model.}
+\description{Function that computes the observable log-likelihood of the LM model with covariates in the latent model (internal use).}
 
 \usage{
-lk_obs_latent(th,S,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE)
+lk_obs_latent(th, S, R, b, yv, Am, XXdis, Xlab, ZZdis, Zlab, param, fort = TRUE)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{th}{vector of parameters}
   \item{S}{matrix of distinct response configurations}
+  \item{R}{matrix of missing response configurations}
   \item{b}{number of response categories}
   \item{yv}{corresponding vector of frequencies}
   \item{Am}{design matrix for the logits}

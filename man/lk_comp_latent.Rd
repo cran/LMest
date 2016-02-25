@@ -8,11 +8,12 @@
 \description{Function that computes complete log-likelihood of the latent Markov model with covariates
 in the distribution of the latent process (internal use).}
 
-\usage{lk_comp_latent(S,yv,Piv,PI,Psi,k,fort=TRUE,der=FALSE,
-                       dlPsi=NULL,dlPiv=NULL,dlPI=NULL)}
+\usage{lk_comp_latent(S, R, yv, Piv, PI, Psi, k, fort = TRUE, der = FALSE,
+       dlPsi = NULL, dlPiv = NULL, dlPI = NULL)}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{matrix of distinct response configurations}
+  \item{R}{matrix of missing response configurations}
   \item{yv}{corresponding vector of frequencies}
   \item{Piv}{initial probability matrix}
   \item{PI}{transition probability matrices}

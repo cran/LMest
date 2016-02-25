@@ -7,7 +7,7 @@
 
 \description{Function to build a block diagonal matrix (internal function).}
 
-\usage{blkdiag(A,B)}
+\usage{blkdiag(A, B)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{

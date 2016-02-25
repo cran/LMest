@@ -7,7 +7,7 @@
 
 \description{Function that compute the product of each matrix in X by the vector y  (internal funtion).}
 
-\usage{prod_array(X,y)}
+\usage{prod_array(X, y)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
