@@ -7,8 +7,8 @@
 
 \description{Main function for estimating LM model with covariates in the measurement model based on a cumulative logit parameterization.}
 
-\usage{est_lm_cov_manifest(S, X, k, q, mod, tol = 10^-8, maxit = 1000, start = 0, 
-       mu = NULL, al = NULL, be = NULL, si = NULL, rho = NULL,
+\usage{est_lm_cov_manifest(S, X, k, q=NULL, mod=c("LM", "FM"), tol = 10^-8, maxit = 1000, 
+	start = 0, mu = NULL, al = NULL, be = NULL, si = NULL, rho = NULL,
        la = NULL, PI = NULL, output = FALSE, out_se = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
@@ -17,7 +17,7 @@
   \item{X}{array (n x TT x nc) of covariates with eventually includes lagged response (nc = number of covariates)}
   \item{k}{number of latent states}
   \item{q}{number of support points for AR}
-  \item{mod}{model (0 = LM with stationary transition, 1 = finite mixture)}
+  \item{mod}{model ("LM" = Latent Markov with stationary transition, "FM" = finite mixture)}
   \item{tol}{tolerance for the convergence (optional) and tolerance of conditional probability if tol>1 then return}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}

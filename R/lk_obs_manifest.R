@@ -51,14 +51,22 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
   I = diag(np);
   one = matrix(1,np,1);
   Pio = array(0,c(n,k*q,TT))
-  par0 = par[1:(lev-1+k)]
-  Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+  if(mod==0){
+  	par0 = par[1:(lev-2+k)]
+    Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
+  }else{
+  	par0 = par[1:(lev-1+k)]
+    Eta01 = prod_array(Xd,par[(lev+k):length(par)])
+  }
+  j = 0
   for(c in 1:k){
     u = matrix(0,1,k); u[c] = 1; u = u[-1]
     D0 = cbind(I,matrix(u,nrow=1)%x%one)
     for(d in 1:q){
-      j = j+1;
-      D = cbind(D0,sup[d]*one); agg = D%*%par0
+      j = j+1
+      if(mod==0) D = D0
+      else D = cbind(D0,sup[d]*one)
+      agg = D%*%par0
       Eta1 = Eta01+agg%*%matrix(1,1,nd)
       Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
       Pv1 = lm%*%matrix(1,1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100);
@@ -125,8 +133,10 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
       u = matrix(0,1,k); u[c] = 1; u = u[-1]
       D0 = cbind(I,matrix(u,nrow=1)%x%one)
       for(d in 1:q){
-        j = j+1;
-        D = cbind(D0,sup[d]*one); agg = D%*%par0
+        j = j+1
+        if(mod==0) D = D0
+        else  D = cbind(D0,sup[d]*one)
+        agg = D%*%par0
         Eta1 = Eta01+agg%*%matrix(1,1,nd)
         Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100);
         Pit1 = lm%*%matrix(1,1,nd)+Lm%*%Qv1; Pit1 = pmin(pmax(Pit1,10^-100),1-10^-100);

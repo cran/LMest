@@ -486,8 +486,10 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 		for(h in 1:(npar)){
 			count = 0
 			for(c in 1:k) for(j in 1:r){
-				count = count+1
-				ind = (count-1)*mb+(1:mb)
+				#count = count+1
+				#ind = (count-1)*mb+(1:mb)
+				ind = count+(1:b[j])
+				count = count+b[j]
 				Cor[h,ind] = t(Am[[j]])%*%(dY1[1:(b[j]+1),c,j,h]-sum(dY1[1:(b[j]+1),c,j,h])*Psi[1:(b[j]+1),c,j])
 			}
 		}

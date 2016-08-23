@@ -1,4 +1,4 @@
-est_lm_cov_manifest <- function(S,X,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
+est_lm_cov_manifest <- function(S,X,k,q=NULL,mod=c("LM","FM"),tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
                                   be=NULL,si=NULL,rho=NULL,la=NULL,PI=NULL,output=FALSE,out_se=FALSE){
 
 #
@@ -43,8 +43,10 @@ est_lm_cov_manifest <- function(S,X,k,q,mod,tol=10^-8,maxit=1000,start=0,mu=NULL
 # PRED1: prediction of the overall latent effect
 
 # preliminaries
-
-
+mod = match.arg(mod)
+if(mod=="LM") mod=0 else mod=1
+if(mod==0) q = 1
+if(mod==1 & is.null(q)) stop("value of q is missing")
 # *** organize response matrix ***
 lev = max(S)+1
 if(min(S)>0){
@@ -95,11 +97,6 @@ if(q==1) sup = 0 else{
   sup = seq(-lim,lim,2*lim/(q-1))
 }
 Mar = diag(k)%x%matrix(1,1,q) 
-if(mod==0 & q>1){
-	cat("|------------------------ WARNING --------------------|\n")
-    cat("| When mod=0, q has to be set equal to 1              |\n")   
-    cat("|-----------------------------------------------------|\n\n")
-}  
 G2 = NULL; H2 = NULL; IPI = NULL
 if(k>1){
   if(mod==0){ 
@@ -142,11 +139,13 @@ if(is.null(mu)){
   if(start==1){
     la = matrix(runif(k),k,1); la = la/sum(la)
     rho = 2*matrix(runif(k),k,1)-1
-    si = runif(1)*5
+    if(mod==0) si = NULL
+    else si = runif(1)*5
   }else{
     la = matrix(1,k,1)/k
     rho = matrix(0,k,1)
-    si = 3
+    if(mod==0) si = NULL
+    else si = 3
   }
 }  
 if(start==2){
@@ -164,7 +163,7 @@ if(start==2){
 	PI=PI
 	if(mod==0){
 		rho = matrix(0,k,1)
-		si = 0
+		si = NULL
 	}
 	if(mod==1){
 		rho = rho
@@ -226,14 +225,22 @@ while(cont && itg<5){
   I = diag(ne)
   one = matrix(1,ne,1)
   Pio = array(0,c(n,k*q,TT))
-  par0 = par[1:(lev-1+k)]
-  Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+  if(mod==0){
+  	par0 = par[1:(lev-2+k)]
+  	Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
+  }else{
+  	par0 = par[1:(lev-1+k)]
+  	Eta01 = prod_array(Xd,par[(lev+k):length(par)])
+  }
+  j = 0
   for(c in 1:k){
     u = matrix(0,1,k); u[c] = 1; u = u[-1]
     D0 = cbind(I,matrix(u,nrow=1)%x%one)
     for(d in 1:q){
       j = j+1;
-      D = cbind(D0,sup[d]*one); agg = D%*%par0 
+      if(mod==0) D = D0
+      else D = cbind(D0,sup[d]*one)
+      agg = D%*%par0 
       Eta1 = Eta01+agg%*%rep(1,nd)  
       Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
       Pv1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100)
@@ -243,6 +250,7 @@ while(cont && itg<5){
   Q = rec1(Pio,las,PIs)
   if(q*k==1) pim = Q[,,TT] else pim = rowSums(Q[,,TT])
   lk = sum(log(pim))
+  
   if(tol>1){
   	est = NULL; return
   }
@@ -310,7 +318,9 @@ while(cont && itg<5){
       D0 = cbind(I,t(as.matrix(u))%x%one)
       for(d in 1:q){
         j = j+1
-        D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+        if(mod==0) D = D0
+        else D = cbind(D0,sup[d]*one)
+        agg = as.vector(D%*%par0)
         Eta1 = Eta01+agg%o%rep(1,nd)
         Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
         Pit1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pit1 = pmin(pmax(Pit1,10^-100),1-10^-100)
@@ -355,16 +365,24 @@ while(cont && itg<5){
     mdpar = max(abs(dpar))
     if(mdpar>1) dpar = dpar/mdpar
     par = par+dpar
-    si = par[ne+k]
+    if(mod==1) si = par[ne+k]
     # compute new log-likelihood
-    par0 = par[1:(lev-1+k)]
-    Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+    if(mod==0){
+    	par0 = par[1:(lev-2+k)]
+    	Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
+    }else{
+    	par0 = par[1:(lev-1+k)]
+    	Eta01 = prod_array(Xd,par[(lev+k):length(par)])
+    }
+    j = 0
     for(c in 1:k){
       u = matrix(0,1,k); u[c] = 1; u = u[-1]
       D0 = cbind(I,t(as.matrix(u))%x%one)
       for(d in 1:q){
         j = j+1;
-        D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+        if(mod==0) D = D0
+        else D = cbind(D0,sup[d]*one)
+        agg = as.vector(D%*%par0)
         Eta1 = Eta01+agg%o%rep(1,nd)
         Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100);
         Pv1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100);
@@ -421,7 +439,7 @@ while(cont && itg<5){
     J1 = D
     J1 = -(J1+t(J1))/2
  
- 	print(c("rcond of information = ",toString(round(rcond(J1),3))))
+ 	if(rcond(J1)<10^-15) print(c("rcond of information = ",toString(round(rcond(J1),3))))
     dpar1 = ginv(J1)%*%s1;
     mdpar1 = max(abs(dpar1));
     if(mdpar1>0.5) dpar1 = dpar1/mdpar1*0.5
@@ -465,15 +483,14 @@ while(cont && itg<5){
 mu = par[1:ne]
 al = 0
 if(k>1) al = c(al,par[(ne+1):(ne+k-1)])
-mu = mu+al%*%la
-al = al-al%*%la
-be = par[(ne+k+1):length(par)]
+mu = as.vector(mu+al%*%la)
+al = as.vector(al-al%*%la)
+if(mod==0) be = par[(ne+k):length(par)]
+else be = par[(ne+k+1):length(par)]
 if(mod==0) np = k*(k-1)
 if(mod==1) np = k-1
 np = np + (ne+(k-1)+nc) + ((k+1)*(q>1))
-if(q==1){
-	si=NULL; rho = NULL
-}
+if(q==1) rho = NULL
 
 # compute aic, bic and prediction of latent structure
 aic = -2*lk+2*(np)
@@ -509,8 +526,8 @@ if(out_se){
   }
   s1 = d0
   J1 = D
-  J1 = -(J1+t(J1))/2 
-  print(c("rcond of information = ",rcond(J1)))
+  J1 = -(J1+t(J1))/2
+  if(rcond(J1)<10^-15) print(c("rcond of information = ",rcond(J1)))
   se1 = sqrt(diag(ginv(J1)))
   if(k>1){
   	if(mod==0) se1 = se1[-(1:(k*(k-1)))]
@@ -523,7 +540,8 @@ if(out_se){
   }
   #se = list(lrho=lrho, be = se1[(ne+k+1):length(se1)])
   selrho = lrho
-  sebe = se1[(ne+k+1):length(se1)]
+  if(mod==0) sebe = se1[(ne+k):length(se1)]
+  else sebe = se1[(ne+k+1):length(se1)]
 }
 
 out = list(mu=mu,al=al,be=be,si=si,rho=rho,la=la,PI=PI,lk=lk,np=np,aic=aic,bic=bic,call=match.call())

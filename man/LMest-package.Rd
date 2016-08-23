@@ -9,7 +9,7 @@
 Package: \tab LMest\cr
 Type: \tab Package\cr
 Version: \tab 2.2\cr
-Date: \tab 2016-02-25\cr
+Date: \tab 2016-08-23\cr
 License: \tab Unlimited\cr
 }
 The most important functions are \code{est_lm_basic}, \code{est_lm_cov_manifest}, and \code{est_lm_cov_latent} which estimate the basic LM model and its extensions including covariates

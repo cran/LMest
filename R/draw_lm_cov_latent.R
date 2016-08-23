@@ -17,6 +17,12 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
   	if(length(dPsi)==1) k = 1
   	else k = dPsi[2]
     if(length(dPsi)==2) Psi = array(Psi,c(dPsi,1))
+    if(r==1){
+    		b=dim(Psi)[1]
+    }else{
+    		b = rep(0,r)
+		for(j in 1:r) b[j] = sum(!is.na(Psi[,1,j]))-1
+	}
     # Covariate structure and related matrices: initial probabilities
 	if(is.vector(X1)) X1 = matrix(X1,n,1)
 	nc1 = dim(X1)[2] # number of covariates on the initial probabilities
@@ -82,7 +88,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
       if(r==1){
         Y[i,t] = which(rmultinom(1,1,Psi)==1)-1
       }else{
-        for (j in 1:r) Y[i,t,j] = which(rmultinom(1,1,Psi[,j])==1)-1
+        for (j in 1:r) Y[i,t,j] = which(rmultinom(1,1,Psi[1:(b[j]+1),j])==1)-1
       }
     }
   }else{
@@ -114,7 +120,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
       U[i,t] = which(rmultinom(1,1,PI[U[i,t-1],,i,t])==1)
     }
     for(i in 1:n) for(t in 1:TT) for(j in 1:r){
-      Y[i,t,j] = which(rmultinom(1,1,Psi[,U[i,t],j])==1)-1
+      Y[i,t,j] = which(rmultinom(1,1,Psi[1:(b[j]+1),U[i,t],j])==1)-1
     }
   }
 # output
