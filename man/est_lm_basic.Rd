@@ -21,8 +21,8 @@
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors}
   \item{piv }{initial value of the initial probability vector (if start=2)}
-  \item{Pi }{initial value of the transition probability matrices (if start=2)}
-  \item{Psi }{initial value of the conditional response probabilities (if start=2)}
+  \item{Pi }{initial value of the transition probability matrices (k x k x TT) (if start=2) }
+  \item{Psi }{initial value of the conditional response probabilities (mb x k x r) (if start=2)}
 }
 
 \value{
@@ -52,9 +52,10 @@ data(data_drug)
 data_drug = as.matrix(data_drug)
 S = data_drug[,1:5]-1
 yv = data_drug[,6]
-# fit of the Basic LC model
+# fit of the Basic LM model
 k = 3
 out = est_lm_basic(S,yv,k,mod=1)
+summary(out)
 
 \dontrun{
 # Example based on criminal data

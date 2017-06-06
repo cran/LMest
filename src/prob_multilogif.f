@@ -1,4 +1,4 @@
-      subroutine prob_multilogit(Xdis,be,label,Pdis,P,k,ndis,ns,ncov)
+      subroutine prob_multilogif(Xdis,be,label,Pdis,P,k,ndis,ns,ncov)
       
       integer i,k,ncov,ndis,ns,label(ns)
       double precision Xdis(k,ncov,ndis),be(ncov),Pdis(ndis,k),P(ns,k)

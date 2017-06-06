@@ -5,18 +5,19 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate LM model with covariates in the measurement model}
 
-\description{Main function for estimating LM model with covariates in the measurement model based on a cumulative logit parameterization.}
+\description{Main function for estimating LM model with covariates in the measurement model based on a global logit parameterization.}
 
-\usage{est_lm_cov_manifest(S, X, k, q=NULL, mod=c("LM", "FM"), tol = 10^-8, maxit = 1000, 
-	start = 0, mu = NULL, al = NULL, be = NULL, si = NULL, rho = NULL,
-       la = NULL, PI = NULL, output = FALSE, out_se = FALSE)}
+\usage{est_lm_cov_manifest(S, X, yv = rep(1,nrow(S)), k, q = NULL, mod = c("LM", "FM"),
+       tol = 10^-8, maxit = 1000, start = 0, mu = NULL, al = NULL, be = NULL, si = NULL,
+       rho = NULL, la = NULL, PI = NULL, output = FALSE, out_se = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{array of available configurations (n x TT) with categories starting from 0}
   \item{X}{array (n x TT x nc) of covariates with eventually includes lagged response (nc = number of covariates)}
+  \item{yv}{vector of frequencies of the available configurations}
   \item{k}{number of latent states}
-  \item{q}{number of support points for AR}
+  \item{q}{number of support points for the AR(1) process}
   \item{mod}{model ("LM" = Latent Markov with stationary transition, "FM" = finite mixture)}
   \item{tol}{tolerance for the convergence (optional) and tolerance of conditional probability if tol>1 then return}
   \item{maxit}{maximum number of iterations of the algorithm}
@@ -24,8 +25,8 @@
  \item{mu}{starting value for mu (optional)}
  \item{al}{starting value for al (optional)}
  \item{be}{starting value for be (optional)}
- \item{si}{starting value for si (optional)} 
- \item{rho}{starting value for rho (optional)}
+ \item{si}{starting value for si when mod="FM" (optional)} 
+ \item{rho}{starting value for rho when mod="FM" (optional)}
  \item{la}{starting value for la (optional)}
  \item{PI}{starting value for PI (optional)}
  \item{output}{to return additional output (PRED0, PRED1)}
@@ -36,8 +37,8 @@
 	\item{mu }{vector of cutpoints}
 	\item{al }{support points for the latent states}
 	\item{be }{estimate of the vector of regression parameters}
-	\item{si }{sigma of the AR process}
-	\item{rho }{parameter vector for AR}
+	\item{si }{sigma of the AR(1) process (mod = "FM")}
+	\item{rho }{parameter vector for AR(1) process (mod = "FM")}
 	\item{la }{vector of initial probabilities}
 	\item{PI }{transition matrix}
  	\item{lk }{maximum log-likelihood}
@@ -78,7 +79,7 @@ S = 5-res$YY
 # *** fit stationary LM model
 res0 = vector("list",10); tol = 10^-6;
 for(k in 1:10){
-  res0[[k]] = est_lm_cov_manifest(S,X,k,1,mod=0,tol)
+  res0[[k]] = est_lm_cov_manifest(S,X,k,1,mod="LM",tol)
    save.image("example_SRHS.RData")
 }
 
@@ -87,7 +88,7 @@ tol = 0.005
 res = vector("list",4)
 k=1
 q = 51
-res[[k]]=est_lm_cov_manifest(S,X,k,q,mod=1,tol,output=T)
-for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,k,q=61,mod=1,tol,output=T)
+res[[k]]=est_lm_cov_manifest(S,X,k,q,mod="FM",tol,output=TRUE)
+for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,k,q=61,mod="FM",tol,output=TRUE)
 }
 }

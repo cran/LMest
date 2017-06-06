@@ -1,5 +1,5 @@
 est_lm_cov_latent <-
-function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
+function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilogit",
                        Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,fixPsi=FALSE){
 
 # Fit the LM model with individual covariates in the distribution of the latent process
@@ -38,7 +38,8 @@ function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilo
   		warning("Data frame not allowed for S")
   	}
   	if(ns!=length(yv)) stop("dimensions mismatch between S and yv")
-   	if(any(is.na(X1)) | any(is.na(X2))) stop("missing data not allowed in X1 or X2")
+   	if(!is.null(X1)) if(any(is.na(X1))) stop("missing data not allowed in X1")
+   	if(!is.null(X2)) if(any(is.na(X2))) stop("missing data not allowed in X2")
   	miss = any(is.na(S))
 	if(miss){
          cat("Missing data in the dataset, treated as missing at random\n")
@@ -72,69 +73,88 @@ function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilo
 	J = NULL
   		
 # Covariate structure and related matrices: initial probabilities
-	if(is.vector(X1)) X1 = matrix(X1,ns,1)
-	nc1 = dim(X1)[2] # number of covariates on the initial probabilities
-	if(ns!= dim(X1)[1]) stop("dimension mismatch between S and X1")
- 
-	nameBe = colnames(X1)
 	if(k == 2) GBe = as.matrix(c(0,1)) else{
 		GBe = diag(k); GBe = GBe[,-1]
 	}
-	out = aggr_data(X1,fort=fort)
-	Xdis = out$data_dis
-	if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
-	Xlab = out$label
+	if(is.null(X1)){
+		nc1=0
+		Xlab = rep(1,ns)
+		nameBe = NULL
+	}else{
+		if(is.vector(X1)) X1 = matrix(X1,ns,1)
+		nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+		if(ns!= dim(X1)[1]) stop("dimension mismatch between S and X1")
+ 
+		nameBe = colnames(X1)
+	
+		out = aggr_data(X1,fort=fort)
+		Xdis = out$data_dis
+		if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
+		Xlab = out$label
+	}	
 	Xndis = max(Xlab)
 	XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
 	for(i in 1:Xndis){
-		xdis = c(1,Xdis[i,])
+		if(nc1==0) xdis = 1 else xdis = c(1,Xdis[i,])
 		XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
 	}
+		
 
 # for the transition probabilities
-	if(TT==2) X2 = array(X2,c(ns,1,dim(X2)[2]))
-	if(is.matrix(X2)) X2 = array(X2,c(ns,TT-1,1))
-    nc2 = dim(X2)[3] # number of covariates on the transition probabilities
-    if(ns!= dim(X2)[1]) stop("dimension mismatch between S and X2")
+	if(is.null(X2)){
+		if(param=="difflogit"){
+			warning("with X2=NULL parametrization difflogit not considered")	
+			param="multilogit"
+		}
+		nc2 = 0
+		Zlab = rep(1,ns*(TT-1))
+		nameGa = NULL
+		Zndis = max(Zlab)
+	}else{	
+		if(TT==2) X2 = array(X2,c(ns,1,dim(X2)[2]))
+		if(is.matrix(X2)) X2 = array(X2,c(ns,TT-1,1))
+    		nc2 = dim(X2)[3] # number of covariates on the transition probabilities
+    		if(ns!= dim(X2)[1]) stop("dimension mismatch between S and X2")
 
-    nameGa = colnames(aperm(X2,c(1,3,2)))
-	Z = NULL
-	for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
-	if(nc2==1) Z = as.vector(X2)
-	out = aggr_data(Z,fort=fort); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
-	if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
+    		nameGa = colnames(aperm(X2,c(1,3,2)))
+		Z = NULL
+		for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
+		if(nc2==1) Z = as.vector(X2)
+		out = aggr_data(Z,fort=fort); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+		if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
+	}	
 	if(param=="multilogit"){
-    	ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
-	    for(h in 1:k){
-		    if(k==2){
-			    if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
-		    }else{
-			    GGa = diag(k); GGa = GGa[,-h]
-		    }  		
-		    for(i in 1:Zndis){
-			    zdis = c(1,Zdis[i,])
-			    ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
-		    }
-	    }
+    		ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
+	    	for(h in 1:k){
+			if(k==2){
+				if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
+		    	}else{
+			    	GGa = diag(k); GGa = GGa[,-h]
+		    	}	  		
+		    	for(i in 1:Zndis){
+			    	if(nc2==0) zdis = 1 else zdis = c(1,Zdis[i,])
+			    	ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
+		    	}
+	   	 }
 	 }else if(param=="difflogit"){
-        Zlab = (((Zlab-1)*k)%x%rep(1,k))+rep(1,ns*(TT-1))%x%(1:k)
-        ZZdis = array(0,c(k,k*(k-1)+(k-1)*nc2,Zndis*k))
-        j = 0
+        	Zlab = (((Zlab-1)*k)%x%rep(1,k))+rep(1,ns*(TT-1))%x%(1:k)
+        	ZZdis = array(0,c(k,k*(k-1)+(k-1)*nc2,Zndis*k))
+        	j = 0
 		for(i in 1:Zndis){
-            for(h in 1:k){
-                j = j+1
-                if(k==2){
-			      if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
-		        }else{
-			        GGa = diag(k); GGa = GGa[,-h]
-		        }  		
-			    u = matrix(0,1,k); u[1,h] = 1
-			    U = diag(k); U[,h] = U[,h]-1
-			    U = U[,-1]
-		        ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Zdis[i,]))            
-            }
-	    }
-    }
+            	for(h in 1:k){
+                	j = j+1
+                	if(k==2){
+			      	if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
+		        	}else{
+			        	GGa = diag(k); GGa = GGa[,-h]
+		        	}  		
+			    	u = matrix(0,1,k); u[1,h] = 1
+			    	U = diag(k); U[,h] = U[,h]-1
+			    	U = U[,-1]
+		        	ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Zdis[i,]))            
+            	}
+	    	}
+    	}
 	
 # for information matrix
   	if(out_se){
@@ -203,10 +223,13 @@ function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilo
             Ga = matrix(0,(nc2+1)*(k-1),k)
             Ga[1+(0:(k-2))*(nc2+1),] = -log(10)
 			PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
-			for(h in 1:k){
-			    out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+			for(h in 1:k){		
+				tmp = ZZdis[,,,h]
+				if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+				out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
 			    PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
 		    }
+		  
 		}else if(param=="difflogit"){
              Ga = matrix(0,k*(k-1)+(k-1)*nc2)
              Ga[1:((h-1)*k)] = -log(10)
@@ -216,6 +239,7 @@ function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilo
    		     PI = aperm(PI,c(2,1,3,4))
 		}
   	}
+  	
 # random initialization
   	if(start==1){
   		if(fixPsi==FALSE){
@@ -238,7 +262,9 @@ function(S,X1,X2,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,param="multilo
     		Ga[1+(0:(k-2))*(nc2+1),] = -abs(rnorm((k-1)))   
 	    	PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
 		    for(h in 1:k){
-			    out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+		    		tmp = ZZdis[,,,h]
+				if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+			    out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
 			    PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
 		   }
     	}else if(param=="difflogit"){
@@ -330,16 +356,20 @@ cat("------------|-------------|-------------|-------------|-------------|------
 	    	for(h in 1:k){
 		    	UU = NULL
 		    	for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
-		    	out = est_multilogit(UU,ZZdis[,,,h],Zlab,Ga[,h],PIdis[,,h],fort=fort)
+		    	tmp = ZZdis[,,,h]
+			if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+			tmp2 = PIdis[,,h]
+			if(Zndis==1) tmp2 = matrix(tmp2,1,k)
+		    	out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort)
 		    	PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1)); Ga[,h] = out$be
 	   	 	}
 		}else if(param=="difflogit"){
 		    Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
 		    Tmp = matrix(Tmp,ns*k*(TT-1),k)
            	out = est_multilogit(Tmp,ZZdis,Zlab,Ga,PIdis,fort=fort)
-	    	PIdis = out$Pdis; Ga = out$be
-	    	Tmp = array(out$P,c(k,ns,TT-1,k))
-	    	PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3)) 
+	    		PIdis = out$Pdis; Ga = out$be
+	    		Tmp = array(out$P,c(k,ns,TT-1,k))
+	    		PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3)) 
         }
 # Compute log-likelihood
    		paro = par; par = c(as.vector(Piv),as.vector(PI),as.vector(Psi))
@@ -454,7 +484,11 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 		    for(h in 1:k){
 			    UU = NULL
 			    for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
-		    	out = est_multilogit(UU,ZZdis[,,,h],Zlab,Ga[,h],PIdis[,,h],fort=fort,ex=TRUE)
+			    tmp = ZZdis[,,,h]
+				if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+				tmp2 = PIdis[,,h]
+				if(Zndis==1) tmp2 = matrix(tmp2,1,k)
+		   	 	out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort,ex=TRUE)
 			    sc = c(sc,out$sc); Fi = blkdiag(Fi,out$Fi) 
 	    	}
 		}else if(param=="difflogit"){
@@ -504,7 +538,12 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 	    		for(h1 in 1:npar){
 				    UU = NULL
 			    	for(t in 2:TT) UU = rbind(UU,t(dU[h,,,t,h1]))
-			    	out = est_multilogit(UU,ZZdis[,,,h],Zlab,Ga[,h],PIdis[,,h],fort=fort,ex=TRUE)
+			    	tmp = ZZdis[,,,h]
+				if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+				tmp2 = PIdis[,,h]
+				if(Zndis==1) tmp2 = matrix(tmp2,1,k)
+
+			    	out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort,ex=TRUE)
 			    	ind = nal+nbe+(h-1)*rGa+(1:rGa)
 			    	Cor[h1,ind] = out$sc
 				}
@@ -558,7 +597,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
     for(i in 1:ns) for(t in 1:TT){
     	Ul[i,t] = which.max(V[i,,t])
     }
-    if(all(yv==1)) V1=V
+    if(all(yv==1)) V1=V else V1 = V/yv
 
     if(out_se){
     	if(r==1){
@@ -583,15 +622,16 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
     }
 	Be = matrix(be,nc1+1,k-1)
 	if (is.null(nameBe)){
-		nameBe = c("intercept",paste("X1",1:nc1,sep=""))
+		if(nc1==0) nameBe = c("Intercept") else nameBe = c("intercept",paste("X1",1:nc1,sep=""))
 	}else{
 		nameBe = c("intercept",nameBe)
 	}	
+
 	dimnames(Be) = list(nameBe,logit=2:k)
 	if(out_se) {seBe = matrix(sebe,nc1+1,k-1); dimnames(seBe) = list(nameBe,logit=2:k)}
 	if(param=="multilogit"){
 		if(is.null(nameGa)){
-			nameGa = c("intercept", paste("X2",1:nc2,sep=""))
+			if(nc2==0) nameGa = c("Intercept") else nameGa = c("intercept", paste("X2",1:nc2,sep=""))
 		}else{
 			nameGa = c("intercept",nameGa)
 		}
@@ -599,6 +639,7 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 			Ga = array(as.vector(Ga),c(nc2+1,k-1,k))
 			dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
 		}else if(k==2){ 
+			
 			dimnames(Ga) = 	list(nameGa,logit=1:k)
 		}
 		if(out_se){
@@ -643,8 +684,8 @@ if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-
 	# adjust output
 	lk = as.vector(lk)
 	if(output){
-		dimnames(Piv)=list(subject=1:n,state=1:k)
-		dimnames(PI)=list(state=1:k,state=1:k,subject=1:n,time=1:TT)
+		dimnames(Piv)=list(subject=1:ns,state=1:k)
+		dimnames(PI)=list(state=1:k,state=1:k,subject=1:ns,time=1:TT)
 	}
 	if(r==1) dimnames(Psi) = list(category=0:b,state=1:k,item=1) else 		dimnames(Psi)=list(category=0:mb,state=1:k,item=1:r)
 	out = list(lk=lk,Be=Be,Ga=Ga,Psi=Psi,np=np,aic=aic,bic=bic,lkv=lkv,

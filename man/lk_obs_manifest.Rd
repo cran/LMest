@@ -8,7 +8,7 @@
 \description{Function that computes the observable log-likelihood of the LM model with covariates in the measurement model (internal use).}
 
 \usage{
-lk_obs_manifest(par, Y, Xd, indn, lev, k, sup, G2, IPI, mod, outp = FALSE)
+lk_obs_manifest(par, Y, Xd, yv, indn, lev, k, sup, G2, IPI, mod, outp = FALSE)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -16,6 +16,7 @@ lk_obs_manifest(par, Y, Xd, indn, lev, k, sup, G2, IPI, mod, outp = FALSE)
   \item{par}{vector of regression parameters}
   \item{Y}{matrix of response variables}
   \item{Xd}{matrix of covariates}
+  \item{yv}{vector of frequencies of response configurations}
   \item{indn}{index of the design matrix for each unit}
   \item{lev}{vector containing the number of levels of each variable}
   \item{k}{number of latent states}

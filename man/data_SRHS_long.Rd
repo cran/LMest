@@ -14,11 +14,11 @@
   A data frame with 56592 observations on the following 6 variables.
   \describe{
     \item{\code{id}}{subject id}
-    \item{\code{gender}}{gender of the subject}
-    \item{\code{race}}{race}
-    \item{\code{education}}{educational level}
+    \item{\code{gender}}{gender of the subject coded as 1 for "male", 2 for "female"}
+    \item{\code{race}}{race coded as 1 for "white", 2 for "black", 3 for "others"}
+    \item{\code{education}}{educational level coded as 1 for "high school", 2 for "general educational diploma", 3 for "high school graduate", 4 for "some college", 5 for "college and above"}
     \item{\code{age}}{age at the different time occasions}
-    \item{\code{srhs}}{self-reported health status at the different time occasions}
+    \item{\code{srhs}}{self-reported health status at the different time occasions coded as 1 for "excellent", 2 for "very good", 3 for "good", 4 for "fair", 5 for "poor"}
   }
 }
 

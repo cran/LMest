@@ -45,15 +45,18 @@
 data(data_criminal_sim)
 out = long2wide(data_criminal_sim,"id","time","sex",
 	 c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=999)	
-    XX = out$XX
-    YY = out$YY
-    freq = out$freq
-	n1 = sum(freq[XX[,1]==1])
-	n2 = sum(freq[XX[,1]==2])
-    n = sum(freq)
+
+XX = out$XX
+YY = out$YY
+freq = out$freq
+n1 = sum(freq[XX[,1]==1])
+n2 = sum(freq[XX[,1]==2])
+n = sum(freq)
+
 # fit mixed LM model only for females
-    YY = YY[XX[,1]==2,,]; freq = freq[XX[,1]==2]
-    k1 = 2; k2 = 2
-    res = est_lm_mixed(YY,freq,k1,k2,tol=10^-8)
+YY = YY[XX[,1]==2,,]; freq = freq[XX[,1]==2]
+k1 = 2; k2 = 2
+res = est_lm_mixed(YY,freq,k1,k2,tol=10^-8)
+summary(res)
 }
 }

@@ -231,11 +231,12 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	
 #est_lm_manifest
 if(class(est)=="LMmanifest"){
-	lev = max(S)+1
+	if(!is.null(est$rho)) stop("decoding allowed only for mod=LM")
+	S = Y; X = X1
+	lev = length(est$mu)+1
 	q = 1; k = dim(est$PI)[1]
 	nt = prod(lev)
 	n1=FALSE
-	S = Y; X = X1
 	if(is.vector(S)){
 		n1 = TRUE
 		n = 2; TT = length(S)
@@ -258,11 +259,11 @@ if(class(est)=="LMmanifest"){
 	
 	Y0 = S+1
 	S = array(0,c(nt,n,TT))
+	
 	for(i in 1:n) for(t in 1:TT){
    		ind = Y0[i,t]
    		S[ind,i,t] = 1
 	}	
-
 	nc = dim(X)[3]
 	ne = lev-1
 
@@ -303,7 +304,7 @@ if(class(est)=="LMmanifest"){
 	la = est$la
 	be = est$be
 	PI = est$PI
-	si = 3
+	si = NULL
 	par = c(mu,al,si,be)
 	if(k==1) tau = NULL else{
 		tau = H2%*%log(PI[IPI]) 
@@ -337,14 +338,17 @@ if(class(est)=="LMmanifest"){
   		I = diag(ne)
   		one = matrix(1,ne,1)
   		Pio = array(0,c(n,k*q,TT))
-  		par0 = par[1:(lev-1+k)]
-  		Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+  		par0 = par[1:(lev-2+k)]
+  		Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
+  	 	j = 0
   		for(c in 1:k){
     		u = matrix(0,1,k); u[c] = 1; u = u[-1]
     		D0 = cbind(I,matrix(u,nrow=1)%x%one)
     		for(d in 1:q){
       			j = j+1;
-      			D = cbind(D0,sup[d]*one); agg = D%*%par0 
+      			#D = cbind(D0,sup[d]*one); agg = D%*%par0 
+      			D = D0
+      			agg = D%*%par0
       			Eta1 = Eta01+agg%*%rep(1,nd)  
       			Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
       			Pv1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100)
@@ -355,9 +359,8 @@ if(class(est)=="LMmanifest"){
   
  		 if(q*k==1) pim = Q[,,TT] else if(n==1) pim = sum(Q[,,TT]) else pim = rowSums(Q[,,TT])
   		lk = sum(log(pim))
-   
-  		# E-step
-  		out = rec3(Q,PIs,Pio,pim)
+   	# E-step
+  		out = rec3(Q,yv=rep(1,n),PIs,Pio,pim)
   		U = out$U; V = out$V
   		# M-step: latent parameters
   		if(k>1){
@@ -375,7 +378,9 @@ if(class(est)=="LMmanifest"){
    			D0 = cbind(I,t(as.matrix(u))%x%one)
   			for(d in 1:q){
   				j = j+1
-   				D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+   				#D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+    			D = D0
+    			agg = as.vector(D%*%par0)
     			Eta1 = Eta01+agg%o%rep(1,nd)
     			Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
    	 			Pit1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pit1 = pmin(pmax(Pit1,10^-100),1-10^-100)
@@ -412,14 +417,20 @@ if(class(est)=="LMmanifest"){
    		}
   	}
   # compute new log-likelihood
-  par0 = par[1:(lev-1+k)]
-  Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+ # par0 = par[1:(lev-1+k)]
+  #Eta01 = prod_array(Xd,par[(lev+k):length(par)]); j = 0
+
+  par0 = par[1:(lev-2+k)]
+  Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
+  j=0
   for(c in 1:k){
   	u = matrix(0,1,k); u[c] = 1; u = u[-1]
     D0 = cbind(I,t(as.matrix(u))%x%one)
     for(d in 1:q){
         j = j+1;
-        D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+      #  D = cbind(D0,sup[d]*one); agg = as.vector(D%*%par0)
+        D = D0
+        agg = as.vector(D%*%par0)
         Eta1 = Eta01+agg%o%rep(1,nd)
         Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100);
         Pv1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100);
@@ -450,7 +461,7 @@ if(q==1){
 }
 
 # compute aic, bic and prediction of latent structure
-out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod=0,outp=TRUE)
+out = lk_obs_manifest(par1,S,Xd,yv=rep(1,n),indn,lev,k,sup,G2,IPI,mod=0,outp=TRUE)
 lk = out$lk; U = out$U
 sup1 = t(Mar)%*%al
 if(q>1) sup1 = sup1+matrix(1,k,1)%x%(sup*si)
@@ -470,7 +481,7 @@ piv = la
 PI = PI
 # local deconding
 Ul = matrix(0,n,TT)
-for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
+for(i in 1:n) for(t in 1:TT){Ul[i,t] = which.max(V[i,,t])}
 if(n==1) Ul = as.vector(Ul)
 # global deconding (Viterbi)
 R = array(0,c(n,k,TT))

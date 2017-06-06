@@ -18,7 +18,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
   	else k = dPsi[2]
     if(length(dPsi)==2) Psi = array(Psi,c(dPsi,1))
     if(r==1){
-    		b=dim(Psi)[1]
+    		b=dim(Psi)[1]-1
     }else{
     		b = rep(0,r)
 		for(j in 1:r) b[j] = sum(!is.na(Psi[,1,j]))-1

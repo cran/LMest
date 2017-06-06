@@ -1,4 +1,4 @@
-lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
+lk_obs_manifest <- function(par,Y,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
 
 #        [lk,U,s] = lk_obs(par,Y,X,Xd,indn,lev,k,sup,G2,IPI,mod=0)
 #
@@ -77,10 +77,10 @@ lk_obs_manifest <- function(par,Y,Xd,indn,lev,k,sup,G2,IPI,mod,outp=FALSE){
   if(k==1) PIs = as.matrix(PIs)
   Q = rec1(Pio,las,PIs)
   if(q*k==1) pim = Q[,,TT] else pim = rowSums(Q[,,TT])
-  lk = sum(log(pim))
+  lk = sum(yv*log(pim))
   # compute U
   if(outp){
-  	out = rec3(Q,PIs,Pio,pim)
+  	out = rec3(Q,yv,PIs,Pio,pim)
   	U = out$U; V = out$V
   }else{U=NULL; V=NULL}
   # compute derivative

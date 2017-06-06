@@ -5,7 +5,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Perform local and global decoding}
 
-\description{Function that performs local decoding and global decoding (Viterbi) from the output of \code{est_lm_basic}, \code{est_lm_cov_latent}, \code{est_lm_cov_manifest}, and \code{est_lm_mixed}.}
+\description{Function that performs local and global decoding (Viterbi) from the output of \code{est_lm_basic}, \code{est_lm_cov_latent}, \code{est_lm_cov_manifest}, and \code{est_lm_mixed}.}
 
 \usage{
 decoding(est, Y, X1 = NULL, X2 = NULL, fort = TRUE)
@@ -40,7 +40,7 @@ data_drug = as.matrix(data_drug)
 S = data_drug[,1:5]-1
 yv = data_drug[,6]
 n = sum(yv)
-# fit of the Basic LM model
+# fit the Basic LM model
 k = 3
 est = est_lm_basic(S,yv,k,mod=1)
 # decoding for a single sequence

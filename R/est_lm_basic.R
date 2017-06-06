@@ -74,6 +74,7 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
 	   		}
 	    }
 	    Psi = P/(n*TT)
+	    dimnames(Psi)=list(category=0:b,item=1:r)
 	    pm = rep(1,ns)
 	   	for(t in 1:TT) for(j in 1:r) pm = pm*Psi[S[,t,j]+1,j]
 	    lk = sum(yv*log(pm))
@@ -147,11 +148,13 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
   		M = matrix(1,ns,k)
    		V[,,TT] = Yvp*L[,,TT]
    		U[,,TT] = (t(L[,,TT-1])%*%(Yvp*Phi[,,TT]))*Pi[,,TT]
-   		for(t in seq(TT-1,2,-1)){
-   			M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1]);
-      		V[,,t] = Yvp*L[,,t]*M
-      		U[,,t] = (t(L[,,t-1])%*%(Yvp*Phi[,,t]*M))*Pi[,,t]
-		}
+   		if(TT>2){
+   			for(t in seq(TT-1,2,-1)){
+   				M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1]);
+      			V[,,t] = Yvp*L[,,t]*M
+      			U[,,t] = (t(L[,,t-1])%*%(Yvp*Phi[,,t]*M))*Pi[,,t]
+			}
+		}		
 		M = (Phi[,,2]*M)%*%t(Pi[,,2])
 		V[,,1] = Yvp*L[,,1]*M
 #print(proc.time()-time)
@@ -403,11 +406,13 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
 	np = (k-1)+k*sum(bv)
   	if(mod==0) np = np+(TT-1)*k*(k-1)
   	if(mod==1) np = np+k*(k-1)
-  	if(mod==2) np = np+2*k*(k-1)
+  	if(mod>1) np = np+2*k*(k-1)
   	aic = -2*lk+np*2
   	bic = -2*lk+np*log(n)
 	cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")	
 	# adjust output
+	if(any(yv!=1)) V = V/yv
+	
 	lk = as.vector(lk)
 	dimnames(Pi)=list(state=1:k,state=1:k,time=1:TT)
 	dimnames(Psi)=list(category=0:b,state=1:k,item=1:r)

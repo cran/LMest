@@ -20,7 +20,7 @@ function(piv,Pi,Psi,n,B=100,start=0,mod=0,tol=10^-6){
 	    	out = est_lm_basic(Sb,yvb,k,start,mod,tol)
 	    	mPsi = mPsi+out$Psi/B; mpiv = mpiv+out$piv/B; mPi = mPi+out$Pi/B
 	    	m2Psi = m2Psi+out$Psi^2/B; m2piv = m2piv+out$piv^2/B; m2Pi = m2Pi+out$Pi^2/B
-	    	mth = mth+out$th/B; m2th = m2th+out$th/B
+#	    	mth = mth+out$th/B; m2th = m2th+out$th/B
     }
     sePsi = sqrt(m2Psi-mPsi^2); sepiv = sqrt(m2piv-mpiv^2); sePi = sqrt(m2Pi-mPi^2)
 #    seth = sqrt(m2th-mth^2)

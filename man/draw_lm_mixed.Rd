@@ -16,7 +16,7 @@ draw_lm_mixed(la, Piv, Pi, Psi, n, TT)
   \item{la }{vector of mass probabilities for the first latent variable}
   \item{Piv }{matrix of initial probabilities of the latent Markov chain (k2 x k1)}
   \item{Pi }{set of transition matrices (k2 x k2 x k1)}
-  \item{Psi }{array of conditional response probabitlies (l x k2 x r)}
+  \item{Psi }{array of conditional response probabitlies (mb x k2 x r)}
   \item{n }{sample size}
   \item{TT }{number of time occasions}
 }

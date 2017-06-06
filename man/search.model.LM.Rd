@@ -46,7 +46,7 @@ n = sum(yv)
 # Search Basic LM model
 
 res = search.model.LM("basic",kv=1:4,S,yv,mod=1)
-
+summary(res)
 
 
 }

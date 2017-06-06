@@ -12,10 +12,10 @@
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{
-  \item{X1 }{matrix of the initial probabilities (n x nc1)}
-  \item{X2 }{array of the transition probabilities (n x TT-1 x nc2)}
+  \item{X1 }{matrix of covariates affecting the initial probabilities (n x nc1)}
+  \item{X2 }{array of covariates affecting the transition probabilities (n x TT-1 x nc2)}
   \item{param }{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
-  \item{Psi }{matrix of conditional response probabilities}
+  \item{Psi }{array of conditional response probabilities (mb x k x r)}
   \item{Be }{parameters affecting the logit for the initial probabilities}
   \item{Ga }{parametes affecting the logit for the transition probabilities}
   \item{B}{number of bootstrap samples}
@@ -23,10 +23,10 @@
 }
 
 \value{
-  \item{mPsi }{average of bootstrap estimates of the conditional response matrix}
+  \item{mPsi }{average of bootstrap estimates of the conditional response probabilities}
   \item{mBe }{average of bootstrap estimates of the parameters affecting the logit for the initial probabilities}
   \item{mGa }{average of bootstrap estimates of the parameters affecting the logit for the transition probabilities}
-  \item{sePsi }{standard errors for the conditional response matrix}
+  \item{sePsi }{standard errors for the conditional response probabilities }
   \item{seBe }{standard errors for the parameters in Be}
   \item{seGa }{standard errors for the parameters in Ga }
 }

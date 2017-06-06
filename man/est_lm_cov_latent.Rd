@@ -5,9 +5,9 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate LM model with covariates in the latent model}
 
-\description{Main function for estimating LM model with covariates in the latent model.}
+\description{Main function for estimating the LM model with covariates in the latent model.}
 
-\usage{est_lm_cov_latent(S, X1, X2, yv = rep(1,nrow(S)), k, start = 0, tol = 10^-8, 
+\usage{est_lm_cov_latent(S, X1=NULL, X2=NULL, yv = rep(1,nrow(S)), k, start = 0, tol = 10^-8, 
 	   maxit = 1000, param = "multilogit", Psi, Be, Ga, fort = TRUE, output = FALSE, 
 	   out_se = FALSE, fixPsi = FALSE)}
 
@@ -22,7 +22,7 @@
   \item{tol}{tolerance level for checking convergence of the algorithm}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{param}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
- \item{Psi}{intial value of the matrix of the conditional response probabilities}
+ \item{Psi}{intial value of the array of the conditional response probabilities (mb x k x r)}
  \item{Be}{intial value of the parameters affecting the logit for the initial probabilities (if start=2)}
  \item{Ga}{intial value of the parametes affecting the logit for the transition probabilities (if start=2)}
  \item{fort}{to use fortran routine when possible (FALSE for not use fortran)} 
@@ -79,6 +79,7 @@ X2 =res$XX[,2:TT,]
 
 # estimate the model
 est2f = est_lm_cov_latent(S,X1,X2,k=2,output=TRUE,out_se=TRUE)
+summary(est2f)
 
 # average transition probability matrix
 PI = round(apply(est2f$PI[,,,2:TT],c(1,2),mean),4)

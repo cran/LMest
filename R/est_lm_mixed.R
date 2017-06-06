@@ -246,6 +246,8 @@ est_lm_mixed <- function(S,yv=rep(1,nrow(S)),k1,k2,start=0,tol=10^-8,maxit=1000,
 
 # adjust output
     lk = as.vector(lk); bic = as.vector(bic)
+    if(any(yv!=1)) W = W/yv
+    
 	dimnames(Piv)=list(v=1:k2,u=1:k1)
 	dimnames(Pi)=list(v0=1:k2,v1=1:k2,u=1:k1)
 	dimnames(Psi)=list(y=0:b,v=1:k2,j=1:r)

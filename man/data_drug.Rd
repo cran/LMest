@@ -6,7 +6,7 @@
 
 \title{Dataset about marijuana consumption}
 
-\description{Longitudinal dataset about marijuana consumption measured by ordinal variables with 3 categories.}
+\description{Longitudinal dataset about marijuana consumption measured by ordinal variables with 3 categories with increasing levels of consumption.}
 
 \usage{data(data_drug)}
 

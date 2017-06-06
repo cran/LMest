@@ -14,8 +14,8 @@ draw_lm_basic(piv, Pi, Psi, n)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{piv }{vector of initial probabilities of the latent Markov chain}
-  \item{Pi }{set of transition matrices}
-  \item{Psi }{matrix of conditional response probabitlies}
+  \item{Pi }{set of transition probabilities matrices (k x k x TT)}
+  \item{Psi }{array of conditional response probabitlies (mb x k x r)}
   \item{n }{sample size}
 }
 
@@ -29,11 +29,17 @@ draw_lm_basic(piv, Pi, Psi, n)
 
 \examples{
 # draw a sample for 1000 units and only one response variable
+n = 1000
+TT = 6
+k = 2
+r = 1 #number of response variables
+mb = 3 #maximum number of response categories
+
 piv = c(0.7,0.3)
-Pi = matrix(c(0.9,0.1,0.1,0.9),2,2)
-Pi = array(Pi,c(2,2,6))
+Pi = matrix(c(0.9,0.1,0.1,0.9),k,k)
+Pi = array(Pi,c(k,k,TT))
 Pi[,,1] = 0
-Psi = matrix(c(0.7,0.2,0.1,0.5,0.4,0.1),3,2)
-Psi = array(Psi,c(3,2,1))
+Psi = matrix(c(0.7,0.2,0.1,0.5,0.4,0.1),mb,k)
+Psi = array(Psi,c(mb,k,r))
 out = draw_lm_basic(piv, Pi, Psi, n=1000)
 }

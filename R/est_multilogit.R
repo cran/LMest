@@ -12,21 +12,25 @@ time = proc.time()
  	 k = dim(Y)[2]
      nbe = dim(Xdis)[2]
      ndis = max(label)
+    
 # correct covariance matrix
      if(length(dim(Xdis))==2) Xdis = aperm(array(Xdis,c(ndis,nbe,1),c(3,2,1)))    
      if(dim(Xdis)[1]<k){
      	Xdis0 = Xdis
-     	Xdis = array(0,c(k,nbe,n))
+     	Xdis = array(0,c(k,nbe,ndis))
      	Xdis[2:k,,] = Xdis0
      } 
+    
 #print(c(4,proc.time()-time))
 # starting values
+
 	if(is.null(be)){
 		be = rep(0,nbe)
 		Pdis = NULL}
 	if(is.null(Pdis)){
 		Pdis = prob_multilogit(Xdis,be,label,fort)$Pdis
 	}
+		
     Ydis = matrix(0,ndis,k)	
 	if(fort==F){
 	    for(i in 1:ndis){
@@ -46,11 +50,13 @@ time = proc.time()
         it = it+1; lko = lk 
     	if(fort==F){
         	sc = 0; Fi = 0
+        
 	        for(i in 1:ndis){
 		        pdis = Pdis[i,]
 		        sc = sc+t(Xdis[,,i])%*%(Ydis[i,]-ny[i]*pdis)
 		        Fi = Fi+ny[i]*t(Xdis[,,i])%*%(diag(pdis)-pdis%o%pdis)%*%Xdis[,,i]
 	        }
+	       
 	    }else{
             out = .Fortran("nr_multilogit",Xdis=Xdis,be=be,Pdis=Pdis,Ydis=Ydis,ny=ny,k=as.integer(k),ndis=as.integer(ndis),ncov=as.integer(nbe),
             sc=rep(0,nbe),Fi=matrix(0,nbe,nbe))
@@ -65,7 +71,11 @@ time = proc.time()
 	        while(flag){
 	        	be = be0+dbe
 	        	Eta = matrix(0,ndis,k)
-	        	for(i in 1:ndis) Eta[i,] = Xdis[,,i]%*%be
+	  #      	browser()
+	   		 for(i in 1:ndis){
+	        		if(nbe==1) Eta[i,] = Xdis[,,i]*be
+	        		else Eta[i,] = Xdis[,,i]%*%be
+	        	}	
 	        	if(max(abs(Eta))>100){
 	        		dbe = dbe/2
 	        		flag = TRUE	

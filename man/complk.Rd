@@ -5,7 +5,7 @@
 
 \title{Complete log-likelihood of the basic latent Markov model}
 
-\description{Function that computes complete log-likelihood of the latent Markov model
+\description{Function that computes complete log-likelihood of the basic latent Markov model
 (internal use).}
 
 \usage{complk(S, R, yv, piv, Pi, Psi, k)}

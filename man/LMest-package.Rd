@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab LMest\cr
 Type: \tab Package\cr
-Version: \tab 2.2\cr
-Date: \tab 2016-08-23\cr
+Version: \tab 2.4\cr
+Date: \tab 2017-06-06\cr
 License: \tab Unlimited\cr
 }
 The most important functions are \code{est_lm_basic}, \code{est_lm_cov_manifest}, and \code{est_lm_cov_latent} which estimate the basic LM model and its extensions including covariates
@@ -34,7 +34,7 @@ data_drug = as.matrix(data_drug)
 S = data_drug[,1:5]-1
 yv = data_drug[,6]
 n = sum(yv)
-# fit of the Basic LC model
+# fit of the Basic LM model
 k = 3
 out1 = est_lm_basic(S,yv,k,mod=1,out_se=TRUE)
 \dontrun{

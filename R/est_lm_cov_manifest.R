@@ -1,4 +1,4 @@
-est_lm_cov_manifest <- function(S,X,k,q=NULL,mod=c("LM","FM"),tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
+est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"),tol=10^-8,maxit=1000,start=0,mu=NULL,al=NULL,
                                   be=NULL,si=NULL,rho=NULL,la=NULL,PI=NULL,output=FALSE,out_se=FALSE){
 
 #
@@ -6,7 +6,7 @@ est_lm_cov_manifest <- function(S,X,k,q=NULL,mod=c("LM","FM"),tol=10^-8,maxit=10
 # (when mod = 1)
 #
 # INPUT:
-# S:     array of available configurations (n x TT x r)
+# S:     array of available configurations (n x TT)
 # X:     array (n x TT x nc) of covariates with eventually includes lagged
 #        response
 # k:     number of latent states
@@ -41,8 +41,8 @@ est_lm_cov_manifest <- function(S,X,k,q=NULL,mod=c("LM","FM"),tol=10^-8,maxit=10
 # selrho: standard errors for logit type transformation of rho
 # PRED0: prediction of latent state
 # PRED1: prediction of the overall latent effect
-
 # preliminaries
+
 mod = match.arg(mod)
 if(mod=="LM") mod=0 else mod=1
 if(mod==0) q = 1
@@ -55,32 +55,33 @@ if(min(S)>0){
   		cat("|-----------------------------------------------|\n")	
  } 
 nt = prod(lev)
-n = nrow(S); TT = ncol(S)
+ns = nrow(S); TT = ncol(S)
+n = sum(yv)
+
 if(is.array(S)){
 	r = dim(S)[3]
 	if(!is.na(r) & r>1) warning("multivariate data are not allowed; only the first response variable is considered")
-	S = matrix(S,n,TT)
+	S = matrix(S,ns,TT)
 } 
 if(is.data.frame(S)) warning("Data frame not allowed for S")
-if(n!= dim(X)[1]) stop("dimension mismatch between S and X")
+if(ns!= dim(X)[1]) stop("dimension mismatch between S and X")
 
 Y0 = S+1
-S = array(0,c(nt,n,TT))
-for(i in 1:n) for(t in 1:TT){
+S = array(0,c(nt,ns,TT))
+for(i in 1:ns) for(t in 1:TT){
    ind = Y0[i,t]
    S[ind,i,t] = 1
 }
-if(is.matrix(X)) X = array(X,c(n,TT,1))
+if(is.matrix(X)) X = array(X,c(ns,TT,1))
 nc = dim(X)[3]
 ne = lev-1
 
 XX = X
-X = array(0,c(ne,nc,n,TT))
-for(i in 1:n) for(t in 1:TT){
+X = array(0,c(ne,nc,ns,TT))
+for(i in 1:ns) for(t in 1:TT){
    if(lev==2) X[,,i,t] = XX[i, t, ]
    else X[,,i,t] = rep(1,ne)%o%XX[i,t,]
 }
-
 opt = list(TolFun=10^-6,TolX=10^-6)
 opt1 = list(TolFun=10^-6,Display="iter")
 out = marg_param(lev,"g")
@@ -120,8 +121,8 @@ if(is.null(mu)){
   Pim = apply(S,c(1,2),sum)+0.05*TT; Eta = Cm%*%log(Mm%*%Pim)
   Eta = Eta%x%matrix(1,1,TT)
   eta = as.vector(Eta)
-  Z = matrix(aperm(X,c(1,4,3,2)),n*ne*TT,dim(X)[2])
-  Z = cbind(matrix(1,n*TT,1)%x%diag(ne),Z)
+  Z = matrix(aperm(X,c(1,4,3,2)),ns*ne*TT,dim(X)[2])
+  Z = cbind(matrix(1,ns*TT,1)%x%diag(ne),Z)
   par = ginv(t(Z)%*%Z)%*%t(Z)%*%eta
   mu = par[1:ne]; par = par[-(1:ne)]; be = par
   if(k==1) al = NULL else{
@@ -166,7 +167,9 @@ if(start==2){
 		si = NULL
 	}
 	if(mod==1){
+		if(is.null(rho)) stop("initial value of the parameter vector for AR(1) process (rho) must be given in input")
 		rho = rho
+		if(is.null(si)) stop("initial value of sigma (si) must be given in input")
 		si = si
 	}
 	
@@ -183,8 +186,9 @@ lrho = (rho+1)/2
 lrho = log(lrho/(1-lrho))
 SUP = sup%o%rep(1,q)
 WEI = matrix(0,k*q,k*q)
+
 for(j in 1:k){
-  ind = (j-1)*q+(1:q);
+  ind = (j-1)*q+(1:q)
   Wei = dnorm(t(SUP),rho[j]*SUP,sqrt(1-rho[j]^2))
   Wei = Wei/rowSums(Wei)
   WEI[,ind] = matrix(1,k,1)%x%Wei
@@ -192,16 +196,15 @@ for(j in 1:k){
 PIs = (PI%x%matrix(1,q,q))*WEI
 
 t0 = proc.time()
-
 # to do in Fortran
 # find non-redundant X configurations (may be very slow)
 # Xd = array(X,c(ne,nc,n*TT))
 # indn = matrix(1:(n*TT),n,TT)
 # for(jd in 1:nd) INDN[[jd]]$ind = jd
-X1 = matrix(X,ne*nc,n*TT)
+X1 = matrix(X,ne*nc,ns*TT)
 out1 = t(unique(t(X1)))
 nd = ncol(out1)
-indn = rep(0,n*TT)
+indn = rep(0,ns*TT)
 INDN = vector("list",nd)
 tmp = ne*nc
 for(jd in 1:nd){
@@ -209,7 +212,7 @@ for(jd in 1:nd){
 	indn[ind] = jd
 	INDN[[jd]]$ind = ind
 }
-indn = matrix(indn,n,TT)
+indn = matrix(indn,ns,TT)
 Xd = array(out1,c(ne,nc,nd))
 #for(jd in 1:nd) INDN[[jd]]$ind = which(indn==jd)
 cat(c("n. distinct covariate conf. = ",nd))
@@ -224,7 +227,7 @@ while(cont && itg<5){
   # compute initial log-likelihood
   I = diag(ne)
   one = matrix(1,ne,1)
-  Pio = array(0,c(n,k*q,TT))
+  Pio = array(0,c(ns,k*q,TT))
   if(mod==0){
   	par0 = par[1:(lev-2+k)]
   	Eta01 = prod_array(Xd,par[(lev+k-1):length(par)])
@@ -249,8 +252,8 @@ while(cont && itg<5){
   }
   Q = rec1(Pio,las,PIs)
   if(q*k==1) pim = Q[,,TT] else pim = rowSums(Q[,,TT])
-  lk = sum(log(pim))
-  
+  lk = sum(yv*log(pim))
+
   if(tol>1){
   	est = NULL; return
   }
@@ -276,7 +279,7 @@ while(cont && itg<5){
   	it = it+1
     lko = lk; paro = par; tauo = tau; lrhoo = lrho
     # E-step
-    out = rec3(Q,PIs,Pio,pim)
+    out = rec3(Q,yv,PIs,Pio,pim)
     U = out$U; V = out$V
     # M-step: latent parameters
     if(k>1){
@@ -337,7 +340,7 @@ while(cont && itg<5){
         XXRi1 = aperm(XXRi1,c(2,1,3))
         pc = U[,j,]; pc = as.vector(pc)
         nt = dim(S)[1]
-        YGP = matrix(S,nt,n*TT)-Pit1[,as.vector(indn)]
+        YGP = matrix(S,nt,ns*TT)-Pit1[,as.vector(indn)]
         Om = array(0,c(lev,lev,nd))
         for(r1 in 1:lev) for(r2 in 1:lev){
             if(r2==r1){
@@ -391,7 +394,7 @@ while(cont && itg<5){
     }
     Q = rec1(Pio,las,PIs)
     if(k*q==1) pim = Q[,,TT] else pim = rowSums(Q[,,TT])
-    lk = sum(log(pim))
+    lk = sum(yv*log(pim))
     # display results
     dis = max(abs(c(par-paro,tau-tauo,lrho-lrhoo)))
 #    if((proc.time()[1]-t0)>tdisp){
@@ -423,14 +426,14 @@ while(cont && itg<5){
   while(abs(lk-lko)>10^-5 && it<100 && mod==1){
     lko = lk
     it = it+1
-    out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
+    out = lk_obs_manifest(par1,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
     nx = length(par1)
     d0 = out$s
     ny = length(d0)
     D = matrix(0,nx,ny)
     for (i in 1:nx){
     	o = matrix(0,nx,1); o[i] = 10^-6
-    	out = lk_obs_manifest(par1+o,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
+    	out = lk_obs_manifest(par1+o,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
     	d1 = out$s
   		d = (d1-d0)/10^-6
   		D[i,] = t(d)
@@ -445,14 +448,14 @@ while(cont && itg<5){
     if(mdpar1>0.5) dpar1 = dpar1/mdpar1*0.5
     par1o = par1;
     par1 = par1+dpar1;
-    lktmp = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod)
+    lktmp = lk_obs_manifest(par1,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod)
     lk = lktmp$lk
     cont = 0;
     while(lk<(lko-10^-6)){
       cont = 1;
       dpar1 = dpar1/2;
       par1 = par1o+dpar1;
-      lktmp = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod)
+      lktmp = lk_obs_manifest(par1,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod)
       lk = lktmp$lk
       print(c('halved step',toString(lk-lko)))
     }
@@ -499,27 +502,31 @@ bic = -2*lk+log(n)*(np)
 
 # prediction
 if(output){
-  out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
+  out = lk_obs_manifest(par1,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)  
   lk = out$lk; U = out$U
   sup1 = t(Mar)%*%al
  # if(q>1) sup1 = sup1+kron(ones(k,1),sup*si)
   if(q>1) sup1 = sup1+matrix(1,k,1)%x%(sup*si)
-  PRED0 = array(0,c(n,k,TT)); PRED1 = matrix(0,n,TT)
+  PRED0 = array(0,c(ns,k,TT)); PRED1 = matrix(0,ns,TT)
   for(t in 1:TT){
     PRED0[,,t] = U[,,t]%*%t(Mar)
     PRED1[,t] = U[,,t]%*%sup1
   }
+  if(any(yv!=1)){
+  	PRED0=PRED0/yv
+  	PRED1=PRED1/yv
+  }
 }
 # standard errors
 if(out_se){ 					
-  out = lk_obs_manifest(par1,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
+  out = lk_obs_manifest(par1,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
   nx = length(par1)
   d0 = out$s
   ny = length(d0)
   D = matrix(0,nx,ny)
   for (i in 1:nx){
     	o = matrix(0,nx,1); o[i] = 10^-6
-    	out = lk_obs_manifest(par1+o,S,Xd,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
+    	out = lk_obs_manifest(par1+o,S,Xd,yv,indn,lev,k,sup,G2,IPI,mod,outp=TRUE)
     	d1 = out$s
   		d = (d1-d0)/10^-6
   		D[i,] = t(d)
