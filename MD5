@@ -1,4 +1,4 @@
-d4c7cdfed47d31cb55bb703fc9603593 *DESCRIPTION
+44fbc99d2b0094552a9975251f318414 *DESCRIPTION
 3b192ce5454f7a2f2f7e8b27edebef0c *NAMESPACE
 e53e9c6d94232ef02a2c704139696c1f *R/blkdiag.R
 56a333311688fca8f2d47972686c29a1 *R/bootstrap_lm_basic.R
@@ -57,7 +57,8 @@ a573184aee1d3fbdb157b9285438ddb5 *data/RLMSdat.rda
 533f769333ebad04b5a0c0624010b33b *data/data_SRHS_long.rda
 5a952b7ec49cebddfdff9ce85a9f613b *data/data_criminal_sim.rda
 9e2c2997c39baebd56596091828a4325 *data/data_drug.rda
-4921b0b534d55b859eeeb7a964895fbd *man/LMest-package.Rd
+2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
+1507d096af6abe6140bb0a8c55bec9b4 *man/LMest-package.Rd
 02eddd15ad08405d641fe4d03465f2eb *man/RLMSdat.Rd
 7c40ffd2a838d5589c13aa3c85fdf8d7 *man/blkdiag.Rd
 1905487bffc892c2ac6c5c2852ceecbb *man/bootstrap_lm_basic.Rd

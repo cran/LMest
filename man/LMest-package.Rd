@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab LMest\cr
 Type: \tab Package\cr
-Version: \tab 2.4\cr
-Date: \tab 2017-06-06\cr
+Version: \tab 2.4.1\cr
+Date: \tab 2017-10-16\cr
 License: \tab Unlimited\cr
 }
 The most important functions are \code{est_lm_basic}, \code{est_lm_cov_manifest}, and \code{est_lm_cov_latent} which estimate the basic LM model and its extensions including covariates
@@ -18,8 +18,11 @@ The most important functions are \code{est_lm_basic}, \code{est_lm_cov_manifest}
 Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)
 Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
 }
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
-	Chapman and Hall/CRC press.}
+\references{
+	Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
+
+Bartolucci, F., Pandolfi, S. and Pennoni, F. (2017), LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data, \emph{Journal of Statistical Software}, \bold{81}, 1-38, doi:10.18637/jss.v081.i04.	
+}
 %~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
 \keyword{ package }
 %\seealso{
