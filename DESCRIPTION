@@ -1,14 +1,14 @@
 Package: LMest
 Type: Package
 Title: Latent Markov Models with and without Covariates
-Version: 2.4.1
-Date: 2017-10-16
+Version: 2.4.2
+Date: 2018-03-09
 Author: Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)
 Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
 Description: Fit certain versions of the Latent Markov model for longitudinal categorical data.
 License: GPL (>= 2)
 Depends: R (>= 2.0.0), MASS, MultiLCIRT, stats
 NeedsCompilation: yes
-Packaged: 2017-10-16 08:47:26 UTC; francescobartolucci
 Repository: CRAN
-Date/Publication: 2017-10-16 12:53:32 UTC
+Packaged: 2018-03-09 11:05:35 UTC; francescobartolucci
+Date/Publication: 2018-03-11 08:55:21 UTC

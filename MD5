@@ -1,4 +1,4 @@
-44fbc99d2b0094552a9975251f318414 *DESCRIPTION
+9e3e58300d6e024f26b021d6f87a72a9 *DESCRIPTION
 3b192ce5454f7a2f2f7e8b27edebef0c *NAMESPACE
 e53e9c6d94232ef02a2c704139696c1f *R/blkdiag.R
 56a333311688fca8f2d47972686c29a1 *R/bootstrap_lm_basic.R
@@ -37,7 +37,7 @@ e6d8d1d5908842c23b1d4d4ee7274133 *R/print.LMsearch.R
 65c2f855eb3fcf6a0f5fbe683f4ed5ec *R/print.MCbasic.R
 7f206a5adb660cfb345f1d712c3e07a2 *R/print.MClatent.R
 f7b3ba92c3bd463dddb6475edf52423e *R/prob_multilogit.R
-1a6d7cc12caaed601191937d0de1c39a *R/prob_post_cov.R
+16b2c82bc76557e87e9675e2a4a70774 *R/prob_post_cov.R
 43224461df0d8d7b83a98d85208b8c75 *R/prod_array.R
 015a3373bd9f1ca75cc652f88cabe02a *R/rec1.R
 eac09c48682de5d547e21fc68ce0b04c *R/rec3.R
@@ -58,7 +58,7 @@ a573184aee1d3fbdb157b9285438ddb5 *data/RLMSdat.rda
 5a952b7ec49cebddfdff9ce85a9f613b *data/data_criminal_sim.rda
 9e2c2997c39baebd56596091828a4325 *data/data_drug.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
-1507d096af6abe6140bb0a8c55bec9b4 *man/LMest-package.Rd
+7bbca46c2a7baffc9a8ec37cca2513cf *man/LMest-package.Rd
 02eddd15ad08405d641fe4d03465f2eb *man/RLMSdat.Rd
 7c40ffd2a838d5589c13aa3c85fdf8d7 *man/blkdiag.Rd
 1905487bffc892c2ac6c5c2852ceecbb *man/bootstrap_lm_basic.Rd
