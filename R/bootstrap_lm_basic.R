@@ -8,10 +8,10 @@ function(piv,Pi,Psi,n,B=100,start=0,mod=0,tol=10^-6){
 # Preliminaries
 	k = length(piv)
 	c = dim(Psi)[1]
-	T = dim(Pi)[3]
+	TT = dim(Pi)[3]
 # Reparametrize
-    mPsi = 0; mpiv = 0; mPi = 0
-    m2Psi = 0; m2piv = 0; m2Pi = 0
+    mPsi = mpiv = mPi = 0
+    m2Psi = m2piv = m2Pi = 0
 #    mth = 0; m2th = 0;
     for(b in 1:B){
 	    	out = draw_lm_basic(piv,Pi,Psi,n)

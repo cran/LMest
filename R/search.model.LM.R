@@ -1,4 +1,4 @@
-search.model.LM <- function(version = c("basic","latent","manifest"), kv, ..., nrep=2, tol1 = 10^-5, tol2 = 10^-10,out_se=FALSE){
+search.model.LM <- function(version = c("basic","latent","manifest","basic.cont","latent.cont"), kv, ..., nrep=2, tol1 = 10^-5, tol2 = 10^-10,out_se=FALSE){
 
 # function that search for the global maximum of the log-likelihood
 # vector of kv to try for
@@ -17,6 +17,8 @@ for(k in kv){
   	if(version=="basic") out[[k]] = try(est_lm_basic(...,k=k,start=0,tol=tol1))
 	if(version=="latent") out[[k]] = try(est_lm_cov_latent(...,k=k,start=0,tol=tol1))	
 	if(version=="manifest") out[[k]] = try(est_lm_cov_manifest(...,k=k,start=0,tol=tol1))
+	if(version=="basic.cont") out[[k]] = try(est_lm_basic_cont(...,k=k,start=0,tol=tol1))
+	if(version=="latent.cont") out[[k]] = try(est_lm_cov_latent_cont(...,k=k,start=0,tol=tol1))
 	
 	if(!inherits(out[[k]],"try-error")){
   		errv[[k]] = FALSE
@@ -40,6 +42,8 @@ for(k in kv){
     			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))	
     			if(version=="latent") outh = try(est_lm_cov_latent(...,k=k,start=1,tol=tol1))
     			if(version=="manifest") outh = try(est_lm_cov_manifest(...,k=k,start=1,tol=tol1))
+    			if(version=="basic.cont") outh = try(est_lm_basic_cont(...,k=k,start=1,tol=tol1))
+    		if(version=="latent.cont") outh = try(est_lm_cov_latent_cont(...,k=k,start=1,tol=tol1))	
     			if(!inherits(outh,"try-error")){
 	    			lktrace = c(lktrace,outh$lk)
 					if(outh$lk>out[[k]]$lk) out[[k]] = outh	
@@ -60,6 +64,8 @@ for(k in kv){
     			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))	
     			if(version=="latent") outh = try(est_lm_cov_latent(...,k=k,start=1,tol=tol1))
     			if(version=="manifest") outh = try(est_lm_cov_manifest(...,k=k,start=1,tol=tol1))
+    			if(version=="basic.cont") outh = try(est_lm_basic_cont(...,k=k,start=1,tol=tol1))	
+    		if(version=="latent.cont") outh = try(est_lm_cov_latent_cont(...,k=k,start=1,tol=tol1))
     			if(!inherits(outh,"try-error")){
 	    			lktrace = c(lktrace,outh$lk)
 					if(outh$lk>out[[k]]$lk) out[[k]] = outh	
@@ -80,6 +86,11 @@ for(k in kv){
   		if(version=="latent") outn = try(est_lm_cov_latent(...,k=k,start=2,tol=tol2,Psi=out[[k]]$Psi,Be=out[[k]]$Be,Ga=out[[k]]$Ga,out_se=out_se))   	
   	
   		if(version=="manifest") outn = try(est_lm_cov_manifest(...,k=k,start=2,tol=tol2,mu=out[[k]]$mu,al=out[[k]]$al,be=out[[k]]$be,la=out[[k]]$la,PI=out[[k]]$PI,rho=out[[k]]$rho,si=out[[k]]$si,out_se=out_se))
+  		
+  		if(version=="basic.cont") outn = try(est_lm_basic_cont(...,k=k,start=2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Mu=out[[k]]$Mu,Si=out[[k]]$Si))	
+  	
+  		if(version=="latent.cont") outn = try(est_lm_cov_latent_cont(...,k=k,start=2,tol=tol2,Mu=out[[k]]$Mu,Si=out[[k]]$Si,Be=out[[k]]$Be,Ga=out[[k]]$Ga))  	
+  	
   		if(!inherits(outn,"try-error")){
   			lktrace = c(lktrace,outn$lk)
   			out[[k]] = outn		

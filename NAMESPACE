@@ -1,23 +1,27 @@
 useDynLib(LMest, .registration = TRUE)
 
 
-import("MASS", "MultiLCIRT", "stats")
+import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm")
 
-export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "decoding","draw_lm_basic", 
-       "draw_lm_cov_latent", "draw_lm_mixed", "est_lm_basic", "est_lm_cov_latent",
-       "est_lm_cov_manifest", "est_lm_mixed", "long2matrices", "long2wide","search.model.LM","est_mc_basic", "est_mc_cov_latent")
+export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "bootstrap_lm_basic_cont", "bootstrap_lm_cov_latent_cont", "decoding", "draw_lm_basic", 
+       "draw_lm_cov_latent", "draw_lm_mixed", "draw_lm_basic_cont", "draw_lm_cov_latent_cont", "est_lm_basic", "est_lm_cov_latent",
+       "est_lm_cov_manifest", "est_lm_mixed", "est_lm_basic_cont", "est_lm_cov_latent_cont", "long2matrices", "long2wide","search.model.LM","est_mc_basic", "est_mc_cov_latent")
 
 # S3methods
 S3method(print, LMbasic)
 S3method(print, LMlatent)
 S3method(print, LMmanifest)
 S3method(print, LMmixed)
+S3method(print, LMbasiccont)
+S3method(print, LMlatentcont)
 S3method(print, LMsearch)
 S3method(print, MCbasic)
 S3method(print, MClatent)
 S3method(summary, LMbasic)
 S3method(summary, LMlatent)
 S3method(summary, LMmanifest)
+S3method(summary, LMbasiccont)
+S3method(summary, LMlatentcont)
 S3method(summary, LMmixed)
 S3method(summary, LMmixed)
 S3method(summary, LMsearch)
