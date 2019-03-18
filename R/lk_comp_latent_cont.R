@@ -11,9 +11,11 @@ lk_comp_latent_cont <- function(Y,yv,Piv,PI,Mu,Si,k){
 	Phi = array(1,c(n,k,TT)); L = array(0,c(n,k,TT))
 	
 	for(u in 1:k) Phi[,u,1] = dmvnorm(matrix(Y[,1,],n,r),Mu[,u],Si)
+#	Phi = pmax(Phi,10^-30)
 	L[,,1] = Phi[,,1]*Piv
 	for(t in 2:TT){
 		for(u in 1:k) Phi[,u,t] = dmvnorm(matrix(Y[,t,],n,r),Mu[,u],Si)
+#		Phi = pmax(Phi,10^-30)
    		for(i in 1:n)	L[i,,t] = L[i,,t-1]%*%PI[,,i,t]
    		L[,,t] = L[,,t]*Phi[,,t]
   	}

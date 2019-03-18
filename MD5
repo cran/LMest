@@ -1,5 +1,5 @@
-29ee3a1e560b68ce5baeec69c4afa69c *DESCRIPTION
-fe208de4a9707a088d12dae1256abfb1 *NAMESPACE
+f385d27de2f999a153cc3d7f4c6dba35 *DESCRIPTION
+da3d9eea2a46c9b54dd50bcba1cd434e *NAMESPACE
 e53e9c6d94232ef02a2c704139696c1f *R/blkdiag.R
 0f3a295c0316a2f1dacdca139057ce2c *R/bootstrap_lm_basic.R
 88de12fe63e20a86055ae42b6939df95 *R/bootstrap_lm_basic_cont.R
@@ -13,10 +13,10 @@ ac84f02384c5ab78390c118e29a2af4a *R/draw_lm_basic_cont.R
 2ac960a97d201b167b8f4ac153f0d91e *R/draw_lm_cov_latent.R
 2ef69783e845f8b02d92df1bfe251ed8 *R/draw_lm_cov_latent_cont.R
 d6d859b0c50e48a189fc113dd8329534 *R/draw_lm_mixed.R
-38a6e3e6e9c9e136ecdf55cf896bd487 *R/est_lm_basic.R
-332833201d43f4111116d080dedb39f6 *R/est_lm_basic_cont.R
-0e6ec9765ddd4701f582c6c99b9932e8 *R/est_lm_cov_latent.R
-48b329cc5e73184da7478b1a2a67c081 *R/est_lm_cov_latent_cont.R
+011ed0afa8f5932365cbb05cf811e800 *R/est_lm_basic.R
+c93aa94b7a00b9a86fc3916ae0df8532 *R/est_lm_basic_cont.R
+b6f0f917e138b6203c71911b991f68ec *R/est_lm_cov_latent.R
+f2168a3e0214d28e347ac7614ce888cb *R/est_lm_cov_latent_cont.R
 1ffe0f44f668c2f3adb1c315c34b8298 *R/est_lm_cov_manifest.R
 025d138647cf28fcbc8e322c7ba650e2 *R/est_lm_mixed.R
 3e5126870d33dbeb5886d02b909799d4 *R/est_mc_basic.R
@@ -27,8 +27,9 @@ d6d859b0c50e48a189fc113dd8329534 *R/draw_lm_mixed.R
 8f1a41321e33baf624a0f9a038fa7809 *R/invglob.R
 99ba6620b6a1602d267f087aa28f0e93 *R/lk_ar_rho.R
 87e6c080f0e4982a1f249938b15fb427 *R/lk_comp_latent.R
-6f1dd93defc03c25e18def516c2ed43f *R/lk_comp_latent_cont.R
+5bb817eafe65eea9043ba179299a3c62 *R/lk_comp_latent_cont.R
 e968d1e2c214412eacb41dd49e5f0323 *R/lk_obs.R
+44c941c9f1b52f1251cd4cfb2c2026f8 *R/lk_obs_cont.R
 86cc4042bdbe76142d53a62719df5a58 *R/lk_obs_latent.R
 79c31a6d7aff32b935e1f1ffd9501778 *R/lk_obs_manifest.R
 d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
@@ -57,7 +58,7 @@ eac09c48682de5d547e21fc68ce0b04c *R/rec3.R
 b81597769229f704cc0745fdc42f3705 *R/sq.R
 d4df6edb1dc3d1028749483e80be70ed *R/stationary.R
 202262bbc5f6deccae3a251ae954cc1f *R/summary.LMbasic.R
-6e0cffcfa865310a4a0f09588661b1ef *R/summary.LMbasiccont.R
+71ebba2746b43c24888c4db92b60fe6e *R/summary.LMbasiccont.R
 4f8db4781f9e396361e25bbec66f0380 *R/summary.LMlatent.R
 e39c6f95684f5b35b305967d19846965 *R/summary.LMlatentcont.R
 4663b84ac45f232b28cefe2013d544ae *R/summary.LMmanifest.R
@@ -71,7 +72,7 @@ a573184aee1d3fbdb157b9285438ddb5 *data/RLMSdat.rda
 5a952b7ec49cebddfdff9ce85a9f613b *data/data_criminal_sim.rda
 9e2c2997c39baebd56596091828a4325 *data/data_drug.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
-b53c7909fc99ae908c447a2845465b92 *man/LMest-package.Rd
+9d44b522c968aa649f3dd9bf76df5b68 *man/LMest-package.Rd
 02eddd15ad08405d641fe4d03465f2eb *man/RLMSdat.Rd
 7c40ffd2a838d5589c13aa3c85fdf8d7 *man/blkdiag.Rd
 1905487bffc892c2ac6c5c2852ceecbb *man/bootstrap_lm_basic.Rd
@@ -90,7 +91,7 @@ c5a5fc6410f505ab3dcf134e86a30f5d *man/draw_lm_cov_latent.Rd
 1cd55518fb591be1068112b8c0ba57ad *man/draw_lm_cov_latent_cont.Rd
 c1d1f45f23c8dccf81ac14573f81a41e *man/draw_lm_mixed.Rd
 dbdbab28a8561aaa7ab8de9ff83c9336 *man/est_lm_basic.Rd
-6aa820d761a2a2eb7aed35fa8462784d *man/est_lm_basic_cont.Rd
+5aa4e3e7489bd217ab0b317b55729604 *man/est_lm_basic_cont.Rd
 ae2e6c97181e14595eb8de58b0b3d752 *man/est_lm_cov_latent.Rd
 161320e9c14652989fd00edc71cb5ce1 *man/est_lm_cov_latent_cont.Rd
 dbba47ee1d66b95a13a3511c5b4af20b *man/est_lm_cov_manifest.Rd

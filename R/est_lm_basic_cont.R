@@ -1,5 +1,5 @@
 est_lm_basic_cont <-
-function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL){
+function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL){
 
 # Preliminaries
     check_der = FALSE  # to check derivatives
@@ -16,15 +16,32 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
   		if(is.matrix(Y)) Y = array(Y,c(dim(Y),1))
   	}else r = sY[3]
   	
-  	# miss = any(is.na(S))
-	# if(miss){
-         # cat("Missing data in the dataset, treated as missing at random\n")
-         # R = 1 * (!is.na(S))
-         # S[is.na(S)] = 0
-	# }else{
-		# R = NULL
-	# }
   	Yv = matrix(Y,n*TT,r)
+  	
+  	## Check and inpute for missing data
+  	miss = any(is.na(Yv))
+  	if(miss)
+  	{
+  	  Yv <- imputeData(Yv, verbose = FALSE)
+  	  Y <- array(Yv,c(n,TT,r))
+  	  cat("Missing data in the dataset. imputeData function (mclust package) used for imputation.\n")
+  	}
+  	
+  	
+  	th = NULL; sc = NULL; J = NULL  		
+  	if(out_se){
+  	  B = cbind(-rep(1,k-1),diag(k-1))
+  	  Bm = rbind(rep(0,k-1),diag(k-1))
+  	  C = array(0,c(k-1,k,k))
+  	  Cm = array(0,c(k,k-1,k))
+  	  for(u in 1:k){
+  	    C[,,u] = rbind(cbind(diag(u-1),-rep(1,u-1),matrix(0,u-1,k-u)),
+  	                   cbind(matrix(0,k-u,u-1),-rep(1,k-u),diag(k-u)))
+  	    Cm[,,u] = rbind(cbind(diag(u-1),matrix(0,u-1,k-u)),
+  	                    rep(0,k-1),
+  	                    cbind(matrix(0,k-u,u-1),diag(k-u)))
+  	  }
+  	}
   	
 # When there is just 1 latent class
   	if(k == 1){ 
@@ -32,7 +49,7 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
    	 	Mu = colMeans(Yv)
    	 	Si = cov(Yv)
    	 	lk = sum(dmvnorm(Yv,Mu,Si,log=TRUE))
-		np = k*r+r*(r+1)/2
+		  np = k*r+r*(r+1)/2
 	    aic = -2*lk+np*2
 	    bic = -2*lk+np*log(n)
     		out =     		list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=NULL,V=NULL,call=match.call())
@@ -48,15 +65,15 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
 		Mu = matrix(0,r,k)
 		for(u in 1:k) Mu[,u] = qt[u]*std+mu
    		
-  		piv = rep(1,k)/k
+  	piv = rep(1,k)/k
 		Pi = matrix(1,k,k)+9*diag(k); Pi = diag(1/rowSums(Pi))%*%Pi;
 		Pi = array(Pi,c(k,k,TT)); Pi[,,1] = 0
   	}
   	if(start==1){
   		Mu = matrix(0,r,k)
-		mu = colMeans(Yv)
-		Si = cov(Yv)
-		for(u in 1:k) Mu[,u] = rmvnorm(1,mu,Si)
+		  mu = colMeans(Yv)
+		  Si = cov(Yv)
+		  for(u in 1:k) Mu[,u] = rmvnorm(1,mu,Si)
 	    Pi = array(runif(k^2*TT),c(k,k,TT))
 	    for(t in 2:TT) Pi[,,t] = diag(1/rowSums(Pi[,,t]))%*%Pi[,,t]
 	    Pi[,,1] = 0
@@ -145,9 +162,80 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
     	lkv = c(lkv,lk)
 #print(proc.time()-time)
 	}
-
+  # Compute information matrix if required	
+  if(out_se){
+    th = NULL
+    th = c(th,as.vector(Mu))
+    th = c(th,Si[upper.tri(Si,TRUE)])
+    th = c(th,B%*%log(piv))
+    if(mod==0) for(t in 2:TT) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,t]))
+    if(mod==1) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,2]))
+    
+    th0 = th-10^-5/2
+ #   browser()
+    out = lk_obs_cont(th0,Bm,Cm,k,Y,TT,r,mod)
+    lk0 = out$lk; sc0 = out$sc
+    lth = length(th)
+    scn = rep(0,lth)
+    J = matrix(0,lth,lth)
+    for(j in 1:lth){
+      thj = th0; thj[j] = thj[j]+10^-5
+      out = lk_obs_cont(thj,Bm,Cm,k,Y,TT,r,mod)
+      scn[j] = (out$lk-lk0)/10^-5
+      J[,j] = (out$sc-sc0)/10^-5
+    }
+    J = -(J+t(J))/2
+#    print(c(lk,lk0))
+#    print(round(cbind(scn,sc0,round(scn-sc0,4)),5))
+  #  se = sqrt(diag(ginv(J)))
+    Va = ginv(J)
+    nMu = r*k
+    nSi = r*(r+1)/2
+    Va2 = Va[1:(nMu+nSi),1:(nMu+nSi)]
+    se2 = sqrt(diag(Va2))
+    
+    Va = Va[-(1:(nMu+nSi)),-(1:(nMu+nSi))]
+    Om = diag(piv)-tcrossprod(piv,piv)
+    M = Om%*%Bm
+    if(mod==0){
+      for(t in 2:TT) for(u in 1:k){
+        Om = diag(Pi[u,,t])-Pi[u,,t]%o%Pi[u,,t]
+        M = blkdiag(M,Om%*%Cm[,,u])
+      }
+    }
+    if(mod==1){
+      for(u in 1:k){
+        Om = diag(Pi[u,,2])-Pi[u,,2]%o%Pi[u,,2]
+        M = blkdiag(M,Om%*%Cm[,,u])
+      }
+    }
+    if(mod>1){
+      for(u in 1:k){
+        Om = diag(Pi[u,,2])-Pi[u,,2]%o%Pi[u,,2]
+        M = blkdiag(M,Om%*%Cm[,,u])
+      }
+      for(u in 1:k){
+        Om = diag(Pi[u,,mod+1])-Pi[u,,mod+1]%o%Pi[u,,mod+1]
+        M = blkdiag(M,Om%*%Cm[,,u])
+      }
+    }
+    M = as.matrix(M)
+    Va = M%*%Va%*%t(M)
+    dVa = diag(Va)
+    if(any(dVa<0)) warning("Negative elements in the estimated variance-covariance matrix for the parameters estimates")
+    se = sqrt(abs(dVa))
+    # Divide parameters
+    se = c(se2,se)
+    seMu = se[1:nMu]
+    seSi = se[nMu+(1:nSi)]
+    sepiv = se[nMu+nSi+(1:k)]
+     
+    if(mod==0) sePi = se[nMu+nSi+k+(1:(k*k*(TT-1)))]
+    if(mod==1) sePi = se[nMu+nSi+k+(1:(k*k))]
+    if(mod>1) sePi = se[nMu+nSi+k+(1:(k*k*2))]
+    }  
 # Compute number of parameters  
-	np = (k-1)+k*r+r*(r+1)/2
+	  np = (k-1)+k*r+r*(r+1)/2
   	if(mod==0) np = np+(TT-1)*k*(k-1)
   	if(mod==1) np = np+k*(k-1)
   	if(mod>1) np = np+2*k*(k-1)
@@ -155,7 +243,7 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
   	bic = -2*lk+np*log(n)
 	cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")	
 	# adjust output
-#	if(any(yv!=1)) V = V/yv
+  #	if(any(yv!=1)) V = V/yv
 	
 	lk = as.vector(lk)
 	dimnames(Pi)=list(state=1:k,state=1:k,time=1:TT)
@@ -165,7 +253,31 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL
 	dimnames(Si)=list(item=1:r,item=1:r)
 
 	out = list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=lkv,V=V,call=match.call())
-	
+	if(out_se){
+	   seMu = matrix(seMu,r,k)
+	   seSi2 = matrix(0,r,r)
+	   seSi2[upper.tri(seSi2,TRUE)]=seSi
+	   seSi2[lower.tri(seSi2)]=seSi2[upper.tri(seSi2)]
+	   seSi = seSi2
+	   sePi0 = sePi
+	   sePi = array(0,c(k,k,TT))
+	   if(mod>1){
+	     sePi0 = array(sePi0,c(k,k,2))
+	     sePi0 = aperm(sePi0,c(2,1,3))
+	     sePi[,,2:mod] = sePi0[,,1]
+	     sePi[,,(mod+1):TT] = sePi0[,,2]
+	   } else {
+	     sePi[,,2:TT] = sePi0
+	     sePi = aperm(sePi,c(2,1,3))
+	   }
+	   dimnames(sePi) = list(state=1:k,state=1:k,time=1:TT)
+	   if(r==1) dimnames(seMu) = list(item=1,state=1:k) else dimnames(seMu)=list(item=1:r,state=1:k)
+	  
+	  out$sepiv = sepiv
+	  out$sePi = sePi
+	  out$seMu = seMu
+	  out$seSi = seSi
+	}
     cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
     class(out)="LMbasiccont"
 	return(out)

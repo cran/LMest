@@ -33,7 +33,17 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
    	if(!is.null(X2)) if(any(is.na(X2))) stop("missing data not allowed in X2")
   	
 	Yv = matrix(Y,n*TT,r)
-	  		
+	  
+	## Check and inpute for missing data
+	
+	miss = any(is.na(Yv))
+	if(miss)
+	{
+	  Yv <- imputeData(Yv,verbose = FALSE)
+	  Y <- array(Yv,c(n,TT,r))
+	  cat("Missing data in the dataset. imputeData function (mclust package) used for imputation.\n")
+	}
+			
 # Covariate structure and related matrices: initial probabilities
 	if(k == 2){
 		GBe = as.matrix(c(0,1))
@@ -224,7 +234,7 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
     }
 
 ###### standard EM #####
-   	out = lk_comp_latent_cont(Y,yv,Piv,PI,Mu,Si,k)    	
+   	out = lk_comp_latent_cont(Y,yv,Piv,PI,Mu,Si,k) 
    	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   # 	if(is.nan(lk)) browser()
 	it = 0; lko = lk-10^10; lkv = NULL

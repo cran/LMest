@@ -344,6 +344,7 @@ cat("------------|-------------|-------------|-------------|-------------|------
 	    	}
 	    	for(j in 1:r) for(c in 1:k){
 				tmp = Y1[1:(b[j]+1),c,j]
+				if(any(is.na(tmp))) tmp[is.na(tmp)] = 0
 				tmp = pmax(tmp/sum(tmp),10^-10)
 				Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
 			}

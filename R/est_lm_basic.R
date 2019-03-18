@@ -3,7 +3,7 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
 
 # Preliminaries
     check_der = FALSE  # to check derivatives
-	n = sum(yv)
+	  n = sum(yv)
    	sS = dim(S)
   	ns = sS[1]
   	TT = sS[2]
@@ -158,6 +158,7 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
 		M = (Phi[,,2]*M)%*%t(Pi[,,2])
 		V[,,1] = Yvp*L[,,1]*M
 #print(proc.time()-time)
+		
 # If required store parameters
 # ---- M-step ----
 # Update Psi
@@ -178,9 +179,11 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
 	}
 	for(j in 1:r) for(c in 1:k){
 		tmp = Y1[1:(bv[j]+1),c,j]
+		if(any(is.na(tmp))) tmp[is.na(tmp)] = 0 
 		tmp = pmax(tmp/sum(tmp),10^-10)
 		Psi[1:(bv[j]+1),c,j] = tmp/sum(tmp)
 	} 
+	
 #print(proc.time()-time)
 # Update piv and Pi
 	piv = colSums(V[,,1])/n
@@ -203,6 +206,7 @@ function(S,yv,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL
     	paro = par; par = c(piv,as.vector(Pi),as.vector(Psi))
    	  	if(any(is.na(par))) par = par[-which(is.na(par))]
     	lko = lk
+    	
     	out = complk(S,R,yv,piv,Pi,Psi,k)
     	lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     	if(it/10 == round(it/10)) cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")

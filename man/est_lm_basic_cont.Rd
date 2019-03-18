@@ -7,8 +7,8 @@
 
 \description{Main function for estimating the basic LM model for continuous outcomes.}
 
-\usage{est_lm_basic_cont(Y, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000, piv = NULL,
-                  Pi = NULL, Mu = NULL, Si = NULL)}
+\usage{est_lm_basic_cont(Y, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000,
+                  out_se=FALSE, piv = NULL, Pi = NULL, Mu = NULL, Si = NULL)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,6 +18,7 @@
   \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
+  \item{out_se}{to compute the information matrix and standard errors}
   \item{piv }{initial value of the initial probability vector (if start=2)}
   \item{Pi }{initial value of the transition probability matrices (k x k x TT) (if start=2) }
   \item{Mu }{initial value of the conditional means (r x k) (if start=2)}

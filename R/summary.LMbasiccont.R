@@ -31,15 +31,15 @@ if(is.null(object$sePi)==FALSE){
 }	
 	cat("\n Mu - Conditional response means:\n")
 	print(round(object$Mu,4))
-	if(is.null(object$seMu)==FALSE){
-		cat("\n Standard errors for the conditional response probability matrix:\n")
-		print(round(object$seMu,4))
-	}
+	 if(is.null(object$seMu)==FALSE){
+	 	cat("\n Standard errors for the conditional response means:\n")
+	 	print(round(object$seMu,4))
+	 }
 
 	cat("\n Si - Variance-covariance matrix:\n")
 	print(round(object$Si,4))
-	if(is.null(object$seSi)==FALSE){
-		cat("\n Standard errors for the variance-covariance matrix:\n")
-		print(round(object$seSi,4))
-	}
+	 if(is.null(object$seSi)==FALSE){
+	 	cat("\n Standard errors for the variance-covariance matrix:\n")
+	 	print(round(object$seSi,4))
+	 }
 }
