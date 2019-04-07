@@ -20,11 +20,14 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,Mu
   	
   	## Check and inpute for missing data
   	miss = any(is.na(Yv))
-  	if(miss)
-  	{
-  	  Yv <- imputeData(Yv, verbose = FALSE)
-  	  Y <- array(Yv,c(n,TT,r))
-  	  cat("Missing data in the dataset. imputeData function (mclust package) used for imputation.\n")
+	if(miss){
+		Yv = cbind(1,Yv)
+		pYv = prelim.mix(Yv,1)
+		thhat = em.mix(prelim.mix(Yv,1))
+		rngseed(1)
+		Yv = imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1]
+		Y = array(Yv,c(n,TT,r))
+		cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
   	}
   	
   	
@@ -253,6 +256,7 @@ function(Y,k,start=0,mod=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,Mu
 	dimnames(Si)=list(item=1:r,item=1:r)
 
 	out = list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=lkv,V=V,call=match.call())
+	if(miss) out$Y = Y
 	if(out_se){
 	   seMu = matrix(seMu,r,k)
 	   seSi2 = matrix(0,r,r)

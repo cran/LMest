@@ -39,9 +39,13 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
 	miss = any(is.na(Yv))
 	if(miss)
 	{
-	  Yv <- imputeData(Yv,verbose = FALSE)
-	  Y <- array(Yv,c(n,TT,r))
-	  cat("Missing data in the dataset. imputeData function (mclust package) used for imputation.\n")
+		Yv = cbind(1,Yv)
+		pYv = prelim.mix(Yv,1)
+		thhat = em.mix(prelim.mix(Yv,1))
+		rngseed(1)
+		Yv = imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1]
+		Y = array(Yv,c(n,TT,r))
+		cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
 	}
 			
 # Covariate structure and related matrices: initial probabilities
@@ -82,7 +86,7 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
 		Zlab = rep(1,n*(TT-1))
 		nameGa = NULL
 		Zndis = max(Zlab)
-	}else{	
+	}else{
 		if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
 		if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
     	nc2 = dim(X2)[3] # number of covariates on the transition probabilities
@@ -274,10 +278,10 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
 		    	UU = NULL
 		    	for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
 		    	tmp = ZZdis[,,,h]
-			if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
-			tmp2 = PIdis[,,h]
-			if(Zndis==1) tmp2 = matrix(tmp2,1,k)
-		    	out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2)
+				if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+				tmp2 = PIdis[,,h]
+				if(Zndis==1) tmp2 = matrix(tmp2,1,k)
+	    		out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2)
 		    	PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,n,TT-1)); Ga[,h] = out$be
 	   	 	}
 		}else if(param=="difflogit"){
@@ -369,6 +373,7 @@ function(Y,X1=NULL,X2=NULL,yv = rep(1,nrow(Y)),k,start=0,tol=10^-8,maxit=1000,
 	           call=match.call(),param=param)
 	 
 	# final output
+	if(miss) out$Y = Y
     if(output){
     	out$PI = PI
     	out$Piv = Piv

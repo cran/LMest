@@ -1,4 +1,4 @@
-est_mc_cov_latent <-
+est_mc_cov <-
 function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),start=0,tol=10^-8,maxit=1000,out_se=FALSE,output=FALSE,fort=TRUE){
 
 # Preliminaries

@@ -12,7 +12,7 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{Y}{array of continuous outcomes (n x TT x r)}
+  \item{Y}{array of continuous outcomes (n x TT x r) - with missing responses, data are imputed using mix package}
   \item{k}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
   \item{mod}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
@@ -37,6 +37,7 @@
   \item{bic }{value of BIC for model selection}
   \item{lkv }{log-likelihood trace at every step}
   \item{V }{array containing the posterior distribution of the latent states for each units and time occasion}
+  \item{Y }{optional completed array with imputed (with missing responses)}
   \item{call}{command used to call the function}
 }
 

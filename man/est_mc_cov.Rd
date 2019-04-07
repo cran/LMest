@@ -1,13 +1,13 @@
-\name{est_mc_cov_latent}
+\name{est_mc_cov}
 
-\alias{est_mc_cov_latent}
+\alias{est_mc_cov}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate Markov chain (MC) model with covariates}
 
 \description{Main function for estimating the MC model with covariates.}
 
-\usage{est_mc_cov_latent(S, X1 = NULL, X2 = NULL, yv = rep(1,nrow(S)), start = 0, tol = 10^-8,
+\usage{est_mc_cov(S, X1 = NULL, X2 = NULL, yv = rep(1,nrow(S)), start = 0, tol = 10^-8,
 	   maxit = 1000, out_se = FALSE, output = FALSE, fort = TRUE)}
 
 %- maybe also 'usage' for other objects documented here.
@@ -63,7 +63,7 @@ TT=6
 X1 = as.matrix(XX[,1])
 X2 = as.matrix(XX[,2:TT])
 # estimate the model
-res = est_mc_cov_latent(S=YY,yv=freq,X1=X1,X2=X2,output=TRUE)
+res = est_mc_cov(S=YY,yv=freq,X1=X1,X2=X2,output=TRUE)
 summary(res)
 
 # Initial probability for female

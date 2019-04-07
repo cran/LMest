@@ -1,13 +1,11 @@
 useDynLib(LMest, .registration = TRUE)
 
 
-import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm", "mclust")
+import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm", "mix")
 
 export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "bootstrap_lm_basic_cont", "bootstrap_lm_cov_latent_cont", "decoding", "draw_lm_basic", 
        "draw_lm_cov_latent", "draw_lm_mixed", "draw_lm_basic_cont", "draw_lm_cov_latent_cont", "est_lm_basic", "est_lm_cov_latent",
-       "est_lm_cov_manifest", "est_lm_mixed", "est_lm_basic_cont", "est_lm_cov_latent_cont", "long2matrices", "long2wide","search.model.LM","est_mc_basic", "est_mc_cov_latent")
-
-importFrom("mclust", imputeData)
+       "est_lm_cov_manifest", "est_lm_mixed", "est_lm_basic_cont", "est_lm_cov_latent_cont", "long2matrices", "long2wide","search.model.LM","est_mc_basic", "est_mc_cov")
 
 # S3methods
 S3method(print, LMbasic)

@@ -13,7 +13,7 @@
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{Y}{array of continuous outcomes (n x TT x r)}
+  \item{Y}{array of continuous outcomes (n x TT x r) - with missing responses, data are imputed using mix package}
   \item{X1}{matrix of covariates affecting the initial probabilities (n x nc1)}
   \item{X2}{array of covariates affecting the transition probabilities (n x TT-1 x nc2)}
   \item{yv}{vector of frequencies of the available configurations}
@@ -42,7 +42,8 @@
   \item{Piv }{estimate of initial probability matrix}
   \item{PI }{estimate of transition probability matrices}
   \item{Ul }{matrix containing the predicted sequence of latent states by the local decoding method}
-   \item{call}{command used to call the function}
+  \item{Y }{optional completed array with imputed (with missing responses)}
+  \item{call}{command used to call the function}
 }
 
 \references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
