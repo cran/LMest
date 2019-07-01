@@ -6,7 +6,7 @@
 
 \title{Dataset about marijuana consumption}
 
-\description{Longitudinal dataset about marijuana consumption measured by ordinal variables with 3 categories with increasing levels of consumption.}
+\description{Longitudinal dataset about marijuana consumption measured by ordinal variables with 3 categories with increasing levels of consumption (1  "never in the past year", 2 "no more than once in a month in the past year", 3 "more than once a month in the past year").}
 
 \usage{data(data_drug)}
 
@@ -22,12 +22,12 @@
   }
 }
 
-\source{Elliot, D. S., Huizinga, D. and Menard, S. (1989) Multiple Problem Youth: Delinquency, Substance Use, and Mental
-Health Problems. New York: Springer.}
+\source{Elliot, D. S., Huizinga, D. and Menard, S. (1989) \emph{Multiple Problem Youth: Delinquency, Substance Use, and Mental
+Health Problems.} New York: Springer.}
 
-\references{Bartolucci, F. (2006). Likelihood inference for a class of latent markov models under 
-linear hypotheses on the transition probabilities. Journal of the Royal Statistical Society, 
-series B, 68, 155-178.}
+\references{Bartolucci, F. (2006) Likelihood inference for a class of latent markov models under
+linear hypotheses on the transition probabilities. \emph{Journal of the Royal Statistical Society,
+series B}, \bold{68}, 155-178.}
 
 \examples{
 data(data_drug)

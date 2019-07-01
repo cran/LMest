@@ -1,14 +1,12 @@
 \name{bootstrap_lm_basic}
 
 \alias{bootstrap_lm_basic}
-%- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{Parametric bootstrap for the basic LM model}
 
-\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
+\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates. \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{bootstrap}} \bold{function}.}
 
 \usage{bootstrap_lm_basic(piv, Pi, Psi, n, B = 100, start = 0, mod = 0, tol = 10^-6)}
-%- maybe also 'usage' for other objects documented here.
 
 \arguments{
   \item{piv }{initial probability vector}
@@ -37,13 +35,13 @@
 # Example of drug consumption data
 # load data
 data(data_drug)
-data_drug = as.matrix(data_drug)
-S = data_drug[,1:5]-1
-yv = data_drug[,6]
-n = sum(yv)
+data_drug <- as.matrix(data_drug)
+S <- data_drug[,1:5]-1
+yv <- data_drug[,6]
+n <- sum(yv)
 # fit of the Basic LM model
-k = 3
-out1 = est_lm_basic(S,yv,k,mod=1,out_se=TRUE)
-out2 = bootstrap_lm_basic(out1$piv,out1$Pi,out1$Psi,n,mod=1,B=1000)
+k <- 3
+out1 <- est_lm_basic(S, yv, k, mod = 1, out_se = TRUE)
+out2 <- bootstrap_lm_basic(out1$piv, out1$Pi, out1$Psi, n, mod = 1, B = 1000)
 }
 }

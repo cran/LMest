@@ -1,8 +1,7 @@
 rec3 <- function(Q,yv,PI,Pio,pim){
-
 # preliminaries
   out = dim(Pio)
-  ns = out[1]; k = out[2]; TT = out[3] 
+  ns = out[1]; k = out[2]; TT = out[3]
 # for t=T
   if(k==1){
     U = array(1,c(k,ns,TT)); V = matrix(ns*(TT-1),k,k)
@@ -14,13 +13,16 @@ rec3 <- function(Q,yv,PI,Pio,pim){
     R = matrix(1,k,ns);
     for(i in 1:ns) V = V+Q1[,i]%o%P1[i,]
 # for other t
-    for(t in seq(TT-1,2,-1)){
-      R = PI%*%(t(Pio[,,t+1])*R)
-      P1 = Pio[,,t]*t(R)
-      U[,,t] = Q1*R
-      Q1 = t((yv*Q[,,t-1])/pim)
-      for(i in 1:ns) V = V+Q1[,i]%o%P1[i,]
-    }
+    ## Se TT = 2
+    if(TT>2){
+      for(t in seq(TT-1,2,-1)){
+        R = PI%*%(t(Pio[,,t+1])*R)
+        P1 = Pio[,,t]*t(R)
+        U[,,t] = Q1*R
+        Q1 = t((yv*Q[,,t-1])/pim)
+        for(i in 1:ns) V = V+Q1[,i]%o%P1[i,]
+      }
+    } 
     V = PI*V
     R = PI%*%(t(Pio[,,2])*R)
     U[,,1] = Q1*R

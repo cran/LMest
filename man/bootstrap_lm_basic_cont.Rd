@@ -1,14 +1,12 @@
 \name{bootstrap_lm_basic_cont}
 
 \alias{bootstrap_lm_basic_cont}
-%- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{Parametric bootstrap for the basic LM model for continuous outcomes}
 
-\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
+\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates. \cr \cr \bold{The function is no longer maintained. Please look at \code{\link{bootstrap}} function}.}
 
 \usage{bootstrap_lm_basic_cont(piv, Pi, Mu, Si, n, B = 100, start = 0, mod = 0, tol = 10^-6)}
-%- maybe also 'usage' for other objects documented here.
 
 \arguments{
   \item{piv }{initial probability vector}
@@ -37,17 +35,18 @@
 
 \examples{
 \dontrun{
-# Example based on multivariate longitudinal continuous data 
+# Example based on multivariate longitudinal continuous data
+
 # load data
 require(mmm)
 data(multiLongGaussian)
-res = long2matrices(multiLongGaussian$ID,X=cbind(multiLongGaussian$X,multiLongGaussian$time),
-      Y=cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
-Y = res$YY
-n = dim(Y)[1]
+res <- long2matrices(multiLongGaussian$ID, X = cbind(multiLongGaussian$X, multiLongGaussian$time),
+      Y = cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
+Y <- res$YY
+n <- dim(Y)[1]
 # fit of the Basic LM model for continuous outcomes
-k = 3
-out1 = est_lm_basic_cont(Y,k,mod=1)
-out2 = bootstrap_lm_basic_cont(out1$piv,out1$Pi,out1$Mu,out1$Si,n,mod=1,B = 1000)
+k <- 3
+out1 <- est_lm_basic_cont(Y, k, mod = 1)
+out2 <- bootstrap_lm_basic_cont(out1$piv, out1$Pi, out1$Mu, out1$Si, n, mod = 1, B = 1000)
 }
 }

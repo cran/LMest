@@ -5,11 +5,13 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate LM model with covariates in the measurement model}
 
-\description{Main function for estimating LM model with covariates in the measurement model based on a global logit parameterization.}
+\description{Main function for estimating LM model with covariates in the measurement model based on a global logit parameterization.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmest}} \bold{function}.}
 
-\usage{est_lm_cov_manifest(S, X, yv = rep(1,nrow(S)), k, q = NULL, mod = c("LM", "FM"),
-       tol = 10^-8, maxit = 1000, start = 0, mu = NULL, al = NULL, be = NULL, si = NULL,
-       rho = NULL, la = NULL, PI = NULL, output = FALSE, out_se = FALSE)}
+\usage{
+est_lm_cov_manifest(S, X, yv = rep(1,nrow(S)), k, q = NULL, mod = c("LM", "FM"),
+                    tol = 10^-8, maxit = 1000, start = 0, mu = NULL, al = NULL,
+                    be = NULL, si = NULL, rho = NULL, la = NULL, PI = NULL,
+                    output = FALSE, out_se = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,7 +27,7 @@
  \item{mu}{starting value for mu (optional)}
  \item{al}{starting value for al (optional)}
  \item{be}{starting value for be (optional)}
- \item{si}{starting value for si when mod="FM" (optional)} 
+ \item{si}{starting value for si when mod="FM" (optional)}
  \item{rho}{starting value for rho when mod="FM" (optional)}
  \item{la}{starting value for la (optional)}
  \item{PI}{starting value for PI (optional)}
@@ -53,9 +55,9 @@
 	\item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data, Chapman and Hall/CRC press.
-	
-Bartolucci, F., Bacci, S. and Pennoni, F. (2014), Longitudinal analysis of the 	self-reported health status by mixture latent autoregressive models, Journal of the Royal Statistical Society - series C, 63, pp. 267-288}
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
+
+Bartolucci, F., Bacci, S. and Pennoni, F. (2014) Longitudinal analysis of the 	self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288}
 \author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}
 
 \examples{
@@ -65,30 +67,31 @@ Bartolucci, F., Bacci, S. and Pennoni, F. (2014), Longitudinal analysis of the 	
 
 # load SRHS data
 data(data_SRHS_long)
-dataSRHS = data_SRHS_long
+dataSRHS <- data_SRHS_long
 head(dataSRHS)
 
-res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
-dataSRHS$race==2|dataSRHS$race==3,dataSRHS$education==4,
-dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
-Y=dataSRHS$srhs)
+res <- long2matrices(dataSRHS$id, X = cbind(dataSRHS$gender-1,
+ dataSRHS$race == 2 | dataSRHS$race == 3, dataSRHS$education == 4,
+dataSRHS$education == 5, dataSRHS$age-50, (dataSRHS$age-50)^2/100),
+Y = dataSRHS$srhs)
 
-X =res$XX
-S = 5-res$YY
+X <- res$XX
+S <- 5-res$YY
 
 # *** fit stationary LM model
-res0 = vector("list",10); tol = 10^-6;
+res0 <- vector("list", 10)
+tol <- 10^-6;
 for(k in 1:10){
-  res0[[k]] = est_lm_cov_manifest(S,X,k,1,mod="LM",tol)
+  res0[[k]] <- est_lm_cov_manifest(S, X, k, 1, mod = "LM", tol)
    save.image("example_SRHS.RData")
 }
 
 # *** fit the mixture latent auto-regressive model
-tol = 0.005
-res = vector("list",4)
-k=1
-q = 51
-res[[k]]=est_lm_cov_manifest(S,X,k,q,mod="FM",tol,output=TRUE)
-for(k in 2:4) res[[k]]=est_lm_cov_manifest(S,X,k,q=61,mod="FM",tol,output=TRUE)
+tol <- 0.005
+res <- vector("list",4)
+k <- 1
+q <- 51
+res[[k]] <- est_lm_cov_manifest(S, X, k, q, mod = "FM", tol, output = TRUE)
+for(k in 2:4) res[[k]] <- est_lm_cov_manifest(S, X, k, q = 61, mod = "FM", tol, output = TRUE)
 }
 }

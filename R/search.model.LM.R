@@ -15,11 +15,11 @@ for(k in kv){
 	cat("***************************************************************************\n")
   	cat(k,"\n")
   	if(version=="basic") out[[k]] = try(est_lm_basic(...,k=k,start=0,tol=tol1))
-	if(version=="latent") out[[k]] = try(est_lm_cov_latent(...,k=k,start=0,tol=tol1))	
+	if(version=="latent") out[[k]] = try(est_lm_cov_latent(...,k=k,start=0,tol=tol1))
 	if(version=="manifest") out[[k]] = try(est_lm_cov_manifest(...,k=k,start=0,tol=tol1))
 	if(version=="basic.cont") out[[k]] = try(est_lm_basic_cont(...,k=k,start=0,tol=tol1))
 	if(version=="latent.cont") out[[k]] = try(est_lm_cov_latent_cont(...,k=k,start=0,tol=tol1))
-	
+
 	if(!inherits(out[[k]],"try-error")){
   		errv[[k]] = FALSE
   	}else{
@@ -34,76 +34,72 @@ for(k in kv){
  	cat("lk = ",lkv,"\n")
   	cat("aic = ",aicv,"\n")
   	cat("bic = ",bicv,"\n")
-  	save(file="search.LM.temp.RData",out,aicv,bicv,errv,lkv)
-  	if(k>1){ 
+  	if(k>1){
   		if(nrep==0){
   			cat("***************************************************************************\n")
   				cat(c(k,1),"\n")
-    			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))	
+    			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))
     			if(version=="latent") outh = try(est_lm_cov_latent(...,k=k,start=1,tol=tol1))
     			if(version=="manifest") outh = try(est_lm_cov_manifest(...,k=k,start=1,tol=tol1))
     			if(version=="basic.cont") outh = try(est_lm_basic_cont(...,k=k,start=1,tol=tol1))
-    		if(version=="latent.cont") outh = try(est_lm_cov_latent_cont(...,k=k,start=1,tol=tol1))	
+    		if(version=="latent.cont") outh = try(est_lm_cov_latent_cont(...,k=k,start=1,tol=tol1))
     			if(!inherits(outh,"try-error")){
 	    			lktrace = c(lktrace,outh$lk)
-					if(outh$lk>out[[k]]$lk) out[[k]] = outh	
-    			}  	
+					if(outh$lk>out[[k]]$lk) out[[k]] = outh
+    			}
 				lkv[k] = out[[k]]$lk
   				aicv[k] = out[[k]]$aic
     			bicv[k] = out[[k]]$bic
-   		
+
    				cat("lktrace = ",sort(lktrace),"\n")
     			cat("lk = ",lkv,"\n")
     			cat("aic = ",aicv,"\n")
     			cat("bic = ",bicv,"\n")
-    			save(file="search.LM.temp.RData",out,aicv,bicv,errv,lkv) 
   		}else{
   			for(h in 1:(nrep*(k-1))){
     			cat("***************************************************************************\n")
   				cat(c(k,h),"\n")
-    			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))	
+    			if(version=="basic") outh = try(est_lm_basic(...,k=k,start=1,tol=tol1))
     			if(version=="latent") outh = try(est_lm_cov_latent(...,k=k,start=1,tol=tol1))
     			if(version=="manifest") outh = try(est_lm_cov_manifest(...,k=k,start=1,tol=tol1))
-    			if(version=="basic.cont") outh = try(est_lm_basic_cont(...,k=k,start=1,tol=tol1))	
+    			if(version=="basic.cont") outh = try(est_lm_basic_cont(...,k=k,start=1,tol=tol1))
     		if(version=="latent.cont") outh = try(est_lm_cov_latent_cont(...,k=k,start=1,tol=tol1))
     			if(!inherits(outh,"try-error")){
 	    			lktrace = c(lktrace,outh$lk)
-					if(outh$lk>out[[k]]$lk) out[[k]] = outh	
-    			}  	
+					if(outh$lk>out[[k]]$lk) out[[k]] = outh
+    			}
 				lkv[k] = out[[k]]$lk
   				aicv[k] = out[[k]]$aic
     			bicv[k] = out[[k]]$bic
-   		
+
    				cat("lktrace = ",sort(lktrace),"\n")
     			cat("lk = ",lkv,"\n")
     			cat("aic = ",aicv,"\n")
     			cat("bic = ",bicv,"\n")
-    			save(file="search.LM.temp.RData",out,aicv,bicv,errv,lkv) 		
   			}
   		}
-  		if(version=="basic") outn = try(est_lm_basic(...,k=k,start=2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Psi=out[[k]]$Psi,out_se=out_se))	
-  	
-  		if(version=="latent") outn = try(est_lm_cov_latent(...,k=k,start=2,tol=tol2,Psi=out[[k]]$Psi,Be=out[[k]]$Be,Ga=out[[k]]$Ga,out_se=out_se))   	
-  	
+  		if(version=="basic") outn = try(est_lm_basic(...,k=k,start=2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Psi=out[[k]]$Psi,out_se=out_se))
+
+  		if(version=="latent") outn = try(est_lm_cov_latent(...,k=k,start=2,tol=tol2,Psi=out[[k]]$Psi,Be=out[[k]]$Be,Ga=out[[k]]$Ga,out_se=out_se))
+
   		if(version=="manifest") outn = try(est_lm_cov_manifest(...,k=k,start=2,tol=tol2,mu=out[[k]]$mu,al=out[[k]]$al,be=out[[k]]$be,la=out[[k]]$la,PI=out[[k]]$PI,rho=out[[k]]$rho,si=out[[k]]$si,out_se=out_se))
-  		
-  		if(version=="basic.cont") outn = try(est_lm_basic_cont(...,k=k,start=2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Mu=out[[k]]$Mu,Si=out[[k]]$Si))	
-  	
-  		if(version=="latent.cont") outn = try(est_lm_cov_latent_cont(...,k=k,start=2,tol=tol2,Mu=out[[k]]$Mu,Si=out[[k]]$Si,Be=out[[k]]$Be,Ga=out[[k]]$Ga))  	
-  	
+
+  		if(version=="basic.cont") outn = try(est_lm_basic_cont(...,k=k,start=2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Mu=out[[k]]$Mu,Si=out[[k]]$Si))
+
+  		if(version=="latent.cont") outn = try(est_lm_cov_latent_cont(...,k=k,start=2,tol=tol2,Mu=out[[k]]$Mu,Si=out[[k]]$Si,Be=out[[k]]$Be,Ga=out[[k]]$Ga))
+
   		if(!inherits(outn,"try-error")){
   			lktrace = c(lktrace,outn$lk)
-  			out[[k]] = outn		
+  			out[[k]] = outn
   			out[[k]]$lktrace = lktrace
   			lkv[k] = out[[k]]$lk
   			aicv[k] = out[[k]]$aic
    	 		bicv[k] = out[[k]]$bic
   		}
-  }	
-  save(file="search.LM.temp.RData",out,aicv,bicv,errv,lkv)
+  }
 }
-	
+
 out = list(out.single=out,aicv=aicv,bicv=bicv,lkv=lkv,errv=errv,kv=kv,call=match.call())
-class(out)="LMsearch"	
+class(out)="LMsearch"
 return(out)
 }

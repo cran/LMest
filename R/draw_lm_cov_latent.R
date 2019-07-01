@@ -1,12 +1,15 @@
 draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 
-# Draw a sample from LM model with covariates 
+# Draw a sample from LM model with covariates
 # param = type of parametrization for the transition probabilities:
 #         multilogit = standard multinomial logit for every row of the transition matrix
 #         difflogit  = multinomial logit based on the difference between two sets of parameters
 # fort  = fortran use (FALSE for not use fortran)
 # X1    = design matrix for the initial probabilities (n by n.cov.)
 # X2    = design matrix for the initial probabilities (n by TT-1 by n.cov.)
+
+  warning("draw_lm_cov_latent function is no longer maintained. Please look at drawLMlatent function",call. = FALSE)
+
 
 # Preliminaries
   	n = nrow(X2)
@@ -54,7 +57,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 			  if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
 		  }else{
 			  GGa = diag(k); GGa = GGa[,-h]
-		  }  		
+		  }
 		  for(i in 1:Zndis){
 			  zdis = c(1,Zdis[i,])
 			  ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
@@ -71,11 +74,11 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 			    if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
 		    }else{
 			    GGa = diag(k); GGa = GGa[,-h]
-		    }  		
+		    }
 			  u = matrix(0,1,k); u[1,h] = 1
 			  U = diag(k); U[,h] = U[,h]-1
 			  U = U[,-1]
-		    ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Zdis[i,]))            
+		    ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Zdis[i,]))
       }
 	  }
   }
@@ -98,7 +101,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
     out = prob_multilogit(XXdis,be,Xlab,fort)
     Piv = out$P
     for(i in 1:n) U[i,1] = which(rmultinom(1,1,Piv[i,])==1)
- 
+
 # parameters on transition probabilities
     if(param=="multilogit"){
     	  if(is.list(Ga)) stop("invalid mode (list) for Ga")
@@ -126,7 +129,7 @@ draw_lm_cov_latent <- function(X1,X2,param="multilogit",Psi,Be,Ga,fort=TRUE){
 # output
   if(r==1) Y = matrix(Y,n,TT)
   out = list(U=U,Y=Y)
-  	
+
 }
 
 

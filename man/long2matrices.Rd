@@ -1,12 +1,11 @@
 \name{long2matrices}
 \alias{long2matrices}
-%- Also NEED an '\alias' for EACH other topic documented here.
+
 \title{From data in the long format to data in array format}
 \description{Function that transforms data in the long format to data in array format.}
 \usage{
 long2matrices(id, time = NULL, X = NULL, Y)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{id }{vector of subjects id}
   \item{time }{vector of time occasions}
@@ -22,14 +21,15 @@ long2matrices(id, time = NULL, X = NULL, Y)
 
 \examples{
 # Example based on SRHS data
+
 # load SRHS data
 data(data_SRHS_long)
-dataSRHS = data_SRHS_long[1:1600,]
+dataSRHS <- data_SRHS_long[1:1600,]
 head(dataSRHS)
-X = cbind(dataSRHS$gender-1,dataSRHS$race==2|dataSRHS$race==3,
-dataSRHS$education==4,dataSRHS$education==5,dataSRHS$age-50,
+X <- cbind(dataSRHS$gender-1, dataSRHS$race == 2 | dataSRHS$race == 3,
+dataSRHS$education == 4,dataSRHS$education == 5, dataSRHS$age-50,
 (dataSRHS$age-50)^2/100)
-Y = dataSRHS$srhs
-res = long2matrices(dataSRHS$id,X=X,Y=Y)
+Y <- dataSRHS$srhs
+res <- long2matrices(dataSRHS$id, X = X, Y = Y)
 }
 

@@ -5,7 +5,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Draw samples from the basic LM model for continuous outcomes}
 
-\description{Function that draws samples from the basic LM model for continuous outcomes with specific parameters.}
+\description{Function that draws samples from the basic LM model for continuous outcomes with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMbasic}} \bold{function}.}
 
 \usage{
 draw_lm_basic_cont(piv, Pi, Mu, Si, n)
@@ -27,17 +27,20 @@ draw_lm_basic_cont(piv, Pi, Mu, Si, n)
 \author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
-# draw a sample for 1000 units and 3 response variable
-n = 1000
-TT = 5
-k = 2
-r = 3 #number of response variables
+\dontrun{
 
-piv = c(0.7,0.3)
-Pi = matrix(c(0.9,0.1,0.1,0.9),k,k)
-Pi = array(Pi,c(k,k,TT))
-Pi[,,1] = 0
-Mu  = matrix(c(-2,-2,0,0,2,2),r,k)
-Si = diag(r)
-out = draw_lm_basic_cont(piv,Pi,Mu,Si,n)
+# draw a sample for 1000 units and 3 response variable
+n <- 1000
+TT <- 5
+k <- 2
+r <- 3 #number of response variables
+
+piv <- c(0.7,0.3)
+Pi <- matrix(c(0.9,0.1,0.1,0.9), k, k)
+Pi <- array(Pi, c(k, k, TT))
+Pi[,,1] <- 0
+Mu <- matrix(c(-2,-2,0,0,2,2), r, k)
+Si <- diag(r)
+out <- draw_lm_basic_cont(piv, Pi, Mu, Si, n)
+}
 }

@@ -5,11 +5,11 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate LM model with covariates in the latent model}
 
-\description{Main function for estimating the LM model with covariates in the latent model.}
+\description{Main function for estimating the LM model with covariates in the latent model.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmest}} \bold{function}.}
 
-\usage{est_lm_cov_latent(S, X1=NULL, X2=NULL, yv = rep(1,nrow(S)), k, start = 0, tol = 10^-8, 
-	   maxit = 1000, param = "multilogit", Psi, Be, Ga, fort = TRUE, output = FALSE, 
-	   out_se = FALSE, fixPsi = FALSE)}
+\usage{est_lm_cov_latent(S, X1=NULL, X2=NULL, yv = rep(1,nrow(S)), k, start = 0, tol = 10^-8,
+                  maxit = 1000, param = "multilogit", Psi, Be, Ga, fort = TRUE,
+                  output = FALSE, out_se = FALSE, fixPsi = FALSE)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,7 +25,7 @@
  \item{Psi}{intial value of the array of the conditional response probabilities (mb x k x r)}
  \item{Be}{intial value of the parameters affecting the logit for the initial probabilities (if start=2)}
  \item{Ga}{intial value of the parametes affecting the logit for the transition probabilities (if start=2)}
- \item{fort}{to use fortran routine when possible (FALSE for not use fortran)} 
+ \item{fort}{to use fortran routine when possible (FALSE for not use fortran)}
  \item{output}{to return additional output (V,PI,Piv,Ul)}
  \item{out_se}{to compute the information matrix and standard errors}
  \item{fixPsi}{TRUE if Psi is given in input and is not updated anymore}
@@ -50,7 +50,7 @@
   \item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data},
 	Chapman and Hall/CRC press.}
 \author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
 
@@ -62,34 +62,35 @@
 data(data_SRHS_long)
 dataSRHS = data_SRHS_long
 
-TT = 8 
+TT <- 8
 head(dataSRHS)
-res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
-dataSRHS$race==2|dataSRHS$race==3, dataSRHS$education==4,
-dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
-Y=dataSRHS$srhs)
+res <- long2matrices(dataSRHS$id, X = cbind(dataSRHS$gender-1,
+dataSRHS$race == 2 | dataSRHS$race == 3, dataSRHS$education == 4,
+dataSRHS$education == 5, dataSRHS$age-50, (dataSRHS$age-50)^2/100),
+Y = dataSRHS$srhs)
 
 # matrix of responses (with ordered categories from 0 to 4)
-S = 5-res$YY
-n = dim(S)[1]
+S <- 5-res$YY
+n <- dim(S)[1]
+
 # matrix of covariates (for the first and the following occasions)
 # colums are: gender,race,educational level (2 columns),age,age^2)
-X1 =res$XX[,1,]
-X2 =res$XX[,2:TT,]
+X1 <- res$XX[,1,]
+X2 <- res$XX[,2:TT,]
 
 # estimate the model
-est2f = est_lm_cov_latent(S,X1,X2,k=2,output=TRUE,out_se=TRUE)
+est2f <- est_lm_cov_latent(S, X1, X2, k = 2, output = TRUE, out_se = TRUE)
 summary(est2f)
 
 # average transition probability matrix
-PI = round(apply(est2f$PI[,,,2:TT],c(1,2),mean),4)
+PI <- round(apply(est2f$PI[,,,2:TT], c(1,2), mean), 4)
 
 # Transition probability matrix for white females with high educational level
-ind1 = (X1[,1]==1 & X1[,2]==0 & X1[,4]==1)
-PI1 = round(apply(est2f$PI[,,ind1,2:TT],c(1,2),mean),4)
+ind1 <- X1[,1] == 1 & X1[,2] == 0 & X1[,4] == 1)
+PI1 <- round(apply(est2f$PI[,,ind1,2:TT], c(1,2), mean), 4)
 
 # Transition probability matrix for non-white male, low educational level
-ind2 = (X1[,1]==0 & X1[,2]==1& X1[,3]==0 & X1[,4]==0)
-PI2 = round(apply(est2f$PI[,,ind2,2:TT],c(1,2),mean),4)
+ind2 <- (X1[,1] == 0 & X1[,2] == 1 & X1[,3] == 0 & X1[,4] == 0)
+PI2 <- round(apply(est2f$PI[,,ind2,2:TT], c(1,2), mean), 4)
 }
 }

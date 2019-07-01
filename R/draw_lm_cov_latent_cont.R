@@ -1,6 +1,6 @@
 draw_lm_cov_latent_cont <- function(X1,X2,param="multilogit",Mu,Si,Be,Ga,fort=TRUE){
 
-# Draw a sample from LM model with covariates 
+# Draw a sample from LM model with covariates
 # X1    = design matrix for the initial probabilities (n x n.cov.)
 # X2    = design matrix for the initial probabilities (n x TT-1 x n.cov.)
 # param = type of parametrization for the transition probabilities:
@@ -12,6 +12,9 @@ draw_lm_cov_latent_cont <- function(X1,X2,param="multilogit",Mu,Si,Be,Ga,fort=TR
 # Ga = parameters on the transition probabilities (if start=2)
 # fort  = fortran use (FALSE for not use fortran)
 
+  warning("draw_lm_cov_latent_cont function is no longer maintained. Please look at drawLMlatentcont function",call. = FALSE)
+
+
 # Preliminaries
   	n = nrow(X2)
   	TT = dim(X2)[2]+1
@@ -19,7 +22,7 @@ draw_lm_cov_latent_cont <- function(X1,X2,param="multilogit",Mu,Si,Be,Ga,fort=TR
     	r = 1
     	k = length(Mu)
     	Mu = matrix(Mu,r,k)
-    Si = matrix(Si,r,r)	
+    Si = matrix(Si,r,r)
     }else{
     	r = nrow(Mu)
     	k = ncol(Mu)
@@ -93,7 +96,7 @@ draw_lm_cov_latent_cont <- function(X1,X2,param="multilogit",Mu,Si,Be,Ga,fort=TR
     out = prob_multilogit(XXdis,be,Xlab,fort)
     Piv = out$P
     for(i in 1:n) U[i,1] = which(rmultinom(1,1,Piv[i,])==1)
- 
+
 # following time occasions
     if(param=="multilogit"){
     	  if(is.list(Ga)) stop("invalid mode (list) for Ga")
@@ -121,7 +124,7 @@ draw_lm_cov_latent_cont <- function(X1,X2,param="multilogit",Mu,Si,Be,Ga,fort=TR
 # output
   if(r==1) Y = matrix(Y,n,TT)
   out = list(U=U,Y=Y)
-  	
+
 }
 
 

@@ -5,7 +5,7 @@
 
 \title{Parametric bootstrap for LM models for continuous outcomes with individual covariates in the latent model}
 
-\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
+\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{bootstrap}} \bold{function}.}
 
 \usage{bootstrap_lm_cov_latent_cont(X1, X2, param = "multilogit", Mu, Si, Be, Ga, B = 100)}
 %- maybe also 'usage' for other objects documented here.
@@ -36,20 +36,22 @@
 
 \examples{
 \dontrun{
-# Example based on multivariate longitudinal continuous data 
+# Example based on multivariate longitudinal continuous data
+
 # load data
 require(mmm)
 data(multiLongGaussian)
-TT=4
-res = long2matrices(multiLongGaussian$ID,X=cbind(multiLongGaussian$X,multiLongGaussian$time),
-                    Y=cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
-Y = res$YY
-X1 =res$XX[,1,]
-X2 =res$XX[,2:TT,]
+TT <- 4
+res <- long2matrices(multiLongGaussian$ID, X = cbind(multiLongGaussian$X, multiLongGaussian$time),
+                    Y = cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
+Y <- res$YY
+X1 <- res$XX[,1,]
+X2 <- res$XX[,2:TT,]
 
 # estimate the model
-est = est_lm_cov_latent_cont(Y,X1,X2,k=3,output=TRUE)
-out = bootstrap_lm_cov_latent_cont(X1,X2,Mu=est$Mu,Si=est$Si,Be=est$Be,Ga=est$Ga,B=1000)
+est <- est_lm_cov_latent_cont(Y, X1, X2, k = 3, output = TRUE)
+out <- bootstrap_lm_cov_latent_cont(X1, X2, Mu = est$Mu, Si = est$Si,
+                                    Be = est$Be, Ga = est$Ga, B = 1000)
 
 }
 }

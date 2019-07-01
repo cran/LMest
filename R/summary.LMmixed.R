@@ -1,14 +1,17 @@
-summary.LMmixed<-function(object,...){ 
-cat("Call:\n")
-print(object$call)
+summary.LMmixed<-function(object,...){
+  if(!is.null(object$call))
+  {
+    cat("Call:\n")
+    print(object$call)
+  }
 out_se = object$call$out_se
 cat("\nCoefficients:\n")
 cat("\nMass probabilities:\n")
-print(round(object$la,4)) 
+print(round(object$la,4))
 if(!is.null(object$sela)){
 	cat("\nStandard errors for the mass probabilities:\n")
 	print(round(object$sela,4))
-} 
+}
 cat("\nInitial probabilities:\n")
 print(round(object$Piv,4))
 if(!is.null(object$sePiv)){

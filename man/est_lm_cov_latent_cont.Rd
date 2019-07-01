@@ -2,18 +2,18 @@
 
 \alias{est_lm_cov_latent_cont}
 
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate LM model for continuous outcomes with covariates in the latent model}
 
-\description{Main function for estimating the LM model for continuous outcomes with covariates in the latent model.}
+\description{Main function for estimating the LM model for continuous outcomes with covariates in the latent model.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmestCont}} \bold{function}.}
 
-\usage{est_lm_cov_latent_cont(Y, X1 = NULL, X2 = NULL, yv = rep(1,nrow(Y)), k, start = 0,
-                 tol = 10^-8, maxit = 1000, param = "multilogit", Mu = NULL, Si = NULL,
-                 Be = NULL, Ga = NULL, output = FALSE)}
+\usage{
+est_lm_cov_latent_cont(Y, X1 = NULL, X2 = NULL, yv = rep(1,nrow(Y)), k, start = 0,
+                       tol = 10^-8, maxit = 1000, param = "multilogit",
+                       Mu = NULL, Si = NULL, Be = NULL, Ga = NULL,
+                       output = FALSE, out_se = FALSE)}
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{Y}{array of continuous outcomes (n x TT x r) - with missing responses, data are imputed using mix package}
+  \item{Y}{array of continuous outcomes (n x TT x r)}
   \item{X1}{matrix of covariates affecting the initial probabilities (n x nc1)}
   \item{X2}{array of covariates affecting the transition probabilities (n x TT-1 x nc2)}
   \item{yv}{vector of frequencies of the available configurations}
@@ -27,6 +27,7 @@
  \item{Be}{intial value of the parameters affecting the logit for the initial probabilities (if start=2)}
  \item{Ga}{intial value of the parametes affecting the logit for the transition probabilities (if start=2)}
  \item{output}{to return additional output (V,PI,Piv,Ul)}
+  \item{out_se}{to compute the information matrix and standard errors}
 }
 
 \value{
@@ -42,32 +43,32 @@
   \item{Piv }{estimate of initial probability matrix}
   \item{PI }{estimate of transition probability matrices}
   \item{Ul }{matrix containing the predicted sequence of latent states by the local decoding method}
-  \item{Y }{optional completed array with imputed (with missing responses)}
-  \item{call}{command used to call the function}
+   \item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
-	Chapman and Hall/CRC press.}
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.}
 \author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia, http://www.stat.unipg.it/bartolucci}
 
 \examples{
 \dontrun{
-# Example based on multivariate longitudinal continuous data 
+# Example based on multivariate longitudinal continuous data
+
 # load data
 require(mmm)
 data(multiLongGaussian)
-TT=4
-res = long2matrices(multiLongGaussian$ID,X=cbind(multiLongGaussian$X,multiLongGaussian$time),
-      Y=cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
-Y = res$YY
-X1 =res$XX[,1,]
-X2 =res$XX[,2:TT,]
+TT <- 4
+res <- long2matrices(multiLongGaussian$ID, X = cbind(multiLongGaussian$X, multiLongGaussian$time),
+      Y = cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
+Y <- res$YY
+X1 <- res$XX[,1,]
+X2 <- res$XX[,2:TT,]
 
 # estimate the model
-est = est_lm_cov_latent_cont(Y,X1,X2,k=3,output=TRUE)
+est <- est_lm_cov_latent_cont(Y, X1, X2, k = 3, output = TRUE)
 summary(est)
 
 # average transition probability matrix
-PI = round(apply(est$PI[,,,2:TT],c(1,2),mean),4); PI
+PI <- round(apply(est$PI[,,,2:TT], c(1,2), mean), 4)
+PI
 }
 }

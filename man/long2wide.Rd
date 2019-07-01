@@ -32,6 +32,6 @@ long2wide(data, nameid, namet, colx, coly, aggr = T, full = 999)
 # load criminal data
 data(data_criminal_sim)
 # consider only the first 1000 records to shorten time
-out = long2wide(data_criminal_sim[1:1000,],"id","time","sex",
-	c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=TRUE,full=999)	
+out <- long2wide(data_criminal_sim[1:1000,], "id", "time", "sex",
+	c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"), aggr = TRUE, full = 999)
 }

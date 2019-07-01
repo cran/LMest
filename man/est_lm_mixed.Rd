@@ -2,15 +2,13 @@
 
 \alias{est_lm_mixed}
 
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate mixed LM model}
 
-\description{Main function for estimating the mixed LM model with discrete random effect in the latent model.}
+\description{Main function for estimating the mixed LM model with discrete random effect in the latent model. \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmestMixed}} \bold{function}}
 
-\usage{est_lm_mixed(S, yv = rep(1,nrow(S)), k1, k2, start = 0, tol = 10^-8, maxit = 1000, 
-	   out_se = FALSE)}
+\usage{est_lm_mixed(S, yv = rep(1,nrow(S)), k1, k2, start = 0, tol = 10^-8, maxit = 1000,
+                    out_se = FALSE)}
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{array of available response configurations (n x TT x r) with categories starting from 0}
   \item{yv}{vector of frequencies of the available configurations}
@@ -34,29 +32,32 @@
   \item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data},
 	Chapman and Hall/CRC press.}
 \author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}
 
 \examples{
 \dontrun{
 # Example based of criminal data
+
 # load data
 data(data_criminal_sim)
-out = long2wide(data_criminal_sim,"id","time","sex",
-	 c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=999)	
+out <- long2wide(data_criminal_sim, "id", "time", "sex",
+	 c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"), aggr = T, full = 999)
 
-XX = out$XX
-YY = out$YY
-freq = out$freq
-n1 = sum(freq[XX[,1]==1])
-n2 = sum(freq[XX[,1]==2])
-n = sum(freq)
+XX <- out$XX
+YY <- out$YY
+freq <- out$freq
+n1 <- sum(freq[XX[,1] == 1])
+n2 <- sum(freq[XX[,1] == 2])
+n <- sum(freq)
 
 # fit mixed LM model only for females
-YY = YY[XX[,1]==2,,]; freq = freq[XX[,1]==2]
-k1 = 2; k2 = 2
-res = est_lm_mixed(YY,freq,k1,k2,tol=10^-8)
+YY <- YY[XX[,1] == 2,,]
+freq <- freq[XX[,1] == 2]
+k1 <- 2
+k2 <- 2
+res <- est_lm_mixed(YY, freq, k1, k2, tol = 10^-8)
 summary(res)
 }
 }

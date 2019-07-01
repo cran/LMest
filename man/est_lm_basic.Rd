@@ -2,15 +2,13 @@
 
 \alias{est_lm_basic}
 
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Estimate basic LM model}
 
-\description{Main function for estimating the basic LM model.}
+\description{Main function for estimating the basic LM model.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmest}} \bold{function}.}
 
-\usage{est_lm_basic(S, yv, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000, 
-	   out_se=FALSE, piv=NULL, Pi=NULL, Psi = NULL)}
+\usage{est_lm_basic(S, yv, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000,
+	                  out_se = FALSE, piv = NULL, Pi = NULL, Psi = NULL)}
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{S}{array of available configurations (n x TT x r) with categories starting from 0 (use NA for missing responses)}
   \item{yv}{vector of frequencies of the available configurations}
@@ -41,37 +39,41 @@
   \item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013), Latent Markov Models for Longitudinal Data,
+\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data},
 	Chapman and Hall/CRC press.}
 \author{Francesco Bartolucci, Silvia Pandolfi, University of Perugia (IT), http://www.stat.unipg.it/bartolucci}
 
 \examples{
+\dontrun{
 # Example of drug consumption data
+
 # load data
 data(data_drug)
-data_drug = as.matrix(data_drug)
-S = data_drug[,1:5]-1
-yv = data_drug[,6]
+data_drug <- as.matrix(data_drug)
+S <- data_drug[,1:5]-1
+yv <- data_drug[,6]
+
 # fit of the Basic LM model
-k = 3
-out = est_lm_basic(S,yv,k,mod=1)
+k <- 3
+out <- est_lm_basic(S, yv, k, mod = 1)
 summary(out)
 
-\dontrun{
 # Example based on criminal data
+
 # load criminal data
 data(data_criminal_sim)
-out = long2wide(data_criminal_sim,"id","time","sex",
-c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr=T,full=999)	
-XX = out$XX
-YY = out$YY
-freq = out$freq
+out <- long2wide(data_criminal_sim, "id" , "time" , "sex",
+c("y1","y2","y3","y4","y5","y6","y7","y8","y9","y10"),aggr = T, full = 999)
+XX <- out$XX
+YY <- out$YY
+freq <- out$freq
+
 # fit basic LM model with increasing number of states to select the most suitable
-Res0 = vector("list",7)
+Res0 <- vector("list", 7)
 for(k in 1:7){
-    Res0[[k]] = est_lm_basic(YY,freq,k,mod=1,tol=10^-4)
-    save(list = ls(),file="example_criminal_temp.RData")
+    Res0[[k]] <- est_lm_basic(YY, freq, k, mod = 1, tol = 10^-4)
+    save(list <- ls(), file = "example_criminal_temp.RData")
 }
-out1 = Res0[[6]]
+out1 <- Res0[[6]]
 }
 }

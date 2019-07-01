@@ -6,8 +6,7 @@
 
 \title{Dataset about job satisfaction}
 
-\description{Longitudinal dataset deriving from the Russia Longitudinal Monitoring Survey (RLMS)
- about job satisfaction measured by an ordinal variable with 5 categories.}
+\description{Longitudinal dataset deriving from the Russia Longitudinal Monitoring Survey (RLMS) about job satisfaction measured by an ordinal variable at seven different occasions with five categories, \code{1} for “absolutely satisfied”, \code{2} for  “mostly satisfied”, \code{3} for “neutral”, \code{4} for “not very satisfied”, and \code{5} for “absolutely unsatisfied”.}
 
 \usage{data(RLMSdat)}
 
@@ -21,7 +20,7 @@
     \item{\code{IKSJU}}{reported job satisfaction at the 5th occasion}
     \item{\code{IKSJV}}{reported job satisfaction at the 6th occasion}
     \item{\code{IKSJW}}{reported job satisfaction at the 7th occasion}
-    
+
   }
 }
 

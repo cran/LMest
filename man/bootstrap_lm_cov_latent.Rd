@@ -1,15 +1,14 @@
 \name{bootstrap_lm_cov_latent}
 
 \alias{bootstrap_lm_cov_latent}
-%- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{Parametric bootstrap for LM models with individual covariates in the latent model}
 
-\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.}
+\description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates. \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{bootstrap}} \bold{function}.}
 
-\usage{bootstrap_lm_cov_latent(X1, X2, param = "multilogit", Psi, Be, Ga, B = 100, 
-	   fort = TRUE)}
-%- maybe also 'usage' for other objects documented here.
+\usage{
+bootstrap_lm_cov_latent(X1, X2, param = "multilogit", Psi, Be, Ga, B = 100,
+                        fort = TRUE)}
 
 \arguments{
   \item{X1 }{matrix of covariates affecting the initial probabilities (n x nc1)}
@@ -38,26 +37,26 @@
 # Example based on self-rated health status (SRHS) data
 # load SRHS data
 data(data_SRHS_long)
-dataSRHS = data_SRHS_long
+dataSRHS <- data_SRHS_long
 
-TT = 8 
+TT <- 8
 head(dataSRHS)
-res = long2matrices(dataSRHS$id,X=cbind(dataSRHS$gender-1,
-dataSRHS$race==2|dataSRHS$race==3, dataSRHS$education==4,
-dataSRHS$education==5,dataSRHS$age-50,(dataSRHS$age-50)^2/100),
-Y=dataSRHS$srhs)
+res <- long2matrices(dataSRHS$id, X = cbind(dataSRHS$gender-1,
+dataSRHS$race == 2 | dataSRHS$race == 3, dataSRHS$education == 4,
+dataSRHS$education == 5, dataSRHS$age-50, (dataSRHS$age-50)^2/100),
+Y = dataSRHS$srhs)
 
 # matrix of responses (with ordered categories from 0 to 4)
-S = 5-res$YY
+S <- 5-res$YY
 
 # matrix of covariates (for the first and the following occasions)
 # colums are: gender,race,educational level (2 columns),age,age^2)
-X1 =res$XX[,1,]
-X2 =res$XX[,2:TT,]
+X1 <- res$XX[,1,]
+X2 <- res$XX[,2:TT,]
 
 # estimate the model
-out1 = est_lm_cov_latent(S,X1,X2,k=2,output=TRUE,out_se=TRUE)
+out1 <- est_lm_cov_latent(S, X1, X2, k = 2, output = TRUE, out_se = TRUE)
 
-out2 = bootstrap_lm_cov_latent(X1,X2,Psi=out1$Psi,Be=out1$Be,Ga=out1$Ga,B=1000)
+out2 <- bootstrap_lm_cov_latent(X1, X2, Psi = out1$Psi, Be = out1$Be, Ga = out1$Ga, B = 1000)
 }
 }

@@ -1,29 +1,62 @@
 useDynLib(LMest, .registration = TRUE)
 
 
-import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm", "mix")
+import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm","mix","Formula")
+importFrom("utils", "packageVersion")
 
-export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "bootstrap_lm_basic_cont", "bootstrap_lm_cov_latent_cont", "decoding", "draw_lm_basic", 
-       "draw_lm_cov_latent", "draw_lm_mixed", "draw_lm_basic_cont", "draw_lm_cov_latent_cont", "est_lm_basic", "est_lm_cov_latent",
-       "est_lm_cov_manifest", "est_lm_mixed", "est_lm_basic_cont", "est_lm_cov_latent_cont", "long2matrices", "long2wide","search.model.LM","est_mc_basic", "est_mc_cov")
+export("est_lm_basic", "est_lm_basic_cont","est_lm_cov_manifest","est_lm_cov_latent", "est_lm_cov_latent_cont")
+export("est_lm_mixed")
+export("est_mc_basic","est_mc_cov")
+
+export("search.model.LM")
+
+export("lmest", "lmestCont", "lmestMc", "lmestMixed")
+
+export("lmestSearch")
+
+export("bootstrap_lm_basic", "bootstrap_lm_cov_latent", "bootstrap_lm_basic_cont", "bootstrap_lm_cov_latent_cont")
+export("draw_lm_basic", "draw_lm_cov_latent", "draw_lm_mixed", "draw_lm_basic_cont", "draw_lm_cov_latent_cont")
+
+export("decoding")
+
+export("long2wide","long2matrices")
+export("matrices2long")
+
+export("lmestFormula")
+
+export("drawLMbasic", "drawLMlatent", "drawLMlatentcont", "drawLMbasiccont", "drawLMmixed")
 
 # S3methods
-S3method(print, LMbasic)
-S3method(print, LMlatent)
-S3method(print, LMmanifest)
-S3method(print, LMmixed)
-S3method(print, LMbasiccont)
-S3method(print, LMlatentcont)
-S3method(print, LMsearch)
-S3method(print, MCbasic)
-S3method(print, MClatent)
-S3method(summary, LMbasic)
-S3method(summary, LMlatent)
-S3method(summary, LMmanifest)
-S3method(summary, LMbasiccont)
-S3method(summary, LMlatentcont)
-S3method(summary, LMmixed)
-S3method(summary, LMmixed)
-S3method(summary, LMsearch)
-S3method(summary, MCbasic)
-S3method(summary, MClatent)
+S3method("print", "LMbasic")
+S3method("print", "LMlatent")
+S3method("print", "LMmanifest")
+S3method("print", "LMmixed")
+S3method("print", "LMbasiccont")
+S3method("print", "LMlatentcont")
+S3method("print", "LMsearch")
+S3method("print", "MCbasic")
+S3method("print", "MCcov")
+
+S3method("summary", "LMbasic")
+S3method("summary", "LMlatent")
+S3method("summary", "LMmanifest")
+S3method("summary", "LMbasiccont")
+S3method("summary", "LMlatentcont")
+S3method("summary", "LMmixed")
+S3method("summary", "LMsearch")
+S3method("summary", "MCbasic")
+S3method("summary", "MCcov")
+
+export("bootstrap", "se")
+
+
+S3method("bootstrap", "LMbasic")
+S3method("bootstrap", "LMbasiccont")
+S3method("bootstrap", "LMlatent")
+S3method("bootstrap", "LMlatentcont")
+
+S3method("se", "LMbasic")
+S3method("se", "LMbasiccont")
+S3method("se", "LMlatent")
+S3method("se", "LMlatentcont")
+
