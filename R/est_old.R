@@ -3062,7 +3062,7 @@ est_mc_cov <-
       out$Piv = Piv
     }
     #cat(" |-------------|-------------|-------------|-------------|\n");
-    class(out)="MClatent"
+    class(out)="MCcov"
     return(out)
 
   }

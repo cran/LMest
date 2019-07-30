@@ -1,5 +1,6 @@
 useDynLib(LMest, .registration = TRUE)
 
+#exportPattern("^[[:alpha:]]+")
 
 import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm","mix","Formula")
 importFrom("utils", "packageVersion")
@@ -46,6 +47,7 @@ S3method("summary", "LMmixed")
 S3method("summary", "LMsearch")
 S3method("summary", "MCbasic")
 S3method("summary", "MCcov")
+
 
 export("bootstrap", "se")
 

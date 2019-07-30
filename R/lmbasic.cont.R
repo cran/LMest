@@ -7,7 +7,7 @@ lmbasic.cont <- function(Y,k,start=0,
   sY = dim(Y)
   n = sY[1]
   TT = sY[2]
-mod <- modBasic
+  mod <- modBasic
   if(length(sY)==2){
     r = 1
     if(is.matrix(Y)) Y = array(Y,c(dim(Y),1))
@@ -246,7 +246,7 @@ mod <- modBasic
     seMu = matrix(seMu,r,k)
     seSi2 = matrix(0,r,r)
     seSi2[upper.tri(seSi2,TRUE)]=seSi
-    seSi2[lower.tri(seSi2)]=seSi2[upper.tri(seSi2)]
+    seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
     seSi = seSi2
     sePi0 = sePi
     sePi = array(0,c(k,k,TT))

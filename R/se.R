@@ -975,7 +975,7 @@ se.LMbasiccont <- function(est,...){
   seMu = matrix(seMu,r,k)
   seSi2 = matrix(0,r,r)
   seSi2[upper.tri(seSi2,TRUE)]=seSi
-  seSi2[lower.tri(seSi2)]=seSi2[upper.tri(seSi2)]
+  seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
   seSi = seSi2
   sePi0 = sePi
   sePi = array(0,c(k,k,TT))
@@ -1270,7 +1270,7 @@ se.LMlatentcont <- function(est,...){
   if(r==1) dimnames(seMu) = list(item=1,state=1:k) else dimnames(seMu)=list(item=1:r,state=1:k)
   seSi2 = matrix(0,r,r)
   seSi2[upper.tri(seSi2,TRUE)]=seSi
-  seSi2[lower.tri(seSi2)]=seSi2[upper.tri(seSi2)]
+  seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
   seSi = seSi2
   dimnames(seSi)=list(item=1:r,item=1:r)
 

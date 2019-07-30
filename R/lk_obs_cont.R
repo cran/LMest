@@ -1,18 +1,18 @@
 lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
-	
+
 # copute corresponding parameters
 	n = dim(Y)[1]
   th1 = th[1:(k*r)]; th = th[-(1:(k*r))]
   Mu = matrix(th1,r,k)
-  
+
   th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
   Si = matrix(0,r,r)
   Si[upper.tri(Si,TRUE)]=th1
-  Si[lower.tri(Si)]=Si[upper.tri(Si)]
-  
+  Si = Si+t(Si-diag(diag(Si)))
+
 	th1 = th[1:(k-1)]; th = th[-(1:(k-1))]
 	piv = exp(Bm%*%th1); piv = as.vector(piv/sum(piv))
-	
+
 	if(mod==0){
 		Pi = array(0,c(k,k,TT))
 		for(t in 2:TT) for(u in 1:k){
@@ -78,11 +78,11 @@ lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
     tmp=0
     for(u in 1:k) tmp = tmp+t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
     tmp = iSi%*%tmp%*%iSi
-      
+
     tmp = tmp-(n*TT)*iSi
     diag(tmp) = diag(tmp)/2
     sc = c(sc,tmp[upper.tri(tmp,TRUE)])
-    
+
     # Update piv and Pi
 	sc = c(sc,t(Bm)%*%(colSums(V[,,1])-n*piv))
 	if(mod==0) {
@@ -99,8 +99,8 @@ lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
 	    if(length(dim(Ut2))>2) Ut2 = apply(Ut2,c(1,2),sum)
     	for(u in 1:k) sc = c(sc,t(Cm[,,u])%*%(Ut1[u,]-sum(Ut1[u,])*Pi[u,,2]))
     	for(u in 1:k) sc = c(sc,t(Cm[,,u])%*%(Ut2[u,]-sum(Ut2[u,])*Pi[u,,mod+1]))
-    	 
+
 	}
 # return
-	out = list(lk=lk,sc=sc)	
+	out = list(lk=lk,sc=sc)
 }

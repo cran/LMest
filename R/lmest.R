@@ -141,7 +141,7 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
     # dim(Y) <- df
     for(i in 1:dim(Y)[3])
     {
-      Y[,,i] <- Y[,,i]-min(Y[,,i,],na.rm = TRUE)
+      Y[,,i] <- Y[,,i]-min(Y[,,i],na.rm = TRUE)
     }
   }
   if(!is.null(Xmanifest))

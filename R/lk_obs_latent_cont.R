@@ -1,6 +1,5 @@
-lk_obs_latent_cont <-
-function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
-	
+lk_obs_latent_cont <- function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
+
 # preliminaries
    	sY = dim(Y)
   	n = sY[1]
@@ -8,26 +7,26 @@ function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
   	if(length(sY)==2) r = 1 else r = sY[3]
   	k = dim(XXdis)[1]
   	nc1 = dim(XXdis)[2]/(k-1)-1
-  	if(param=="multilogit"){ 
+  	if(param=="multilogit"){
   		nc2 = dim(ZZdis)[2]/(k-1)-1
   	}else if(param=="difflogit"){
   		nc2 = (dim(ZZdis)[2]-(k*(k-1)))/(k-1)
-  	}	
+  	}
   	Xndis = max(Xlab)
   	Zndis = max(Zlab)
 #  separate parameters
 # Mu e Si
   	th1 = th[1:(k*r)]; th = th[-(1:(k*r))]
   	Mu = matrix(th1,r,k)
-  	
+
   	th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
   	Si = matrix(0,r,r)
   	Si[upper.tri(Si,TRUE)]=th1
-  	Si[lower.tri(Si)]=Si[upper.tri(Si)]
-  
+  	Si = Si+t(Si-diag(diag(Si)))
+
 # parameters on initial probabilities
     ind = (1:((1+nc1)*(k-1)))
- 	  be = th[ind]; 
+ 	  be = th[ind];
    	out = prob_multilogit(XXdis,be,Xlab,fort)
    	Piv = out$P; Pivdis = out$Pdis
    	count = ((1+nc1)*(k-1))
@@ -67,20 +66,20 @@ function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
    	Yv = matrix(Y,n*TT,r)
    	Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
    	for(u in 1:k) sc = c(sc,iSi%*%(t(Yv)%*%Vv[,u]-sum(Vv[,u])*Mu[,u]))
-   	
+
    	# Update Si
    	tmp=0
    	for(u in 1:k) tmp = tmp+t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
    	tmp = iSi%*%tmp%*%iSi
-   	
+
    	tmp = tmp-(n*TT)*iSi
    	diag(tmp) = diag(tmp)/2
    	sc = c(sc,tmp[upper.tri(tmp,TRUE)])
-   	
+
    	# Update piv and Pi
    	out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis,fort=fort,ex=TRUE)
    	sc = c(sc,out$sc)
-   	
+
    	# score and info Pi
    	if(param=="multilogit"){
    	  for(h in 1:k){

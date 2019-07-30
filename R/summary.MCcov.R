@@ -1,4 +1,4 @@
-summary.MCcov<-function(object,...){
+summary.MCcov <- function(object,...){
   if(!is.null(object$call))
   {
     cat("Call:\n")
