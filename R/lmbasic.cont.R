@@ -1,7 +1,7 @@
 lmbasic.cont <- function(Y,k,start=0,
                          modBasic=0,tol=10^-8,
                          maxit=1000,out_se=FALSE,
-                         piv=NULL,Pi=NULL,Mu=NULL,Si=NULL, miss = FALSE){
+                         piv=NULL,Pi=NULL,Mu=NULL,Si=NULL, miss = FALSE, fort = TRUE){
   # Preliminaries
   check_der = FALSE  # to check derivatives
   sY = dim(Y)
@@ -16,6 +16,10 @@ lmbasic.cont <- function(Y,k,start=0,
   Yv = matrix(Y,n*TT,r)
   ## Check and inpute for missing data
 
+
+  R = (!is.na(Y))
+  if(fort) RR = array(as.integer(1*R),c(n,TT,r))
+
   if(miss){
     Yv = cbind(1,Yv)
     pYv = prelim.mix(Yv,1)
@@ -25,7 +29,7 @@ lmbasic.cont <- function(Y,k,start=0,
     Y = array(Yv,c(n,TT,r))
     cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
   }
-
+miss = TRUE
 
   th = NULL; sc = NULL; J = NULL
   if(out_se){
@@ -45,8 +49,8 @@ lmbasic.cont <- function(Y,k,start=0,
   # When there is just 1 latent class
   if(k == 1){
     piv = 1; Pi = 1
-    Mu = colMeans(Yv)
-    Si = cov(Yv)
+    Mu = colMeans(Yv,na.rm=TRUE)
+    Si = cov(Yv,use = "complete.obs")
     lk = sum(dmvnorm(Yv,Mu,Si,log=TRUE))
     np = k*r+r*(r+1)/2
     aic = -2*lk+np*2
@@ -55,23 +59,21 @@ lmbasic.cont <- function(Y,k,start=0,
     class(out)="LMbasiccont"
     return(out)
   }
-
   # Starting values
   if(start == 0){
-    mu = colMeans(Yv)
-    Si = cov(Yv); std = sqrt(diag(Si))
+    mu = colMeans(Yv,na.rm=TRUE)
+    Si = cov(Yv,use = "complete.obs"); std = sqrt(diag(Si))
     qt = qnorm((1:k)/(k+1))
     Mu = matrix(0,r,k)
     for(u in 1:k) Mu[,u] = qt[u]*std+mu
-
     piv = rep(1,k)/k
     Pi = matrix(1,k,k)+9*diag(k); Pi = diag(1/rowSums(Pi))%*%Pi;
     Pi = array(Pi,c(k,k,TT)); Pi[,,1] = 0
   }
   if(start==1){
     Mu = matrix(0,r,k)
-    mu = colMeans(Yv)
-    Si = cov(Yv)
+    mu = colMeans(Yv,na.rm=TRUE)
+    Si = cov(Yv,use = "complete.obs")
     for(u in 1:k) Mu[,u] = rmvnorm(1,mu,Si)
     Pi = array(runif(k^2*TT),c(k,k,TT))
     for(t in 2:TT) Pi[,,t] = diag(1/rowSums(Pi[,,t]))%*%Pi[,,t]
@@ -90,48 +92,102 @@ lmbasic.cont <- function(Y,k,start=0,
   }
 
   # Compute log-likelihood
-  out = complk_cont(Y,piv,Pi,Mu,Si,k)
+  out = complk_cont_miss(Y,R,piv,Pi,Mu,Si,k, fort = fort)
   lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
   cat("     mod    |      k      |    start    |     step    |     lk      |    lk-lko   | discrepancy |\n");
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
-  cat(sprintf("%11g",c(mod,k,start,0,lk)),"\n",sep=" | ")
+  cat(sprintf("%11g",c(mod,k,start,0,lk)),"\n",sep = " | ")
   it = 0; lko = lk-10^10; lkv = NULL
   par = c(piv,as.vector(Pi),as.vector(Mu),as.vector(Si))
   if(any(is.na(par))) par = par[-which(is.na(par))]
   paro = par
   # Iterate until convergence
   while((lk-lko)/abs(lk)>tol & it<maxit){
+    # t0 = proc.time()
     Mu0 = Mu; Si0 = Si; piv0 = piv; Pi0 = Pi
     it = it+1;
     # ---- E-step ----
     # Compute V and U
     V = array(0,c(n,k,TT)); U = array(0,c(k,k,TT))
-    Yvp = matrix(1/pv,n,k)
     M = matrix(1,n,k)
-    V[,,TT] = Yvp*L[,,TT]
-    U[,,TT] = (t(L[,,TT-1])%*%(Yvp*Phi[,,TT]))*Pi[,,TT]
-    if(TT>2){
-      for(t in seq(TT-1,2,-1)){
-        M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1]);
-        V[,,t] = Yvp*L[,,t]*M
-        U[,,t] = (t(L[,,t-1])%*%(Yvp*Phi[,,t]*M))*Pi[,,t]
+    if(n==1) V[,,TT] = L[,,TT]/sum(L[1,,TT])
+    else V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+    if(FALSE){
+      U[,,TT] = .Fortran("prodnorm",L[,,TT-1],Phi[,,TT],Pi[,,TT],n,k,D=matrix(0,k,k))$D
+    }else{
+      for(i in 1:n){
+        Tmp = (L[i,,TT-1]%o%Phi[i,,TT])*Pi[,,TT]
+        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)
       }
     }
+    if(TT>2){
+      for(t in seq(TT-1,2,-1)){
+        #browser()
+        M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1])
+        M = M/rowSums(M)
+        V[,,t] = L[,,t]*M
+        if(n==1) V[,,t] = V[,,t]/sum(V[1,,t])
+        else V[,,t] = V[,,t]/rowSums(V[,,t])
+        if(FALSE){
+          U[,,t] = .Fortran("prodnorm",L[,,t-1],Phi[,,t]*M,Pi[,,t],n,k,D=matrix(0,k,k))$D
+        }else{
+          for(i in 1:n){
+            Tmp = (L[i,,t-1]%o%(Phi[i,,t]*M[i,]))*Pi[,,t]
+            U[,,t] = U[,,t]+Tmp/sum(Tmp)
+          }
+        }
+      }
+    }
+    # print(c(1,proc.time()-t0))
     M = (Phi[,,2]*M)%*%t(Pi[,,2])
-    V[,,1] = Yvp*L[,,1]*M
-
+    M = M/rowSums(M)
+    V[,,1] = L[,,1]*M
+    if(n==1) V[,,1] = V[,,1]/sum(V[1,,1])
+    else V[,,1] = V[,,1]/rowSums(V[,,1])
+    # print(c(3,proc.time()-t0))
     # If required store parameters
     # ---- M-step ----
     # Update Mu
     Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
-    for(u in 1:k) Mu[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
-    # Update Si
-    Si = matrix(0,r,r)
-    for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
-    Si = Si/(n*TT)
-
-    #print(proc.time()-time)
+    if(miss){
+      Y1 = array(Y,c(n,TT,r,k))
+      Var = array(0,c(n,TT,r,r))
+      if(fort){
+        out = .Fortran("updatevar",Y,RR,n,TT,r,k,Mu,Si,Y1=Y1,Var=Var)
+        Y1 = out$Y1; Var = out$Var
+      }else{
+        for(i in 1:n) for(t in 1:TT){
+          nr = sum(R[i,t,])
+          if(nr==0){
+            Y1[i,t,,] = Mu
+            Var[i,t,,] = Si
+          }else if(nr<r){
+            indo = R[i,t,]; indm = !R[i,t,]
+            Tmp = Si[indm,indo]%*%solve(Si[indo,indo])
+            Var[i,t,indm,indm] = Si[indm, indm]-Tmp%*%Si[indo,indm]
+            for(u in 1:k) Y1[i,t,indm,u] = Mu[indm,u]+Tmp%*%(Y[i,t,indo]-Mu[indo,u])
+          }
+        }
+        # browser()
+      }
+      # print(c(3.5,proc.time()-t0))
+      Sitmp = matrix(0,r,r)
+      for(u in 1:k){
+        Yv1 = matrix(Y1[,,,u],n*TT)
+        Var1 = array(Var,c(n*TT,r,r))
+        Mu[,u] = (t(Yv1)%*%Vv[,u])/sum(Vv[,u])
+        Tmp = Yv1-rep(1,n*TT)%*%t(Mu[,u])
+        Sitmp = Sitmp+t(Tmp)%*%(Vv[,u]*Tmp)+apply(Vv[,u]*Var1,c(2,3),sum)
+      }
+      Si = Sitmp/(n*TT)
+    }else{
+      for(u in 1:k) Mu[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
+      Si = matrix(0,r,r)
+      for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
+      Si = Si/(n*TT)
+    }
+    # print(c(4,proc.time()-t0))
     # Update piv and Pi
     piv = colSums(V[,,1])/n
     U = pmax(U,10^-300)
@@ -152,12 +208,17 @@ lmbasic.cont <- function(Y,k,start=0,
     paro = par; par = c(piv,as.vector(Pi),as.vector(Mu),as.vector(Si))
     if(any(is.na(par))) par = par[-which(is.na(par))]
     lko = lk
-    out = complk_cont(Y,piv,Pi,Mu,Si,k)
-
+    # print(c(4.5,proc.time()-t0))
+    out = complk_cont_miss(Y,R,piv,Pi,Mu,Si,k, fort = fort)
+    # print(c(4.7,proc.time()-t0))
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     if(it/10 == round(it/10)) cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
     lkv = c(lkv,lk)
+    # print(c(5,proc.time()-t0))
   }
+  V2 = aperm(V,c(1,3,2))
+  V2 = aperm(array(V2,c(n,TT,k,r)),c(1,2,4,3))
+  Yimp = apply(Y1*V2,c(1,2,3),sum)
   # Compute information matrix if required
   if(out_se){
     th = NULL

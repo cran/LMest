@@ -36,6 +36,8 @@ Maximum likelihood estimation of model parameters is performed through the Expec
 
 Model selection is provided by \code{\link{lmest}} and \code{\link{lmestCont}} functions. In addition, function \code{\link{lmestSearch}} allows us to deal with both model selction and multimodality of the likelihood function. Two main criteria are provided to select the number of latent states: the Akaike Information Criterion and the Bayesian Information Criterion.
 
+Prediction of the latent states is performed by the function \code{\link{lmestDecoding}}: for local and global decoding (Viterbi algorithm) from the output of functions lmest, lmestCont and lmestMixed.
+
 The package allows us to deal with missing responses, including drop-out and non-monotonic missingness, under the missing-at-random assumption.
 
 Standard errors for the parameter estimates are obtained by exact computation of the information matrix or through reliable numerical approximations of this matrix.

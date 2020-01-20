@@ -35,7 +35,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{q}{number of support points for the AR(1) process (if modManifest ="FM")}
    \item{output}{to return additional output: \code{PRED0}, \code{PRED1} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}}) and  \code{V}, \code{PI}, \code{Piv}, \code{Ul} for the LM with covariates on the latent model (\code{\link{LMlatent-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasic-class}}, \code{\link{LMlatent-class}} and \code{\link{LMmanifest-class}}}
-  \item{fort}{to use fortran routines when possible (By default is set to FALSE)}
+  \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
   \item{seed}{an integer value with the random number generator state}
 }
 \details{
@@ -162,7 +162,7 @@ out3
 # Example of drug consumption data
 
 data("data_drug")
-long <- data_drug[,-6]
+long <- data_drug[,-6]-1
 long <- data.frame(id = 1:nrow(long),long)
 long <- reshape(long,direction = "long",
                 idvar = "id",

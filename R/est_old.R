@@ -1178,8 +1178,7 @@ est_lm_cov_latent_cont <-
         }
       }
     }
-
-    # adjust output
+  # adjust output
     lk = as.vector(lk)
     if(output){
       dimnames(Piv)=list(subject=1:n,state=1:k)

@@ -1,5 +1,4 @@
 complk <- function(S,R,yv,piv,Pi,Psi,k){
-
 # Preliminaries
   	sS = dim(S)
   	ns = sS[1]

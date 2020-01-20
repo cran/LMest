@@ -1,8 +1,10 @@
 summary.LMsearch<-function(object,...){
+
   if(!is.null(object$call))
   {
     cat("Call:\n")
     print(object$call)
+    cat("\n")
   }
 	kdim = length(object$kv)
 	np = lk = AIC = BIC= rep(0,kdim)
@@ -10,8 +12,8 @@ summary.LMsearch<-function(object,...){
 	kv <- object$k
 	for(k in kv){
 		cont=cont+1
-		np[cont] = object$out.single[[k]]$np
-		lk[cont] = object$lkv[k]
+		np[cont] = object$out.single[[cont]]$np
+		lk[cont] = object$lkv[cont]
 		#AIC[cont] = object$Aic[k]
 		#BIC[cont] = object$Bic[k]
 	}
@@ -23,6 +25,7 @@ summary.LMsearch<-function(object,...){
 	  Aic = object$Aic
 	  Bic = object$Bic
 	}
-	print(cbind(states=object$k,lk=lk,np=np,AIC=Aic,BIC=Bic))
+	out <- data.frame(states=object$k,lk=lk,np=np,AIC=Aic,BIC=Bic)
+	print(out, row.names = FALSE)
 
 }

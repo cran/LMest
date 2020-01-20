@@ -1,16 +1,20 @@
 decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
-	
+
 	# Provide local decoding on the basis of the output of
 	# est_lm_basic, est_lm_cov_latent, est_lm_cov_manifest (in this case the covariates are only in X1)
 	# and est_lm_mixed
-	
+
 	# est = output from one of these function
 	# Y = vector of responses or matrix of responses for which having local deconding
 	#
 	# Ul = matrix of local deconding corresponding to each row of Y
 	# Ug = matrix of global deconding corresponding to each row of Y
-	
-# est_lm_basic	   
+
+
+  warning("decoding function is no longer maintained. Please look at lmestDecoding function",call. = FALSE)
+
+
+# est_lm_basic
 	if(class(est)=="LMbasic"){
 		miss = any(is.na(Y))
 		if(miss){
@@ -23,10 +27,10 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 			if(is.vector(Y)){
 				Y = t(Y)
 				if(miss) R = t(R)
-			} 		
+			}
 			n = nrow(Y); TT = ncol(Y)
 		}else{
-			if(is.matrix(Y)){ 
+			if(is.matrix(Y)){
 				Y = array(Y,c(1,dim(Y)))
 				if(miss) R = array(R,c(1,dim(R)))
 			}
@@ -58,7 +62,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		for(i in 1:n) for(t in seq(TT-1,1,-1)) Ug[i,t] = which.max(R[i,,t]*Pi[,Ug[i,t+1],t+1])
     	if(n==1) Ug = as.vector(Ug)
 	}
-	
+
 # est_lm_cov_latent
 	if(class(est)=="LMlatent"){
 		param = est$param
@@ -73,27 +77,27 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 			if(is.vector(Y)){
 				Y = t(Y)
 				if(miss) R = t(R)
-				if(is.vector(X1)) X1 = t(X1) 		
-				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2))) 
+				if(is.vector(X1)) X1 = t(X1)
+				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2)))
 				if(is.vector(X2)) X2 = array(X2,c(1,length(X2),1))
-			}		
+			}
 			n = nrow(Y); TT = ncol(Y)
 		}else{
-			if(is.matrix(Y)){ 
+			if(is.matrix(Y)){
 				Y = array(Y,c(1,dim(Y)))
 				if(miss) R = array(R,c(1,dim(R)))
-				if(is.vector(X1)) X1 = t(X1)		
-				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2)))	
+				if(is.vector(X1)) X1 = t(X1)
+				if(is.matrix(X2)) X2 = array(X2,c(1,dim(X2)))
 				if(is.vector(X2)) X2 = array(X2,c(1,length(X2),1))
-			}	
+			}
 			n = dim(Y)[1]; TT = dim(Y)[2]; r = dim(Y)[3]
 		}
-		
-			
+
+
 		k = ncol(est$Be)+1
 		Psi = est$Psi
 		if(is.vector(X1)) X1 = matrix(X1,n,1)
-		nc1 = dim(X1)[2] # number of covariates on the initial probabilities		
+		nc1 = dim(X1)[2] # number of covariates on the initial probabilities
 		Xlab = 1:n
 		if(k == 2){
 			GBe = as.matrix(c(0,1))
@@ -121,7 +125,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 				    if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
 			    }else{
 				    GGa = diag(k); GGa = GGa[,-h]
-			    }  		
+			    }
 			    for(i in 1:Zndis){
 				    zdis = c(1,Z[i,])
 				    ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
@@ -138,12 +142,12 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 				      if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
 			        }else{
 				        GGa = diag(k); GGa = GGa[,-h]
-			        }  		
+			        }
 				    u = matrix(0,1,k); u[1,h] = 1
 				    U = diag(k); U[,h] = U[,h]-1
 				    U = U[,-1]
-			        ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Z[i,]))   
-			       
+			        ZZdis[,,j] = cbind(u%x%GGa,U%x%t(Z[i,]))
+
    	         	}
 		    }
 		}
@@ -158,9 +162,9 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
             Ga = c(as.vector(t(est$Ga[[1]])),as.vector(est$Ga[[2]]))
             PI = array(0,c(k,k,n,TT))
             out = prob_multilogit(ZZdis,Ga,Zlab,fort)
-   		    PIdis = out$Pdis; 
+   		    PIdis = out$Pdis;
    		    Tmp = array(out$P,c(k,n,TT-1,k))
-	    	PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3)) 
+	    	PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3))
 		}
 		out = lk_comp_latent(Y,R,rep(1,n),Piv,PI,Psi,k,fort=fort)
 		Phi = out$Phi; L = out$L; pv = out$pv
@@ -178,14 +182,14 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		if(n==1) Ug[,TT] = which.max(R[,,TT])
 		else Ug[,TT] = apply(R[,,TT],1,which.max)
 		for(i in 1:n) for(t in seq(TT-1,1,-1)) Ug[i,t] = which.max(R[i,,t]*PI[,Ug[i,t+1],i,t+1])
-    	if(n==1) Ug = as.vector(Ug)		
+    	if(n==1) Ug = as.vector(Ug)
 	}
 
 # est_lm_mixed
 	if(class(est)=="LMmixed"){
 		if(dim(est$Psi)[3]==1){
 			if(is.vector(Y)) Y = t(Y)
-			if(is.matrix(Y)) Y =  array(Y,c(dim(Y),1))	
+			if(is.matrix(Y)) Y =  array(Y,c(dim(Y),1))
 			n = nrow(Y); TT = ncol(Y); r=1
 		}else{
 			if(is.matrix(Y)) Y = array(Y,c(1,dim(Y)))
@@ -193,17 +197,17 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		}
 		yv = rep(1,n)
 		la = est$la; Piv = est$Piv; Pi = est$Pi; Psi = est$Psi
-		k1 = length(la); k2 = nrow(Piv)		
+		k1 = length(la); k2 = nrow(Piv)
 		Fc1 = matrix(0,n,k1); Fc2 = array(0,c(n,k1,k2)); Fc3 = array(0,c(n,k1,k2,k2))
 		PP1 = array(0,c(n,k1,k2,TT))
 		Phi = array(1,c(n,k2,TT))
 		for(t in 1:TT){
-  			#if(r==1) Phi[,,t] = Phi[,,t]*Psi[Y[,t]+1,,1] 
+  			#if(r==1) Phi[,,t] = Phi[,,t]*Psi[Y[,t]+1,,1]
   			#else for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[Y[,t,j]+1,,j]
   			for(j in 1:r) Phi[,,t] = Phi[,,t]*Psi[Y[,t,j]+1,,j]
 		}
 		for(i in 1:n) for(u in 1:k1){
-	   		 o = .Fortran("BWforback", TT, k2, Phi[i,,], Piv[,u], Pi[,,u], lk=0, Pp1=matrix(0,k2,TT), 
+	   		 o = .Fortran("BWforback", TT, k2, Phi[i,,], Piv[,u], Pi[,,u], lk=0, Pp1=matrix(0,k2,TT),
 	        	         Pp2=array(0,c(k2,k2,TT)))
 			Fc1[i,u] = exp(o$lk); Fc2[i,u,] = o$Pp1[,1]; Fc3[i,u,,] = apply(o$Pp2,c(1,2),sum)
   			PP1[i,u,,] = o$Pp1
@@ -220,7 +224,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
     	if(n==1) Ul = as.vector(Ul)
 # global deconding (Viterbi)
 		R = array(0,c(n,k2,TT))
-		for(i in 1:n) for(v in 1:k2) R[i,v,1] = Phi[i,v,1]*Piv[v,U1[i]]		 
+		for(i in 1:n) for(v in 1:k2) R[i,v,1] = Phi[i,v,1]*Piv[v,U1[i]]
 		for(i in 1:n) for(t in 2:TT) for(v in 1:k2) R[i,v,t] = Phi[i,v,t]*max(R[i,,t-1]*Pi[,v,U1[i]])
 		Ug = matrix(0,n,TT)
 		if(n==1) Ug[,TT] = which.max(R[,,TT])
@@ -228,7 +232,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 		for(i in 1:n) for(t in seq(TT-1,1,-1)) Ug[i,t] = which.max(R[i,,t]*Pi[,Ug[i,t+1],U1[i]])
     	if(n==1) Ug = as.vector(Ug)
 	}
-	
+
 #est_lm_manifest
 if(class(est)=="LMmanifest"){
 	if(!is.null(est$rho)) stop("decoding allowed only for mod=LM")
@@ -256,14 +260,14 @@ if(class(est)=="LMmanifest"){
 
 	if(is.array(S)) S = matrix(S,n,TT)
 	if(is.matrix(X)) X = array(X,c(n,TT,1))
-	
+
 	Y0 = S+1
 	S = array(0,c(nt,n,TT))
-	
+
 	for(i in 1:n) for(t in 1:TT){
    		ind = Y0[i,t]
    		S[ind,i,t] = 1
-	}	
+	}
 	nc = dim(X)[3]
 	ne = lev-1
 
@@ -285,15 +289,15 @@ if(class(est)=="LMmanifest"){
   		lim = 5;
   		sup = seq(-lim,lim,2*lim/(q-1))
 	}
-	Mar = diag(k)%x%matrix(1,1,q) 
+	Mar = diag(k)%x%matrix(1,1,q)
 
- 
+
 	G2 = NULL; H2 = NULL; IPI = NULL
 	if(k>1){
 		for(c in 1:k){
-    		G2c = diag(k)[,-c]   
+    		G2c = diag(k)[,-c]
       		H2c = diag(k)[-c,]; if (k==2) H2c[c]=-1 else H2c[,c]= -1
-      		if(is.null(G2)) G2 = G2c else if(k==2) G2 = blkdiag(matrix(G2,ncol=1),matrix(G2c,ncol=1)) else G2 = blkdiag(G2,G2c) 
+      		if(is.null(G2)) G2 = G2c else if(k==2) G2 = blkdiag(matrix(G2,ncol=1),matrix(G2c,ncol=1)) else G2 = blkdiag(G2,G2c)
       		if(is.null(H2)) H2 = H2c else if(k==2) H2 = blkdiag(matrix(H2,nrow=1),matrix(H2c,nrow=1))else H2 = blkdiag(H2,H2c)
       		IPI = c(IPI,c+seq(0,k*(k-1),k))
     	}
@@ -307,7 +311,7 @@ if(class(est)=="LMmanifest"){
 	si = NULL
 	par = c(mu,al,si,be)
 	if(k==1) tau = NULL else{
-		tau = H2%*%log(PI[IPI]) 
+		tau = H2%*%log(PI[IPI])
 	}
 	las = la
 	PIs = PI
@@ -331,8 +335,8 @@ if(class(est)=="LMmanifest"){
 	# alternate between EM and NR
 	itg = 0; cont = 1;
 
-	while(cont && itg<5){	
-	
+	while(cont && itg<5){
+
   		cont = 0; itg = itg+1;
   		# compute initial log-likelihood
   		I = diag(ne)
@@ -346,17 +350,17 @@ if(class(est)=="LMmanifest"){
     		D0 = cbind(I,matrix(u,nrow=1)%x%one)
     		for(d in 1:q){
       			j = j+1;
-      			#D = cbind(D0,sup[d]*one); agg = D%*%par0 
+      			#D = cbind(D0,sup[d]*one); agg = D%*%par0
       			D = D0
       			agg = D%*%par0
-      			Eta1 = Eta01+agg%*%rep(1,nd)  
+      			Eta1 = Eta01+agg%*%rep(1,nd)
       			Qv1 = expit(Eta1); Qv1 = pmin(pmax(Qv1,10^-100),1-10^-100)
       			Pv1 = lm%o%rep(1,nd)+Lm%*%Qv1; Pv1 = pmin(pmax(Pv1,10^-100),1-10^-100)
       			for(t in 1:TT) if(n==1) Pio[,j,t] = sum(S[,,t]*Pv1[,indn[,t]]) else Pio[,j,t] = colSums(S[,,t]*Pv1[,indn[,t]])
     		}
   		}
   		Q = rec1(Pio,las,PIs)
-  
+
  		 if(q*k==1) pim = Q[,,TT] else if(n==1) pim = sum(Q[,,TT]) else pim = rowSums(Q[,,TT])
   		lk = sum(log(pim))
    	# E-step
@@ -366,7 +370,7 @@ if(class(est)=="LMmanifest"){
   		if(k>1){
   			u1 = Mar%*%rowSums(U[,,1])
     		V1 = Mar%*%V%*%t(Mar)
-    		out = lk_sta(tau,as.vector(u1),V1,G2,outl=TRUE)			
+    		out = lk_sta(tau,as.vector(u1),V1,G2,outl=TRUE)
     		flk = out$flk; la = out$la; PI = out$PI
   		}
   		las = la; PIs = PI
@@ -440,12 +444,12 @@ if(class(est)=="LMmanifest"){
   Q = rec1(Pio,las,PIs)
   if(k*q==1) pim = Q[,,TT] else pim = rowSums(Q[,,TT])
   lk = sum(log(pim))
-  
+
   # Newton-Rapshon
   par1 = NULL;
   if(k>1) par1 = tau
   par1 = c(par1,par)
-   
+
 }
 # separate parameters and compute aic and bic
 mu = par[1:ne]
@@ -472,8 +476,8 @@ for(t in 1:TT){
 }
 
 if(n1){
-	V = array(PRED0[1,,],c(1,k,TT)); Phi = array(Pio[1,,],c(1,k,TT)) 
-}else{ 
+	V = array(PRED0[1,,],c(1,k,TT)); Phi = array(Pio[1,,],c(1,k,TT))
+}else{
 	V = PRED0; Phi = Pio
 }
 n = dim(V)[1]
@@ -485,16 +489,16 @@ for(i in 1:n) for(t in 1:TT){Ul[i,t] = which.max(V[i,,t])}
 if(n==1) Ul = as.vector(Ul)
 # global deconding (Viterbi)
 R = array(0,c(n,k,TT))
-for(i in 1:n) for(v in 1:k) R[i,v,1] = Phi[i,v,1]*piv[v]	
+for(i in 1:n) for(v in 1:k) R[i,v,1] = Phi[i,v,1]*piv[v]
 Ug = matrix(0,n,TT)
 for(i in 1:n) for(t in 2:TT) for(u in 1:k) R[i,u,t] = Phi[i,u,t]*max(R[i,,t-1]*PI[,u])
 if(n==1) Ug[,TT] = which.max(R[,,TT])
 else Ug[,TT] = apply(R[,,TT],1,which.max)
 for(i in 1:n) for(t in seq(TT-1,1,-1)) Ug[i,t] = which.max(R[i,,t]*PI[,Ug[i,t+1]])
 if(n==1) Ug = as.vector(Ug)
-	
+
 }
 # output
 	out = list(Ul=Ul,Ug=Ug)
-	
+
 }

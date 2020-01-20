@@ -14,7 +14,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
           parInit = list(piv = NULL, Pi = NULL,
                          Mu = NULL, Si = NULL,
                          Be = NULL, Ga = NULL),
-          seed = NULL)
+          fort = TRUE, seed = NULL)
 }
 \arguments{
   \item{responsesFormula}{a symbolic description of the model to be fitted. A detailed description is given in the ‘Details’ section
@@ -35,6 +35,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
   \item{out_se}{to compute the information matrix and standard errors (By default is set to FALSE)}
   \item{output}{to return additional output (\code{V}, \code{PI}, \code{Piv}, \code{Ul}) (\code{\link{LMlatentcont-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasiccont-class}} and \code{\link{LMlatentcont-class}}}
+  \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
   \item{seed}{an integer value with the random number generator state}
 }
 \details{

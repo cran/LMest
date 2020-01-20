@@ -3,7 +3,7 @@
 
 \title{Draw samples from the basic LM model}
 
-\description{Function that draws samples from the basic LM model with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMbasiccont}} \bold{function}.}
+\description{Function that draws samples from the basic LM model with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMbasic}} \bold{function}.}
 
 \usage{
 draw_lm_basic(piv, Pi, Psi, n)

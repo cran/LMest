@@ -4,7 +4,7 @@
 
 \title{Perform local and global decoding}
 
-\description{Function that performs local and global decoding (Viterbi) from the output of \code{est_lm_basic}, \code{est_lm_cov_latent}, \code{est_lm_cov_manifest}, and \code{est_lm_mixed}.}
+\description{Function that performs local and global decoding (Viterbi) from the output of \code{est_lm_basic}, \code{est_lm_cov_latent}, \code{est_lm_cov_manifest}, and \code{est_lm_mixed}.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{lmestDecoding}} \bold{function}}
 
 \usage{
 decoding(est, Y, X1 = NULL, X2 = NULL, fort = TRUE)

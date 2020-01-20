@@ -245,8 +245,12 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
       }
     }
   }
-
-  out = list(out.single=out,Aic=Aic,Bic=Bic,lkv=lkv,errv=errv,k=kv,call=match.call())
+  Aic <- Aic[kv]
+  Bic <- Bic[kv]
+  lkv <- lkv[kv]
+  errv <- errv[kv]
+  names(Aic) <- names(Bic) <- names(lkv) <- names(errv) <- kv
+  out = list(out.single=lapply(kv,function(x) out[[x]]),Aic=Aic,Bic=Bic,lkv=lkv,errv=errv,k=kv,call=match.call())
   class(out)="LMsearch"
   return(out)
 }

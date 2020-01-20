@@ -17,7 +17,6 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
   {
     stop("A data.frame must be provided")
   }
-
   if(start == 2)
   {
     if(is.null(parInit))
@@ -68,18 +67,17 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
 
   if(is.character(id) | is.factor(id))
   {
-    warning("id column must be numeric. Coerced in numeric.")
+    warning("id column must be numeric. Coerced in numeric.", call. = FALSE)
     id <- as.numeric(id)
   }
 
   if(is.character(tv) | is.factor(tv))
   {
-    warning("time column must be numeric. Coerced in numeric.")
+    warning("time column must be numeric. Coerced in numeric.", call. = FALSE)
     tv <- as.numeric(tv)
   }
 
 data.new <- data[,-c(id.which,tv.which), drop = FALSE]
-
   ## of frequencies of the available configurations
   if(is.null(responsesFormula))
   {

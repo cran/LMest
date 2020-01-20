@@ -20,7 +20,7 @@ lmestMc(responsesFormula = NULL,
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors (FALSE is the default option)}
   \item{output}{to return additional output (\code{PI},\code{Piv}) (\code{\link{MCcov-class}})}
-  \item{fort}{to use fortran routines when possible (By default is set to FALSE)}
+  \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
   \item{seed}{An integer value with the random number generator state.}
 }
 

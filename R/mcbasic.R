@@ -10,7 +10,7 @@ mcbasic <- function(S,yv,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE){
   b = max(S)
   U = Pi  = array(0,c(b+1,b+1,TT))
 
-  piv = table(factor(rep(S[,1],yv),levels = min(S[,1]):max(S[,1])))/n ## Modifica Alessio
+  piv = table(factor(rep(S[,1],yv),levels = min(S):max(S)))/n ## Modifica Alessio
 
 
   if(out_se) sepiv = sqrt(piv*(1-piv)/n)

@@ -72,7 +72,6 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
       model = "LMbasiccont"
     }
   }
-
   Y = as.matrix(Y)
   ny = ncol(Y)
   # create matrices
@@ -108,24 +107,31 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
   }else if(model == "LMlatent" | model == "LMlatentcont")
   {
     YY = array(NA,c(n,TT,ny))
-
     for(i in 1:n){
       ind = which(id==idu[i])
       timeid <- time[ind]
       if(!is.null(Xinitial))
       {
         timeid1 <- ind[timeid==1]
-        XXinitial[i,] = Xinitial[timeid1,]
+        if(!length(timeid1)==0)
+        {
+          XXinitial[i,] = Xinitial[timeid1,]
+        }
+
       }
       tmp = 0
       for(t in timeid){
         tmp=tmp+1
         indTemp <- ind[tmp]
+        if(!length(indTemp)==0)
+        {
+
         if(!is.null(Xtrans))
         {
           XXtrans[i,t,] = Xtrans[indTemp,]
         }
         YY[i,t,] = Y[indTemp,]
+        }
       }
     }
     XXtrans <- XXtrans[,-1,, drop = FALSE]

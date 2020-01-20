@@ -8,9 +8,8 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
                       parInit = list(piv = NULL, Pi = NULL,
                                      Mu = NULL, Si = NULL,
                                      Be = NULL, Ga = NULL),
-                      seed = NULL)
+                      fort = TRUE, seed = NULL)
 {
-
 
   if(!is.data.frame(data))
   {
@@ -95,7 +94,7 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
     Xtrans <- temp$Xtrans
   }
   tmp <- long2matrices.internal(Y = Y, id = id, time = tv,
-                          Xinitial = Xinitial, Xmanifest = Xmanifest, Xtrans = Xtrans, cont = TRUE)
+                                Xinitial = Xinitial, Xmanifest = Xmanifest, Xtrans = Xtrans, cont = TRUE)
   model <- tmp$model
   Xinitial <- tmp$Xinitial
   Xtrans <- tmp$Xtrans
@@ -126,16 +125,14 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
       stop("missing data in the covariates affecting the transition probabilities are not allowed")
     }
   }
-
   miss = any(is.na(Y))
-
   aicv = rep(NA,nkv)
   bicv = rep(NA,nkv)
   for(kv in 1:nkv){
     out[[kv]] <- switch(model,
-                       "LMbasiccont" = (lmbasic.cont(Y = Y,k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,out_se = out_se,
-                                                      piv = parInit$piv,Pi = parInit$Pi,Mu = parInit$Mu,Si = parInit$Si, miss = miss)),
-                       "LMlatentcont" = (lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k[kv],
+                        "LMbasiccont" = (lmbasic.cont(Y = Y,k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,out_se = out_se,
+                                                      piv = parInit$piv,Pi = parInit$Pi,Mu = parInit$Mu,Si = parInit$Si, miss = miss, fort = fort)),
+                        "LMlatentcont" = (lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k[kv],
                                                            start = start,tol = tol,maxit = maxit,paramLatent = paramLatent,
                                                            Mu = parInit$Mu, Si = parInit$Si,Be = parInit$Be,Ga = parInit$Ga,output = output, out_se = out_se, miss = miss)))
 

@@ -4,6 +4,7 @@ useDynLib(LMest, .registration = TRUE)
 
 import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm","mix","Formula")
 importFrom("utils", "packageVersion")
+importFrom("graphics", "hist", "pairs", "par", "rect")
 
 export("est_lm_basic", "est_lm_basic_cont","est_lm_cov_manifest","est_lm_cov_latent", "est_lm_cov_latent_cont")
 export("est_lm_mixed")
@@ -11,6 +12,7 @@ export("est_mc_basic","est_mc_cov")
 
 export("search.model.LM")
 
+export("lmestData")
 export("lmest", "lmestCont", "lmestMc", "lmestMixed")
 
 export("lmestSearch")
@@ -37,6 +39,7 @@ S3method("print", "LMlatentcont")
 S3method("print", "LMsearch")
 S3method("print", "MCbasic")
 S3method("print", "MCcov")
+S3method("print", "lmestData")
 
 S3method("summary", "LMbasic")
 S3method("summary", "LMlatent")
@@ -47,9 +50,11 @@ S3method("summary", "LMmixed")
 S3method("summary", "LMsearch")
 S3method("summary", "MCbasic")
 S3method("summary", "MCcov")
+S3method("summary", "lmestData")
 
+S3method("plot", "lmestData")
 
-export("bootstrap", "se")
+export("bootstrap", "se","lmestDecoding")
 
 
 S3method("bootstrap", "LMbasic")
@@ -61,4 +66,13 @@ S3method("se", "LMbasic")
 S3method("se", "LMbasiccont")
 S3method("se", "LMlatent")
 S3method("se", "LMlatentcont")
+
+
+S3method("lmestDecoding", "LMbasic")
+S3method("lmestDecoding", "LMlatent")
+S3method("lmestDecoding", "LMbasiccont")
+S3method("lmestDecoding", "LMmixed")
+S3method("lmestDecoding", "LMmanifest")
+
+export("lmestData")
 

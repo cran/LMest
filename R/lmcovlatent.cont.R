@@ -88,8 +88,8 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     Zndis = max(Zlab)
   }else{
 
-    if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
-    if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
+    #if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
+    #if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
     nc2 = dim(X2)[3] # number of covariates on the transition probabilities
     if(n!= dim(X2)[1]) stop("dimension mismatch between S and X2")
     nameGa = colnames(aperm(X2,c(1,3,2)))

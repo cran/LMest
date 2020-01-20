@@ -41,13 +41,13 @@ lmestMc <- function(responsesFormula = NULL,
 
   if(is.character(id) | is.factor(id))
   {
-    warning("id column must be numeric. Coerced in numeric.")
+    warning("id column must be numeric. Coerced in numeric.", call. = FALSE)
     id <- as.numeric(id)
   }
 
   if(is.character(tv) | is.factor(tv))
   {
-    warning("time column must be numeric. Coerced in numeric.")
+    warning("time column must be numeric. Coerced in numeric.", call. = FALSE)
     tv <- as.numeric(tv)
   }
 
@@ -79,7 +79,7 @@ lmestMc <- function(responsesFormula = NULL,
 
 
   if(dim(Y)[2] > 1){
-    warning("multivariate data are not allowed; only the first response variable is considered")
+    warning("multivariate data are not allowed; only the first response variable is considered", call. = FALSE)
     Y <- Y[,1]
   }
   tmp <- long2matrices.internal(Y = Y, id = id, time = tv,yv = weights,
