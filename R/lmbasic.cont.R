@@ -16,20 +16,10 @@ lmbasic.cont <- function(Y,k,start=0,
   Yv = matrix(Y,n*TT,r)
   ## Check and inpute for missing data
 
-
   R = (!is.na(Y))
   if(fort) RR = array(as.integer(1*R),c(n,TT,r))
 
-  if(miss){
-    Yv = cbind(1,Yv)
-    pYv = prelim.mix(Yv,1)
-    thhat = em.mix(prelim.mix(Yv,1))
-    rngseed(1)
-    Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
-    Y = array(Yv,c(n,TT,r))
-    cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
-  }
-miss = TRUE
+  miss = TRUE
 
   th = NULL; sc = NULL; J = NULL
   if(out_se){

@@ -13,9 +13,11 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
                                  fixPsi = FALSE),
                   fort = TRUE, seed = NULL)
 {
+  data <- as.data.frame(data)
   if(!is.data.frame(data))
   {
     stop("A data.frame must be provided")
+
   }
   if(start == 2)
   {
@@ -170,6 +172,8 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
 
   aicv = rep(NA,nkv)
   bicv = rep(NA,nkv)
+  lkv = rep(NA,nkv)
+
   for(kv in 1:nkv){
     out[[kv]] <- switch(model,
                        "LMbasic" = lmbasic(S = Y,yv = freq,k = k[kv],start = start,modBasic = modBasic,tol = tol,
@@ -184,6 +188,7 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
 
     aicv[kv] = out[[kv]]$aic
     bicv[kv] = out[[kv]]$bic
+    lkv[kv] = out[[kv]]$lk
 
   }
 
@@ -195,16 +200,18 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
   }
   Bic <- bicv
   Aic <- aicv
+  Lk <- lkv
 
   names(Bic) <- paste("k",k,sep = "=")
   names(Aic) <- paste("k",k,sep = "=")
+  names(Lk) <- paste("k",k,sep = "=")
   # if(nkv > 1)
   # {
   #   Bic = bicv
   #   Aic = aicv
   # }
   out <- do.call(c, list(best,
-                          list( Bic = Bic, Aic = Aic, call = match.call(),data = data)))
+                          list(Lk = lkv, Bic = Bic, Aic = Aic, call = match.call(),data = data)))
   #out <- append(best, list( Bic = Bic, Aic = Aic, call = match.call(),data = data))
   attributes(out)$responsesFormula = responsesFormula
   attributes(out)$latentFormula = latentFormula

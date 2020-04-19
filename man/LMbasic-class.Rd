@@ -23,6 +23,7 @@
   \item{sepiv}{standard errors for the initial probabilities}
   \item{sePi}{standard errors for the transition probabilities}
   \item{sePsi}{standard errors for the conditional response probabilities}
+     \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
  	\item{Bic}{vector containing the values of the BIC for each \code{k}}
   \item{Aic}{vector containing the values of the AIC for each \code{k}}
   \item{call}{command used to call the function}

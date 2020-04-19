@@ -6,10 +6,11 @@ lmestMc <- function(responsesFormula = NULL,
                     out_se = FALSE, output = FALSE, fort = TRUE, seed = NULL)
 {
 
-
+  data <- as.data.frame(data)
   if(!is.data.frame(data))
   {
     stop("A data.frame must be provided")
+
   }
 
 

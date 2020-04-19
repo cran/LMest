@@ -28,6 +28,7 @@
  	\item{J1}{information matrix}
  	\item{PRED0}{prediction of latent state}
  	\item{PRED1}{prediction of the overall latent effect}
+ 	   \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
  	\item{Bic}{vector containing the values of the BIC for each \code{k}}
   \item{Aic}{vector containing the values of the AIC for each \code{k}}
 	\item{call}{command used to call the function}

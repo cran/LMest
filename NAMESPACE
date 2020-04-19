@@ -4,6 +4,7 @@ useDynLib(LMest, .registration = TRUE)
 
 import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm","mix","Formula")
 importFrom("utils", "packageVersion")
+importFrom("stats", "reshape")
 importFrom("graphics", "hist", "pairs", "par", "rect")
 
 export("est_lm_basic", "est_lm_basic_cont","est_lm_cov_manifest","est_lm_cov_latent", "est_lm_cov_latent_cont")

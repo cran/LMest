@@ -26,6 +26,7 @@
   \item{sePsi}{standard errors for the conditional response matrix}
   \item{seBe}{standard errors for \code{Be}}
   \item{seGa}{standard errors for \code{Ga}}
+     \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
   \item{Bic}{vector containing the values of the BIC for each \code{k}}
   \item{Aic}{vector containing the values of the AIC for each \code{k}}
   \item{call}{command used to call the function}
