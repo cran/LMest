@@ -1,6 +1,6 @@
 \name{lmest}
 \alias{lmest}
-\title{Estimate Latent Markov models}
+\title{Estimate Latent Markov models  for categorical responses}
 \description{Main function for estimating Latent Markov (LM) models for categorical responses.}
 \usage{
 lmest(responsesFormula = NULL, latentFormula = NULL,
@@ -25,40 +25,40 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{k}{an integer vector specifying the number of latent states (default: \code{1:4})}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
     \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion Criterion}
-  \item{modBasic}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
-  \item{modManifest}{model for manifest distribution (\code{"LM"} = Latent Markov with stationary transition, \code{"FM"} = finite mixture)}
+  \item{modBasic}{model on the transition probabilities (0 for time-heterogeneity, 1 for time-homogeneity, from 2 to (TT-1) partial time-homogeneity of a certain order)}
+  \item{modManifest}{model for manifest distribution (\code{"LM"} = Latent Markov with stationary transition, \code{"FM"} = finite mixture model) where a mixture of AR(1) processes is  estimated with common variance and specific correlation coefficients. }
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
-  \item{weights}{an optional vector of frequencies of the available response configurations}
+  \item{weights}{an optional vector of weights for the available responses}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
-  \item{out_se}{to compute the information matrix and standard errors (By default is set to FALSE)}
+  \item{out_se}{to compute the information matrix and standard errors}
   \item{q}{number of support points for the AR(1) process (if modManifest ="FM")}
    \item{output}{to return additional output: \code{PRED0}, \code{PRED1} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}}) and  \code{V}, \code{PI}, \code{Piv}, \code{Ul} for the LM with covariates on the latent model (\code{\link{LMlatent-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasic-class}}, \code{\link{LMlatent-class}} and \code{\link{LMmanifest-class}}}
-  \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
+  \item{fort}{to use fortran routines when possible}
   \item{seed}{an integer value with the random number generator state}
 }
 \details{
-The function \code{lmest} is a general function for estimating LM models for categorical responses. The function requires data in long format and two additional columns indicating the unit identifier and the time occasions.
+\code{lmest} is a general function for estimating LM models for categorical responses. The function requires data in long format and two additional columns indicating the unit identifier and the time occasions.
 
-Covariates are allowed on manifest distribution (measurement model) or on the initial and transition probabilities (latent model). Two different formulas are employed to specify the different LM models, \code{responsesFormula} and \code{latentFormula}:
+Covariates are allowed to affect manifest distribution (measurement model) or  the initial and transition probabilities (latent model). Two different formulas are employed to specify the different LM models, \code{responsesFormula} and \code{latentFormula}:
 
 \itemize{
-\item{\code{responsesFormula}} is used to specify the measurament model:
+\item{\code{responsesFormula}} is used  to specify the measurament model:
 \itemize{
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr  the LM model without covariates and two responses (\code{x1} and \code{x2}) is specified;
-\item{\code{responsesFormula = NULL}}\cr  all the columns in the data except the \code{"id"} and \code{"time"} columns are used to estimate the LM model without covariates;
-\item{\code{responsesFormula = x1 + x2 ~ x3 + x4}}\cr the LM model with two responses (\code{x1} and \code{x2}) and two covariates (\code{x3} and \code{x4}) in the measurement model is specified;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr  the LM model without covariates and two responses (\code{y1} and \code{y2}) is specified;
+\item{\code{responsesFormula = NULL}}\cr  all the columns in the data except the \code{"id"} and \code{"time"} columns are used as responses to estimate the LM model without covariates;
+\item{\code{responsesFormula = y1 + y2 ~ x1 + x2}}\cr the LM model with two responses (\code{y1} and \code{y2}) and two covariates (\code{x1} and \code{x2}) in the measurement model is specified;
 }
 
 \item{\code{latentFormula}} is used to specify the LM model with covariates in the latent model:
 
 \itemize{
-\item{\code{responsesFormula = x1 + x2 ~ NULL}}  \cr
-\code{latentFormula = ~ x3 + x4 | x5 + x6} \cr the LM model with two responses (\code{x1} and \code{x2}) and  two covariates affecting the initial probabilities (\code{x3} and \code{x4}) and other two affecting the transition probabilities (\code{x5} and \code{x6}) is specified;
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr \code{latentFormula = ~ 1 | x3 + x4} \cr (or \code{latentFormula = ~ NULL | x3 + x4})  \cr the covariates affect only the transition probabilities and an intercept is specified for the intial probabilities;
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr \code{latentFormula = ~ x3 + x4} \cr the LM model with two covariates (\code{x3} and \code{x4}) affecting both the initial and transition probabilities is specified;
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr \code{latentFormula = ~ NULL | NULL} \cr (or \code{latentFormula = ~ 1 | 1}) \cr the LM model with only an intercept on the initial and transition probabilities is specified.
+\item{\code{responsesFormula = y1 + y2 ~ NULL}}  \cr
+\code{latentFormula = ~ x1 + x2 | x3 + x4} \cr the LM model with two responses (\code{y1} and \code{y2}) and  two covariates affecting the initial probabilities (\code{x1} and \code{x2}) and other two affecting the transition probabilities (\code{x3} and \code{x4}) is specified;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ 1 | x1 + x2} \cr (or \code{latentFormula = ~ NULL | x1 + x2})  \cr the covariates affect only the transition probabilities and an intercept is specified for the intial probabilities;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ x1 + x2} \cr the LM model with two covariates (\code{x1} and \code{x2}) affecting both the initial and transition probabilities is specified;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ NULL | NULL} \cr (or \code{latentFormula = ~ 1 | 1}) \cr the LM model with only an intercept on the initial and transition probabilities is specified.
 }}
 
 
@@ -100,17 +100,17 @@ Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models 
 data("data_SRHS_long")
 SRHS <- data_SRHS_long[1:2400,]
 
-# Categories rescaled to vary from 1 (“poor”) to 5 (“excellent”)
+# Categories rescaled to vary from 0 (“poor”) to 4 (“excellent”)
 
 SRHS$srhs <- 5 - SRHS$srhs
 
 out <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 3,
-            start = 1,
-            modBasic = 1,
-            seed = 123)
+             index = c("id","t"),
+             data = SRHS,
+             k = 3,
+             start = 1,
+             modBasic = 1,
+             seed = 123)
 out
 summary(out)
 
@@ -122,25 +122,25 @@ summary(out)
 ## Basic LM model with model selection using BIC
 
 out1 <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 1:5,
-            tol = 1e-8,
-            modBasic = 1,
-            seed = 123)
+              index = c("id","t"),
+              data = SRHS,
+              k = 1:5,
+              tol = 1e-8,
+              modBasic = 1,
+              seed = 123)
 out1
 out1$Bic
 
 # Basic LM model with model selection using AIC
 
 out2 <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 1:5,
-            tol = 1e-8,
-            modBasic = 1,
-            modSel = "AIC",
-            seed = 123)
+              index = c("id","t"),
+              data = SRHS,
+              k = 1:5,
+              tol = 1e-8,
+              modBasic = 1,
+              modSel = "AIC",
+              seed = 123)
 out2
 out2$Aic
 
@@ -149,13 +149,14 @@ out2$Aic
 data(data_criminal_sim)
 data_criminal_sim = data.frame(data_criminal_sim)
 
-responsesFormula <- lmestFormula(data = data_criminal_sim,
-                                  response = "y")$responsesFormula
+responsesFormula <- lmestFormula(data data_criminal_sim, response = "y")$responsesFormula
 
-out3 <- lmest(responsesFormula = responsesFormula,
+out3 <- lmest(responsesFormula responsesFormula,
               index = c("id","time"),
-              data = data_criminal_sim,
-              k = 1:7,modBasic = 1,tol = 10^-4)
+              data =data_criminal_sim,
+              k = 1:7,
+              modBasic = 1,
+              tol = 10^-4)
 
 out3
 
@@ -168,8 +169,11 @@ long <- reshape(long,direction = "long",
                 idvar = "id",
                 varying = list(2:ncol(long)))
 
-out4 <- lmest(index = c("id","time"),k = 3, data = long,
-             weights = data_drug[,6],modBasic = 1)
+out4 <- lmest(index = c("id","time"),
+              k = 3, 
+              data = long,
+              weights = data_drug[,6],
+              modBasic = 1)
 
 out4
 summary(out4)
@@ -178,17 +182,17 @@ summary(out4)
 # Covariates: gender, race, educational level (2 columns), age and age^2
 
 out5 <- lmest(responsesFormula = srhs ~ NULL,
-             latentFormula =  ~
-             I(gender - 1) +
-             I( 0 + (race == 2) + (race == 3)) +
-             I(0 + (education == 4)) +
-             I(0 + (education == 5)) +
-             I(age - 50) + I((age-50)^2/100),
-             index = c("id","t"),
-             data = SRHS,
-             k = 2,
-             paramLatent = "multilogit",
-             start = 0)
+              latentFormula =  ~
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) +
+              I(age - 50) + I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              paramLatent = "multilogit",
+              start = 0)
 
 out5
 summary(out5)
@@ -196,19 +200,19 @@ summary(out5)
 ### LM model with the above covariates in the measurement model
 
 out6 <- lmest(responsesFormula = srhs ~ -1 +
-             I(gender - 1) +
-             I( 0 + (race == 2) + (race == 3)) +
-             I(0 + (education == 4)) +
-             I(0 + (education == 5)) + I(age - 50) +
-             I((age-50)^2/100),
-             index = c("id","t"),
-             data = SRHS,
-             k = 2,
-             modManifest = "LM",
-             out_se = TRUE,
-             tol = 1e-8,
-             start = 1,
-             seed = 123)
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) + I(age - 50) +
+              I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              modManifest = "LM",
+              out_se = TRUE,
+              tol = 1e-8,
+              start = 1,
+              seed = 123)
 out6
 summary(out6)
 }

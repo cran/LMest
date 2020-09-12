@@ -84,7 +84,7 @@ est_lm_basic <-
       bic = -2*lk+np*log(n)
       out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,aic=aic,bic=bic,lkv=NULL,J=NULL,V=NULL,th=NULL,sc=NULL,call=match.call())
       class(out)="LMbasic"
-      return(out)
+      (out)
     }
     # Starting values
     if(start == 0){
@@ -454,7 +454,7 @@ est_lm_basic <-
 
     cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
     class(out)="LMbasic"
-    return(out)
+    (out)
   }
 
 
@@ -518,7 +518,7 @@ est_lm_basic_cont <-
       bic = -2*lk+np*log(n)
       out =     		list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=NULL,V=NULL,call=match.call())
       class(out)="LMbasiccont"
-      return(out)
+      (out)
     }
 
     # Starting values
@@ -745,7 +745,7 @@ est_lm_basic_cont <-
     }
     cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
     class(out)="LMbasiccont"
-    return(out)
+    (out)
   }
 
 est_lm_cov_latent_cont <-
@@ -770,7 +770,7 @@ est_lm_cov_latent_cont <-
     # Si = var-cov matrix common to all states (if start=2)
     # Be = parameters on the initial probabilities (if start=2)
     # Ga = parameters on the transition probabilities (if start=2)
-    # output = to return additional output
+    # output = to  additional output
 
     # Preliminaries
     check_der = FALSE # to check score and info
@@ -902,7 +902,7 @@ est_lm_cov_latent_cont <-
       bic = -2*lk+np*log(n)
       out = list(lk=lk,Piv=Piv,Pi=Pi,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=NULL,V=NULL,call=match.call())
       class(out)="LMlatentcont"
-      return(out)
+      (out)
     }
     # Starting values: deterministic initialization
     if(start == 0){
@@ -1211,7 +1211,7 @@ est_lm_cov_latent_cont <-
     #cat(" |-------------|-------------|-------------|-------------|\n");
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
     class(out)="LMlatentcont"
-    return(out)
+    (out)
   }
 
 est_lm_cov_latent <-
@@ -1233,7 +1233,7 @@ est_lm_cov_latent <-
     #         multilogit = standard multinomial logit for every row of the transition matrix
     #         difflogit  = multinomial logit based on the difference between two sets of parameters
     # fort   = fortran use (FALSE for not use fortran)
-    # output = to return additional output
+    # output = to  additional output
     # out_se  = TRUE for computing the information and standard errors
     # fixPsi = TRUE if Psi is given in input and is not updated anymore
 
@@ -1401,7 +1401,7 @@ est_lm_cov_latent <-
       bic = -2*lk+np*log(n)
       out = list(lk=lk,Piv=Piv,Pi=Pi,Psi=Psi,np=np,aic=aic,bic=bic,lkv=NULL,V=NULL,call=match.call())
       class(out)="LMlatent"
-      return(out)
+      (out)
     }
     time = proc.time()
     # Starting values: deterministic initialization
@@ -1923,7 +1923,7 @@ est_lm_cov_latent <-
     #cat(" |-------------|-------------|-------------|-------------|\n");
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
     class(out)="LMlatent"
-    return(out)
+    (out)
   }
 
 
@@ -1943,7 +1943,7 @@ est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"
   # q:     number of support points for AR
   # mod:   model (0 = LM with stationary transition, 1 = finite mixture)
   # tol:   tolerance for the convergence (optional) and tolerance of conditional probability
-  #        if tol>1 then return
+  #        if tol>1 then
   # start: equal to 1 for random starting values (optional)
   # mu:    starting value for mu (optional)
   # al:    starting value for al (optional)
@@ -1952,7 +1952,7 @@ est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"
   # rho:   starting value for rho (optional)
   # la:    starting value for la (optional)
   # PI:    starting value for PI (optional)
-  # output:  TRUE to return additional output
+  # output:  TRUE to  additional output
   #out_se:   TRUE for computing information
   #
   # OUTPUT:
@@ -2185,7 +2185,7 @@ est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"
     lk = sum(yv*log(pim))
 
     if(tol>1){
-      est = NULL; return
+      est = NULL; (est)
     }
     # start EM
     t0 = proc.time()[1]; tdisp = 5;
@@ -2498,7 +2498,7 @@ est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"
     cat("----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|\n");
   }
   class(out)="LMmanifest"
-  return(out)
+  (out)
 }
 
 
@@ -2862,7 +2862,7 @@ est_mc_basic <-
     }
 
     class(out)="MCbasic"
-    return(out)
+    (out)
   }
 
 est_mc_cov <-
@@ -3062,7 +3062,7 @@ est_mc_cov <-
     }
     #cat(" |-------------|-------------|-------------|-------------|\n");
     class(out)="MCcov"
-    return(out)
+    (out)
 
   }
 
@@ -3263,6 +3263,6 @@ est_mc_cov <-
 #     }
 #     #cat(" |-------------|-------------|-------------|-------------|\n");
 #     class(out)="MClatent"
-#     return(out)
+#     (out)
 #
 #   }

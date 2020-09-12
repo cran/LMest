@@ -15,8 +15,8 @@ cat("\nTransition probabilities:\n")
 if(k==1){
 	print(object$Pi)
 }else{ 
-	if(!is.null(object$call$mod)){
-		if(object$call$mod==1) print(round(object$Pi[,,2],4)) else print(round(object$Pi[,,2:TT],4))
+	if(!is.null(object$call$modBasic)){
+		if(object$call$modBasic==1) print(round(object$Pi[,,2],4)) else print(round(object$Pi[,,2:TT],4))
 	}else print(round(object$Pi[,,2:TT],4))
 }	
 if(is.null(object$sePi)==FALSE){
@@ -24,8 +24,8 @@ if(is.null(object$sePi)==FALSE){
 	if(k==1){
 		print(object$Pi)
 	}else{
-		if(!is.null(object$call$mod)){
-			if(object$call$mod==1) print(round(object$sePi[,,2],4)) else print(round(object$sePi[,,2:TT],4))
+		if(!is.null(object$call$modBasic)){
+			if(object$call$modBasic==1) print(round(object$sePi[,,2],4)) else print(round(object$sePi[,,2:TT],4))
 		}else print(round(object$sePi[,,2:TT],4))
 	}	
 }	

@@ -44,16 +44,20 @@ Francesco Bartolucci,
 \examples{
 data(data_SRHS_long)
 names(data_SRHS_long)
-# Formula with response srhs and covariates for both initail and transition
+
+# Formula with response srhs and covariates for both initail and transition: 
 # gender,race,educational,age.
 
-## With intercept
+## LM model with covariates on the latent model
+# and with intercepts on the initial and transition probabilities
+
 fm <- lmestFormula(data = data_SRHS_long,
                    response = "srhs",
                    LatentInitial = 3:6, LatentTransition = 3:6)
 fm
 
-## Without intercept
+## LM model with covariates on the latent model
+# and without intercepts on the initial and transition probabilities
 
 fm <- lmestFormula(data = data_SRHS_long,
                    response = "srhs",
@@ -74,11 +78,11 @@ fm
 # Formula with only the responses from y1 to y10 and intercept for manifest
 
 fm <- lmestFormula(data = data_criminal_sim,
-                  response = "y",AddInterceptManifest = TRUE)$responsesFormula
+                   response = "y",AddInterceptManifest = TRUE)$responsesFormula
 fm
 
 
-#####
+## LM model for continous responses
 
 require(mmm)
 data(multiLongGaussian)
@@ -88,35 +92,43 @@ names(multiLongGaussian)
 # X covariates for initail and time covariate for transition
 
 fm <- lmestFormula(data = multiLongGaussian,
-                    response = c("resp"),
-                    LatentInitial = "X",LatentTransition = "time")
+                   response = c("resp"),
+                   LatentInitial = "X",
+                   LatentTransition = "time")
 fm
-## Wrong model because two variable start with X.
-## Check the starts arguments. For the right model:
+
+## Wrong model specification since two variable start with X.
+# Check the starts arguments. 
+
+# For the right model:
 
 fm <- lmestFormula(data = multiLongGaussian,
-                    response = c("resp"),
-                    LatentInitial = "X",LatentTransition = "time",
-                    LatentInitialStart = FALSE)
+                   response = c("resp"),
+                   LatentInitial = "X",LatentTransition = "time",
+                   LatentInitialStart = FALSE)
 fm
+
 ## or
+
 fm <- lmestFormula(data = multiLongGaussian,
-                    response = c("resp"),
-                    LatentInitial = 4,LatentTransition = "time",
-                    LatentInitialStart = FALSE)
+                   response = c("resp"),
+                   LatentInitial = 4,LatentTransition = "time",
+                   LatentInitialStart = FALSE)
 fm
 
 \dontrun{
+
 data(data_criminal_sim)
 data_criminal_sim <- data.frame(data_criminal_sim)
-# Estimate mixed LM model for females
+
+# Mixed LM model for females
 
 responsesFormula <- lmestFormula(data = data_criminal_sim,
-                                  response = "y")$responsesFormula
+                                 response = "y")$responsesFormula
 
 out <- lmest(responsesFormula = responsesFormula,
-            index = c("id","time"),
-            data = data_criminal_sim,
-            k = 2)
+             index = c("id","time"),
+             data = data_criminal_sim,
+             k = 2)
 }
 }

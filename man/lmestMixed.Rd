@@ -16,7 +16,7 @@ lmestMixed(responsesFormula = NULL,
   \item{k1}{number of latent classes}
   \item{k2}{number of latent states}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
-    \item{weights}{an optional vector of frequencies of the available response configurations}
+    \item{weights}{an optional vector of weights for the available responses}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors (FALSE is the default option)}
@@ -27,8 +27,8 @@ The function \code{lmestMixed} estimates the mixed LM for categorical data. The 
 
 \code{responsesFormula} is used to specify the responses of the mixed LM model:
 \itemize{
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr the mixed LM model with two categorical responses (\code{x1} and \code{x2}) is specified;
-\item{\code{responsesFormula = NULL}} \cr all the columns in the data except the \code{"id"} and \code{"time"} columns are used to estimate the mixed LM.
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr the mixed LM model with two categorical responses (\code{y1} and \code{y2}) is specified;
+\item{\code{responsesFormula = NULL}} \cr all the columns in the data except the \code{"id"} and \code{"time"} columns are used as responses to estimate the mixed LM.
 
 }
 
@@ -56,14 +56,16 @@ Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models 
 
 \examples{
 \dontrun{
+
 # Example based on criminal data
 
 data(data_criminal_sim)
 data_criminal_sim <- data.frame(data_criminal_sim)
+
 # Estimate mixed LM model for females
 
 responsesFormula <- lmestFormula(data = data_criminal_sim,
-                                  response = "y")$responsesFormula
+                                 response = "y")$responsesFormula
 
 # fit mixed LM model only for females
 out <- lmestMixed(responsesFormula = responsesFormula,

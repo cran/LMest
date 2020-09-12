@@ -1,13 +1,15 @@
+
 lmestContMISS <- function(responsesFormula = NULL, latentFormula = NULL,
-                          data, index, k = 1:4, start = 0,
-                          modSel = c("BIC", "AIC"), modBasic = 0, covariance = "EEE",
-                          paramLatent = c("multilogit", "difflogit"),
-                          weights = NULL, tol = 10^-10,
-                          maxit = 5000, out_se = FALSE, output = FALSE,
-                          parInit = list(piv = NULL, Pi = NULL,
-                                         Mu = NULL, Si = NULL,
-                                         Be = NULL, Ga = NULL),indb=NULL,
-                          fort = TRUE, seed = NULL){
+                      data, index, k = 1:4, start = 0,
+                      modSel = c("BIC", "AIC"), modBasic = 0, covariance = "EEE",
+                      paramLatent = c("multilogit", "difflogit"),
+                      weights = NULL, tol = 10^-10,
+                      maxit = 5000, out_se = FALSE, output = FALSE,
+                      parInit = list(piv = NULL, Pi = NULL,
+                                     Mu = NULL, Si = NULL,
+                                     Be = NULL, Ga = NULL),indb=NULL,
+                      fort = TRUE, seed = NULL)
+{
 
   data <- as.data.frame(data)
   if(!is.data.frame(data))

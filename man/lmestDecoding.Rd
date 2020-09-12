@@ -23,7 +23,7 @@ lmestDecoding(est, sequence = NULL, fort = TRUE, ...)
 \arguments{
   \item{est}{an object obtained from a call to \code{\link{lmest}}, \code{\link{lmestCont}}, and \code{\link{lmestMixed}}}
   \item{sequence}{an integer vector indicating the units for the decoding. If \code{NULL} the whole observations are considered. (By default is set to NULL)}
-    \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
+    \item{fort}{to use fortran routines when possible}
   \item{\dots}{further arguments}
 }
 
@@ -56,8 +56,11 @@ long <- reshape(long,direction = "long",
                 idvar = "id",
                 varying = list(2:ncol(long)))
 
-est <- lmest(index = c("id","time"),k = 3, data = long,
-              weights = data_drug[,6], modBasic = 1)
+est <- lmest(index = c("id","time"),
+             k = 3, 
+             data = long,
+             weights = data_drug[,6], 
+             modBasic = 1)
 
 # Decoding for a single sequence
 
@@ -73,24 +76,25 @@ out3 <- lmestDecoding(est)
 # Decoding for LM model  with covariates on the initial and transition probabilities
 
 data("data_SRHS_long")
+
 SRHS <- data_SRHS_long[1:2400,]
 
-# Categories rescaled to vary from 1 (“poor”) to 5 (“excellent”)
+# Categories rescaled to vary from 0 (“poor”) to 4 (“excellent”)
 
 SRHS$srhs <- 5 - SRHS$srhs
 
 est2 <- lmest(responsesFormula = srhs ~ NULL,
-             latentFormula =  ~
-             I(gender - 1) +
-             I( 0 + (race == 2) + (race == 3)) +
-             I(0 + (education == 4)) +
-             I(0 + (education == 5)) +
-             I(age - 50) + I((age-50)^2/100),
-             index = c("id","t"),
-             data = SRHS,
-             k = 2,
-             paramLatent = "difflogit",
-             output = TRUE)
+              latentFormula =  ~
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) +
+              I(age - 50) + I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              paramLatent = "difflogit",
+              output = TRUE)
 
 # Decoding for a single sequence
 

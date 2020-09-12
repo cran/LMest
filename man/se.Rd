@@ -35,42 +35,51 @@ se(est, ...)
 \examples{
 \dontrun{
 
+# LM model for categorical responses without covariates 
+
 data("data_SRHS_long")
 SRHS <- data_SRHS_long[1:2400,]
 
-# Categories rescaled to vary from 1 (“poor”) to 5 (“excellent”)
+# Categories rescaled to vary from 0 (“poor”) to 4 (“excellent”)
 
 SRHS$srhs <- 5 - SRHS$srhs
 
 out <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 3,
-            modBasic = 1,
-            out_se = FALSE)
+             index = c("id","t"),
+             data = SRHS,
+             k = 3,
+             modBasic = 1,
+             out_se = FALSE)
+            
 out.se <- se(out)
 
 out1 <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 3,
-            modBasic = 1,
-            out_se = TRUE)
+              index = c("id","t"),
+              data = SRHS,
+              k = 3,
+              modBasic = 1,
+              out_se = TRUE)
+            
 out1.se <- se(out1)
 
+# LM model for categorical responses with covariates on the latent model
+
 out2 <- lmest(responsesFormula = srhs ~ NULL,
-             latentFormula =  ~
-             I(gender - 1) +
-             I( 0 + (race == 2) + (race == 3)) +
-             I(0 + (education == 4)) +
-             I(0 + (education == 5)) +
-             I(age - 50) + I((age-50)^2/100),
-             index = c("id","t"),
-             data = SRHS,
-             k = 2,
-             paramLatent = "multilogit",
-             start = 0)
+              latentFormula =  ~
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) +
+              I(age - 50) + I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              paramLatent = "multilogit",
+              start = 0)
+              
 out2.se <- se(out2)
+
+# LM model for continous responses without covariates 
 
 require(mmm)
 data(multiLongGaussian)
@@ -78,20 +87,26 @@ data(multiLongGaussian)
 t <- rep(1:4, times  = max(multiLongGaussian$ID))
 multiLongGaussian <- data.frame(t = t, multiLongGaussian)
 
+# LM model for continous responses without covariates 
+
 out3 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
                   index = c("ID", "t"),
                   data = multiLongGaussian,
                   k =3,
                   modBasic = 1,
                   tol = 10^-5)
+                  
 out3.se <- se(out3)
 
+# LM model for continous responses with covariates 
+
 out4 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                   latentFormula = ~ X + time | X + time,
-                   index = c("ID", "t"),
-                   data = multiLongGaussian,
-                   k = 3,
-                   output = TRUE)
+                  latentFormula = ~ X + time | X + time,
+                  index = c("ID", "t"),
+                  data = multiLongGaussian,
+                  k = 3,
+                  output = TRUE)
+                  
 out4.se <- se(out4)
 }
 }

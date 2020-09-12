@@ -1,14 +1,12 @@
 \name{bootstrap_lm_cov_latent_cont}
 
 \alias{bootstrap_lm_cov_latent_cont}
-%- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{Parametric bootstrap for LM models for continuous outcomes with individual covariates in the latent model}
 
 \description{Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{bootstrap}} \bold{function}.}
 
 \usage{bootstrap_lm_cov_latent_cont(X1, X2, param = "multilogit", Mu, Si, Be, Ga, B = 100)}
-%- maybe also 'usage' for other objects documented here.
 
 \arguments{
   \item{X1 }{matrix of covariates affecting the initial probabilities (n x nc1)}

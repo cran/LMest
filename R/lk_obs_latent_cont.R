@@ -22,7 +22,7 @@ lk_obs_latent_cont <- function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
   	th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
   	Si = matrix(0,r,r)
   	Si[upper.tri(Si,TRUE)]=th1
-  	Si = Si+t(Si-diag(diag(Si)))
+  	if(r>1) Si = Si+t(Si-diag(diag(Si)))
 
 # parameters on initial probabilities
     ind = (1:((1+nc1)*(k-1)))

@@ -34,17 +34,24 @@ Juan B., Rabiner L. (1991) Hidden Markov Models for Speech Recognition. \emph{Te
 \examples{
 \dontrun{
 # example for the output from est_lm_basic
+
 data(data_drug)
 data_drug <- as.matrix(data_drug)
 S <- data_drug[,1:5]-1
 yv <- data_drug[,6]
 n <- sum(yv)
+
 # fit the Basic LM model
+
 k <- 3
 est <- est_lm_basic(S, yv, k, mod = 1)
+
 # decoding for a single sequence
+
 out1 <- decoding(est, S[1,])
+
 # decoding for all sequences
+
 out2 <- decoding(est, S)
 
 

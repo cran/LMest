@@ -48,7 +48,7 @@ lmbasic.cont.MISS  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_s
       piv = 1; Pi = 1
       Mu = as.matrix(colMeans(Yv,na.rm=TRUE))
       Si = as.matrix(cov(Yv,use = "complete.obs"))
-
+      rownames(Mu) <- dimnames(Y)[[3]]
       lk = 0
       if(r==1){
         for (i in 1:n) for(t in 1:TT){
@@ -69,6 +69,7 @@ lmbasic.cont.MISS  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_s
       np = k*r+r*(r+1)/2
       aic = -2*lk+np*2
       bic = -2*lk+np*log(n)
+      rownames(Mu) <- dimnames(Y)[[3]]
       out =     		list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np, k = k, aic=aic,bic=bic,lkv=NULL,V=NULL,n = n, TT = TT, modBasic = mod )
       class(out)="LMbasiccont"
       return(out)
@@ -363,6 +364,8 @@ lmbasic.cont.MISS  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_s
     #	dimnames(Si) = list(dimnames(Y)[[3]],dimnames(Y)[[3]])
     if(r==1) dimnames(Mu) = list(item=1,state=1:k) else dimnames(Mu)=list(item=1:r,state=1:k)
     dimnames(Si)=list(item=1:r,item=1:r)
+
+    rownames(Mu) <- dimnames(Y)[[3]]
 
     out = list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,k = k,aic=aic,bic=bic,lkv=lkv,V=V, n = n, TT = TT, modBasic = mod)
     if(miss){

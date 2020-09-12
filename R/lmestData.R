@@ -188,7 +188,7 @@ lmestData <- function(data, id = NULL,
   attributes(data)$time = time
   attributes(data)$balanced = bal
 
-  out <- list(data = data, id = id, time = time,
+  out <- list(data = data, id = as.character(factor(id)), time = as.character(factor(time)),
               n = n, TT = TT, d = d,
               Y = Y, Xmanifest = Xmanifest, Xinitial = Xinitial, Xtrans = Xtrans)
 
@@ -300,7 +300,7 @@ C <- length(unique(whichC))
     cat("\n----------","\n\n")
     #dt1 <- dt[,-1]
     dt1 <- dt[,-(which(varType == "c")+1)]
-    temp1 <- data.frame(sapply(dt1, factor))
+    temp1 <- data.frame(lapply(dt1, factor))
     nle <- max(sapply(temp1,nlevels))
     temp1 <- summary(temp1)
     temp <- matrix(NA, nrow = 150, ncol = ncol(dt1))
@@ -333,10 +333,11 @@ C <- length(unique(whichC))
         print(data.frame(dtt,row.names = unique(x$data[,c(id.which)])))
       }
     }else{
+
       cat("\nProportion:")
       cat("\n----------","\n\n")
       #dt1 <- dt[,-1]
-      temp1 <- data.frame(sapply(dt, factor))
+      temp1 <- data.frame(lapply(dt, factor))
       nle <- max(sapply(temp1,nlevels))
       temp1 <- summary(temp1)
       temp <- matrix(NA, nrow = 150, ncol = x$d+1)
@@ -379,7 +380,7 @@ C <- length(unique(whichC))
       #dt1 <- dt[,-1]
 
       dt1 <- dt[x$time == i,-(which(varType == "c")+1)]
-      temp1 <- data.frame(sapply(dt1, factor))
+      temp1 <- data.frame(lapply(dt1, factor))
       nle <- max(sapply(temp1,nlevels))
       temp1 <- summary(temp1)
       temp <- matrix(NA, nrow = 150, ncol = ncol(dt1))
@@ -416,13 +417,14 @@ C <- length(unique(whichC))
       print(summary(dt[x$time == i,-1], maxsum = maxsum, digits = digits))
       }
     }else{
+
       cat("\nProportion by year:")
       cat("\n----------","\n\n")
       #dt1 <- dt[,-1]
       for(i in unique(x$time))
       {
         cat("\nTime = ", i, "\n\n")
-        temp1 <- data.frame(sapply(dt[x$time == i,], factor))
+        temp1 <- data.frame(lapply(dt[x$time == i,], factor))
         nle <- max(sapply(temp1,nlevels))
         temp1 <- summary(temp1)
       temp <- matrix(NA, nrow = 150, ncol = x$d+1)

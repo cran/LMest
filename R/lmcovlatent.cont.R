@@ -143,6 +143,9 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     np = k*r+r*(r+1)/2
     aic = -2*lk+np*2
     bic = -2*lk+np*log(n)
+    Mu = matrix(Mu,r,k)
+    nameY <- dimnames(Y)[[3]]
+    dimnames(Mu) <- list(nameY,state=1:k)
     out = list(lk=lk,Piv=Piv,Pi=Pi,Mu=Mu,Si=Si,np=np,k = k, aic=aic,bic=bic,lkv=NULL,V=NULL, n = n, TT = TT, paramLatent=param )
     class(out)="LMlatentcont"
     return(out)
@@ -418,17 +421,20 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     dimnames(Piv)=list(subject=1:n,state=1:k)
     dimnames(PI)=list(state=1:k,state=1:k,subject=1:n,time=1:TT)
   }
-  if(r==1) dimnames(Mu) = list(item=1,state=1:k) else dimnames(Mu)=list(item=1:r,state=1:k)
-  dimnames(Si)=list(item=1:r,item=1:r)
+  nameY <- dimnames(Y)[[3]]
+  dimnames(Mu) <- list(nameY,state=1:k)
+  if(r==1) colnames(Si) <- nameY else dimnames(Si) <- list(nameY,nameY)
+  
   out = list(lk=lk,Be=Be,Ga=Ga,Mu=Mu,Si=Si,np=np,k = k,aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
   if(out_se){
     seMu = matrix(seMu,r,k)
-    if(r==1) dimnames(seMu) = list(item=1,state=1:k) else dimnames(seMu)=list(item=1:r,state=1:k)
     seSi2 = matrix(0,r,r)
     seSi2[upper.tri(seSi2,TRUE)]=seSi
-    seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
+    if(r>1) seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
     seSi = seSi2
-    dimnames(seSi)=list(item=1:r,item=1:r)
+    dimnames(seMu)=list(nameY,state=1:k)
+    if(r==1) colnames(seSi) <- nameY else dimnames(seSi) <- list(nameY,nameY)
+    
     out$seMu = seMu
     out$seSi = seSi
     out$seBe = seBe

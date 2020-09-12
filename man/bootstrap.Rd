@@ -37,36 +37,44 @@ Average of bootstrap estimates and standard errors for the model parameters in \
 
 \examples{
 \dontrun{
+
+# LM model for categorical responses with covariates on the latent model
+
 data("data_SRHS_long")
 SRHS <- data_SRHS_long[1:2400,]
+
+# Categories rescaled to vary from 0 (“poor”) to 4 (“excellent”)
+
 SRHS$srhs <- 5 - SRHS$srhs
 
 out1 <- lmest(responsesFormula = srhs ~ NULL,
-            index = c("id","t"),
-            data = SRHS,
-            k = 3,
-            tol = 1e-8,
-            start = 1,
-            modBasic = 1,
-            out_se = TRUE,
-            seed = 123)
+              index = c("id","t"),
+              data = SRHS,
+              k = 3,
+              tol = 1e-8,
+              start = 1,
+              modBasic = 1,
+              out_se = TRUE,
+              seed = 123)
 
 boot1 <- bootstrap(out1)
 
 out2 <- lmest(responsesFormula = srhs ~ NULL,
-             latentFormula =  ~
-             I(gender - 1) +
-             I( 0 + (race == 2) + (race == 3)) +
-             I(0 + (education == 4)) +
-             I(0 + (education == 5)) +
-             I(age - 50) + I((age-50)^2/100),
-             index = c("id","t"),
-             data = SRHS,
-             k = 2,
-             paramLatent = "multilogit",
-             start = 0)
+              latentFormula =  ~
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) +
+              I(age - 50) + I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              paramLatent = "multilogit",
+              start = 0)
 
 boot2 <- bootstrap(out2)
+
+# LM model for continous responses without covariates 
 
 require(mmm)
 data(multiLongGaussian)
@@ -84,11 +92,12 @@ out3 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
 boot3 <- bootstrap(out3)
 
 out4 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                   latentFormula = ~ X + time,
-                   index = c("ID", "t"),
-                   data = multiLongGaussian,
-                   k = 3,
-                   output=TRUE)
+                  latentFormula = ~ X + time,
+                  index = c("ID", "t"),
+                  data = multiLongGaussian,
+                  k = 3,
+                  output=TRUE)
+                  
 boot4 <- bootstrap(out4)
 }
 }

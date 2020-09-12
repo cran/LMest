@@ -8,7 +8,7 @@ lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
   th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
   Si = matrix(0,r,r)
   Si[upper.tri(Si,TRUE)]=th1
-  Si = Si+t(Si-diag(diag(Si)))
+  if(r>1) Si = Si+t(Si-diag(diag(Si)))
 
 	th1 = th[1:(k-1)]; th = th[-(1:(k-1))]
 	piv = exp(Bm%*%th1); piv = as.vector(piv/sum(piv))

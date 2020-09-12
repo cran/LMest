@@ -242,7 +242,7 @@ lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),
     lk = sum(yv*log(pim))
 
     if(tol>1){
-      est = NULL; return
+      est = NULL; return(est)
     }
     # start EM
     t0 = proc.time()[1]; tdisp = 5;

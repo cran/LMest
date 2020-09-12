@@ -5,11 +5,13 @@ lmestMixed <- function(responsesFormula = NULL,
                        out_se = FALSE, seed = NULL)
 {
 
-  data <- as.data.frame(data)
-  if(!is.data.frame(data))
+  if(inherits(data, "lmestData"))
   {
+    data <- data$data
+  }else if(!is.data.frame(data))
+  {
+    data <- as.data.frame(data)
     stop("A data.frame must be provided")
-
   }
 
   if(length(index) != 2)

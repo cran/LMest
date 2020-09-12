@@ -7,8 +7,13 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
   # vector of kv to try for
   # nrep = number repetitions with random starting values
   # version = model to be estimated ("basic" = basic LM model (est_lm_basic function); "LMlatent" = LM model with covariates in the distribution of the latent process (est_lm_cov_latent function); "LMmanifest" = LM model with covariates in the measurement model (est_lm_cov_maifest function))
-    if(!is.data.frame(data))
+
+  if(inherits(data, "lmestData"))
   {
+    data <- data$data
+  }else if(!is.data.frame(data))
+  {
+    data <- as.data.frame(data)
     stop("A data.frame must be provided")
   }
 
@@ -147,10 +152,22 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
   }
 
 
+  miss = any(is.na(Y))
+  if(miss)
+  {
+    Yv = cbind(1,Y)
+    pYv = prelim.mix(Yv,1)
+    thhat = em.mix(prelim.mix(Yv,1))
+    rngseed(1)
+    Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
+    Y = array(Yv,dim(Y))
+    cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
+  }
+
+
   data.new <- data[,-c(id.which,tv.which), drop = FALSE]
 
   kv = k
-
   out = vector("list",max(kv))
   lkv = Aic = Bic = errv = rep(NA,max(kv))
   for(k in kv){

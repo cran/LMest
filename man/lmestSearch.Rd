@@ -21,7 +21,7 @@ lmestSearch(responsesFormula = NULL, latentFormula = NULL,
   \item{index}{a character vector with two elements, the first indicating the name of the unit identifier, and the second the time occasions
 }
   \item{k}{a vector of integer values for the number of latent states}
-  \item{weights}{an optional vector of frequencies of the available response configurations}
+  \item{weights}{an optional vector of weights for the available responses}
    \item{version}{type of responses for the LM model: "categorical" and "continuous"}
   \item{nrep}{number of repetitions of each random initialization}
   \item{tol1}{tolerance level for checking convergence of the algorithm in the random initializations}

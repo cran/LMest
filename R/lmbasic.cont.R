@@ -16,10 +16,13 @@ lmbasic.cont <- function(Y,k,start=0,
   Yv = matrix(Y,n*TT,r)
   ## Check and inpute for missing data
 
-  R = (!is.na(Y))
-  if(fort) RR = array(as.integer(1*R),c(n,TT,r))
+R = (!is.na(Y))
+if(fort)
+{
+  RR = array(as.integer(1*R),c(n,TT,r))
+}
 
-  miss = TRUE
+miss = TRUE
 
   th = NULL; sc = NULL; J = NULL
   if(out_se){
@@ -40,11 +43,15 @@ lmbasic.cont <- function(Y,k,start=0,
   if(k == 1){
     piv = 1; Pi = 1
     Mu = colMeans(Yv,na.rm=TRUE)
+
     Si = cov(Yv,use = "complete.obs")
     lk = sum(dmvnorm(Yv,Mu,Si,log=TRUE))
     np = k*r+r*(r+1)/2
     aic = -2*lk+np*2
     bic = -2*lk+np*log(n)
+    Mu = matrix(Mu,r,k)
+    nameY <- dimnames(Y)[[3]]
+    dimnames(Mu) <- list(nameY,state=1:k)
     out =     		list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np, k = k, aic=aic,bic=bic,lkv=NULL,V=NULL,n = n, TT = TT, modBasic = mod )
     class(out)="LMbasiccont"
     return(out)
@@ -285,11 +292,14 @@ lmbasic.cont <- function(Y,k,start=0,
   aic = -2*lk+np*2
   bic = -2*lk+np*log(n)
   cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
+  
   # adjust output
   lk = as.vector(lk)
   dimnames(Pi)=list(state=1:k,state=1:k,time=1:TT)
-  if(r==1) dimnames(Mu) = list(item=1,state=1:k) else dimnames(Mu)=list(item=1:r,state=1:k)
-  dimnames(Si)=list(item=1:r,item=1:r)
+  nameY <- dimnames(Y)[[3]]
+  dimnames(Mu) <- list(nameY,state=1:k)
+  if(r==1) colnames(Si) <- nameY else dimnames(Si) <- list(nameY,nameY)
+  
 
   out = list(lk=lk,piv=piv,Pi=Pi,Mu=Mu,Si=Si,np=np,k = k,aic=aic,bic=bic,lkv=lkv,V=V, n = n, TT = TT, modBasic = mod )
   if(miss) out$Y = Y
@@ -297,7 +307,7 @@ lmbasic.cont <- function(Y,k,start=0,
     seMu = matrix(seMu,r,k)
     seSi2 = matrix(0,r,r)
     seSi2[upper.tri(seSi2,TRUE)]=seSi
-    seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
+    if(r>1) seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
     seSi = seSi2
     sePi0 = sePi
     sePi = array(0,c(k,k,TT))
@@ -311,8 +321,9 @@ lmbasic.cont <- function(Y,k,start=0,
       sePi = aperm(sePi,c(2,1,3))
     }
     dimnames(sePi) = list(state=1:k,state=1:k,time=1:TT)
-    if(r==1) dimnames(seMu) = list(item=1,state=1:k) else dimnames(seMu)=list(item=1:r,state=1:k)
-
+    dimnames(seMu)=list(nameY,state=1:k)
+    if(r==1) colnames(seSi) <- nameY else dimnames(seSi) <- list(nameY,nameY)
+    
     out$sepiv = sepiv
     out$sePi = sePi
     out$seMu = seMu

@@ -4,15 +4,16 @@
 \docType{package}
 \title{Overview of the Package LMest}
 
-\description{The package \code{LMest} is a framework for specifying and fitting Latent (or Hidden) Markov (LM) models, which are tailored for the analysis of longitudinal continuous and categorical data. Covariates are also included in the model specification through suitable parameterizations.}
+\description{The package \code{LMest} is a framework for specifying and fitting Latent (or Hidden) Markov (LM) models for the analysis of longitudinal continuous and categorical data. Covariates are also included in the model specification through suitable parameterizations.}
 
 \details{
-Different LM models are estimated through specific functions requiring a data frame in long format. The functions are the following:
+Different LM models are estimated through specific functions requiring a data frame in long format. Responses are mainly categorical, the functions referred to continous responses are specified with  \code{Cont}.
+The functions are the following:
 \describe{
 \item{\code{\link{lmest}}}{Function to estimate LM models for categorical responses generating the following classes:
 \itemize{
 \item{\code{\link{LMbasic-class}} for the basic LM model without covariates.}
-\item{\code{\link{LMmanifest-class}} for the LM  model with covariates in the measurement model.}
+\item{\code{\link{LMmanifest-class}} for the LM  model with covariates in the measurement submodel.}
 \item{\code{\link{LMlatent-class}} for the LM model with covariates in the latent model.}
 }}
 \item{\code{\link{lmestCont}}}{Function to estimate LM models for continuous outcomes generating the following classes:
@@ -26,23 +27,23 @@ Different LM models are estimated through specific functions requiring a data fr
 }}
 \item{\code{\link{lmestMc}}}{Function to estimate Markov Chain models for categorical responses generating the following classes:
 \itemize{
-\item{\code{\link{MCbasic-class}} for the MC model without covariates.}
+\item{\code{\link{MCbasic-class}} for the Markov Chain (MC) model without covariates.}
 \item{\code{\link{MCcov-class}} for the MC model with covariates.}
 }}
-
 }
+
 
 Maximum likelihood estimation of model parameters is performed through the Expectation-Maximization algorithm, which is implemented by relying on Fortran routines.
 
-Model selection is provided by \code{\link{lmest}} and \code{\link{lmestCont}} functions. In addition, function \code{\link{lmestSearch}} allows us to deal with both model selction and multimodality of the likelihood function. Two main criteria are provided to select the number of latent states: the Akaike Information Criterion and the Bayesian Information Criterion.
+Model selection is provided by \code{\link{lmest}} and \code{\link{lmestCont}} functions. In addition, function \code{\link{lmestSearch}} allows us to deal with both model selection and multimodality of the likelihood function. Two main criteria are provided to select the number of latent states: the Akaike Information Criterion and the Bayesian Information Criterion.
 
 Prediction of the latent states is performed by the function \code{\link{lmestDecoding}}: for local and global decoding (Viterbi algorithm) from the output of functions lmest, lmestCont and lmestMixed.
 
 The package allows us to deal with missing responses, including drop-out and non-monotonic missingness, under the missing-at-random assumption.
 
-Standard errors for the parameter estimates are obtained by exact computation of the information matrix or through reliable numerical approximations of this matrix.
+Standard errors for the parameter estimates are obtained by the function \code{\link{se}} through exact computation of the information matrix or by reliable numerical approximations of this matrix.
 
-The print method shows some convergence information, and the summary method shows the estimation results.
+The \code{\link{print}} method shows some convergence information, and the \code{\link{summary}} method shows the estimation results.
 
 The package also provides some real and simulated data sets that are listed using the function \code{data(package = "LMest")}.
 

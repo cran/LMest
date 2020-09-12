@@ -15,7 +15,7 @@ lmestMc(responsesFormula = NULL,
     \item{index}{a character vector with two elements, the first indicating the name of the unit identifier, and the second the time occasions}
    \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
   \item{modBasic}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
-   \item{weights}{an optional vector of frequencies of the available response configurations}
+   \item{weights}{an optional vector of weights for the available responses}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors (FALSE is the default option)}
@@ -29,11 +29,11 @@ The function \code{lmestMc} estimates the basic MC model and the MC model with c
 
 \code{responsesFormula} is used to specify the basic MC models and the model with covariates:
 \itemize{
-\item{\code{responsesFormula = x1 + x2 ~ NULL}} \cr the MC model without covariates and two responses (\code{x1} and \code{x2}) is specified;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr the MC model without covariates and two responses (\code{y1} and \code{y2}) is specified;
 \item{\code{responsesFormula = NULL}} \cr all the columns in the data except the \code{"id"} and \code{"time"} columns are used to estimate MC without covariates;
-\item{\code{responsesFormula = x1 ~ x2 + x3 | x4 + x5}} \cr the MC model with one response (\code{x1}),  two covariates affecting the initial probabilities (\code{x2} and \code{x3}) and other two different covariates affecting the transition probabilities (\code{x4} and \code{x5}) is specified;
+\item{\code{responsesFormula = y1 ~ x1 + x2 | x3 + x4}} \cr the MC model with one response (\code{y1}),  two covariates affecting the initial probabilities (\code{x1} and \code{x2}) and other two different covariates affecting the transition probabilities (\code{x3} and \code{x4}) is specified;
 %\item{\code{responsesFormula = x1 ~ 1 | x4 + x5}} specifies the MC model where the covariates affects only the transition probabilities and an intercept is considered for the intial probabilities
-\item{\code{responsesFormula = x1 ~ x2 + x3}} \cr the MC model with one response (\code{x1}) and two covariates (\code{x2} and \code{x3}) affecting both the initial and transition probabilities is specified.
+\item{\code{responsesFormula = y1 ~ x1 + x2}} \cr the MC model with one response (\code{y1}) and two covariates (\code{x1} and \code{x2}) affecting both the initial and transition probabilities is specified.
 
 }
 
@@ -68,9 +68,9 @@ data("RLMSlong")
 RLMSlong$value <- 5 - RLMSlong$value
 
 out <- lmestMc(responsesFormula = value ~ NULL,
-                index = c("id","time"),
-                modBasic = 1,
-                data = RLMSlong)
+               index = c("id","time"),
+               modBasic = 1,
+               data = RLMSlong)
 
 out
 summary(out)
@@ -103,13 +103,13 @@ SRHS$srhs <- 5 - SRHS$srhs
 
 
 out2 <- lmestMc(responsesFormula = srhs ~
-                         I( 0 + (race==2) + (race == 3)) +
-                         I(0 + (education == 4)) +
-                         I(0 + (education == 5)) +
-                         I(age - 50) +
-                         I((age-50)^2/100),
-                 index = c("id","t"),
-                 data = SRHS)
+                I( 0 + (race==2) + (race == 3)) +
+                I(0 + (education == 4)) +
+                I(0 + (education == 5)) +
+                I(age - 50) +
+                I((age-50)^2/100),
+                index = c("id","t"),
+                data = SRHS)
 out2
 summary(out2)
 
@@ -119,7 +119,9 @@ data(data_criminal_sim)
 data_criminal_sim = data.frame(data_criminal_sim)
 
 out3 <- lmestMc(responsesFormula = y5~sex,
-              index = c("id","time"), data = data_criminal_sim, output = TRUE)
+                index = c("id","time"),
+                data = data_criminal_sim,
+                output = TRUE)
 
 out3
 

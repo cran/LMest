@@ -21,7 +21,7 @@
   }
 }
 
-\source{http://www.cpc.unc.edu/projects/rlms-hse, http://www.hse.ru/org/hse/rlms}
+\source{\url{http://www.cpc.unc.edu/projects/rlms-hse}, \url{https://www.hse.ru/org/hse/rlms}}
 
 \references{Russia Longitudinal Monitoring survey, RLMS-HSE, conducted by Higher School of Economics and ZAO "Demoscope" together with Carolina Population Center, University of North Carolina at Chapel Hill and the Institute of Sociology RAS}
 

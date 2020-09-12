@@ -13,12 +13,15 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
                                  fixPsi = FALSE),
                   fort = TRUE, seed = NULL)
 {
-  data <- as.data.frame(data)
-  if(!is.data.frame(data))
+  if(inherits(data, "lmestData"))
   {
+    data <- data$data
+  }else if(!is.data.frame(data))
+  {
+    data <- as.data.frame(data)
     stop("A data.frame must be provided")
-
   }
+
   if(start == 2)
   {
     if(is.null(parInit))
@@ -69,14 +72,14 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
 
   if(is.character(id) | is.factor(id))
   {
-    warning("id column must be numeric. Coerced in numeric.", call. = FALSE)
-    id <- as.numeric(id)
+    #warning("id column must be numeric. Coerced in numeric.", call. = FALSE)
+    id <- as.numeric(factor(id))
   }
 
   if(is.character(tv) | is.factor(tv))
   {
-    warning("time column must be numeric. Coerced in numeric.", call. = FALSE)
-    tv <- as.numeric(tv)
+    #warning("time column must be numeric. Coerced in numeric.", call. = FALSE)
+    tv <- as.numeric(factor(tv))
   }
 
 data.new <- data[,-c(id.which,tv.which), drop = FALSE]
@@ -87,12 +90,19 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
     Xmanifest <- NULL
     Xinitial <- NULL
     Xtrans <- NULL
+    Y_names <- colnames(Y)
+    Xmanifest_names <- colnames(Xmanifest)
+    
   }else{
     temp <- getResponses(data = data.new,formula = responsesFormula)
     Y <- temp$Y
     Xmanifest <- temp$X
     Xinitial <- NULL
     Xtrans <- NULL
+
+    Y_names <- colnames(Y)
+    Xmanifest_names <- colnames(Xmanifest)
+
   }
 
 
@@ -101,6 +111,10 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
     temp <- getLatent(data = data.new,latent = latentFormula, responses = responsesFormula)
     Xinitial <- temp$Xinitial
     Xtrans <- temp$Xtrans
+
+    Xinitial_names <- colnames(Xinitial)
+    Xtrans_names <- colnames(Xtrans)
+
   }
   tmp <- long2matrices.internal(Y = Y, id = id, time = tv, yv = weights,
                                 Xinitial = Xinitial, Xmanifest = Xmanifest, Xtrans = Xtrans)
@@ -144,6 +158,9 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
       Y[,,i] <- Y[,,i]-min(Y[,,i],na.rm = TRUE)
     }
   }
+
+  dimnames(Y)[[3]] <- Y_names
+
   if(!is.null(Xmanifest))
   {
     if(any(is.na(Xmanifest)))
@@ -154,6 +171,9 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
 
   if(!is.null(Xinitial))
   {
+
+    dimnames(Xinitial)[[2]] <- Xinitial_names
+
     if(any(is.na(Xinitial)))
     {
       stop("missing data in the covariates affecting the initial probabilities are not allowed")
@@ -163,6 +183,9 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
 
   if(!is.null(Xtrans))
   {
+
+    dimnames(Xtrans)[[3]] <- Xtrans_names
+
     if(any(is.na(Xtrans)))
     {
       stop("missing data in the covariates affecting the transition probabilities are not allowed")

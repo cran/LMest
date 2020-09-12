@@ -1,18 +1,21 @@
 Package: LMest
 Title: Generalized Latent Markov Models
 Description: Latent Markov models for longitudinal continuous and categorical data. See Bartolucci, Pandolfi, Pennoni (2017)<doi:10.18637/jss.v081.i04>.
-Version: 2.6.1
-Date: 2020-04-07
+Version: 3.0.0
+Date: 2020-09-08
 Author: Francesco Bartolucci, Silvia Pandolfi, Fulvia Pennoni, Alessio Farcomeni, Alessio Serafini
 Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
-Depends: R (>= 2.0.0)
+Depends: R (>= 3.5.0)
 Imports: MASS, MultiLCIRT, stats, mvtnorm, mmm, Formula(>= 1.2-3), mix,
-        utils, graphics
+        utils, graphics, diagram(>= 1.6.4), mclust(>= 5.4.6),
+        scatterplot3d(>= 0.3-41), grDevices(>= 4.0.2)
+Suggests: knitr, rmarkdown, bookdown
+VignetteBuilder: knitr
 NeedsCompilation: yes
 Repository: CRAN
 LazyLoad: yes
 Encoding: UTF-8
 ByteCompile: true
 License: GPL (>= 2)
-Packaged: 2020-04-19 16:15:15 UTC; francescobartolucci
-Date/Publication: 2020-04-19 16:40:02 UTC
+Packaged: 2020-09-11 14:24:48 UTC; pennoni
+Date/Publication: 2020-09-12 09:00:03 UTC
