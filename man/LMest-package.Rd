@@ -51,7 +51,7 @@ The package also provides some real and simulated data sets that are listed usin
 
 
 \author{
-Francesco Bartolucci, Alessio Farcomeni, Silvia Pandolfi, Fulvia Pennoni and Alessio Serafini
+Francesco Bartolucci [aut,cre], Silvia Pandolfi [aut], Fulvia Pennoni [aut], Alessio Farcomeni [ctb], and Alessio Serafini [ctb]
 
 Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
 }

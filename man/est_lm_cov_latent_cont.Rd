@@ -53,12 +53,10 @@ est_lm_cov_latent_cont(Y, X1 = NULL, X2 = NULL, yv = rep(1,nrow(Y)), k, start = 
 \dontrun{
 # Example based on multivariate longitudinal continuous data
 
-# load data
-require(mmm)
-data(multiLongGaussian)
-TT <- 4
-res <- long2matrices(multiLongGaussian$ID, X = cbind(multiLongGaussian$X, multiLongGaussian$time),
-      Y = cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
+data(data_long_cont)
+TT <- 5
+res <- long2matrices(data_long_cont$id, X = cbind(data_long_cont$X1, data_long_cont$X2),
+      Y = cbind(data_long_cont$Y1, data_long_cont$Y2, data_long_cont$Y3))
 Y <- res$YY
 X1 <- res$XX[,1,]
 X2 <- res$XX[,2:TT,]

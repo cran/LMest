@@ -656,12 +656,10 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }
   # adjust output
   lk = as.vector(lk)
-  if(output){
-    dimnames(Piv)=list(subject=1:ns,state=1:k)
-    dimnames(PI)=list(state=1:k,state=1:k,subject=1:ns,time=1:TT)
-  }
-  if(r==1) dimnames(Psi) = list(category=0:b,state=1:k,item=1) else 		dimnames(Psi)=list(category=0:mb,state=1:k,item=1:r)
-  out = list(lk=lk,Be=Be,Ga=Ga,Psi=Psi,np=np,k = k, aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
+  dimnames(Piv)=list(subject=1:ns,state=1:k)
+  dimnames(PI)=list(state=1:k,state=1:k,subject=1:ns,time=1:TT)
+  if(r==1) dimnames(Psi) = list(category=0:b,state=1:k,item=1) else dimnames(Psi)=list(category=0:mb,state=1:k,item=1:r)
+  out = list(lk=lk,Be=Be,Ga=Ga,Psi=Psi,Piv = Piv, PI = PI, np=np,k = k, aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
   if(out_se){
     out$sePsi = sePsi
     out$seBe = seBe
@@ -670,8 +668,6 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   # final output
   if(output){
     out$V = V1
-    out$PI = PI
-    out$Piv = Piv
     out$Ul = Ul
   }
   cat("------------|-------------|-------------|-------------|-------------|-------------|\n");

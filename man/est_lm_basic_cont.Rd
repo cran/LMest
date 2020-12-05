@@ -47,11 +47,10 @@ est_lm_basic_cont(Y, k, start = 0, mod = 0, tol = 10^-8, maxit = 1000,
 \dontrun{
 # Example based on multivariate longitudinal continuous data
 
-# load data
-require(mmm)
-data(multiLongGaussian)
-res <- long2matrices(multiLongGaussian$ID,X=cbind(multiLongGaussian$X,multiLongGaussian$time),
-      Y=cbind(multiLongGaussian$resp1, multiLongGaussian$resp2))
+
+data(data_long_cont)
+res <- long2matrices(data_long_cont$id,X=cbind(data_long_cont$X1,data_long_cont$X2),
+      Y=cbind(data_long_cont$Y1, data_long_cont$Y2, data_long_cont$Y3))
 Y <- res$YY
 
 # fit of the Basic LM model for continuous outcomes

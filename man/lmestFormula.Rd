@@ -84,17 +84,16 @@ fm
 
 ## LM model for continous responses
 
-require(mmm)
-data(multiLongGaussian)
-names(multiLongGaussian)
+data(data_long_cont)
+names(data_long_cont)
 
-# Formula with response resp1, resp2, covariate for manifest,
-# X covariates for initail and time covariate for transition
+# Formula with response Y1, Y2, no covariate for manifest,
+# X1 covariates for initail and X2 covariate for transition
 
-fm <- lmestFormula(data = multiLongGaussian,
-                   response = c("resp"),
+fm <- lmestFormula(data = data_long_cont,
+                   response = c("Y"),
                    LatentInitial = "X",
-                   LatentTransition = "time")
+                   LatentTransition = "X2")
 fm
 
 ## Wrong model specification since two variable start with X.
@@ -102,17 +101,16 @@ fm
 
 # For the right model:
 
-fm <- lmestFormula(data = multiLongGaussian,
-                   response = c("resp"),
-                   LatentInitial = "X",LatentTransition = "time",
-                   LatentInitialStart = FALSE)
+fm <- lmestFormula(data = data_long_cont,
+                   response = c("Y"),
+                   LatentInitial = "X1",LatentTransition = "X2")
 fm
 
 ## or
 
-fm <- lmestFormula(data = multiLongGaussian,
-                   response = c("resp"),
-                   LatentInitial = 4,LatentTransition = "time",
+fm <- lmestFormula(data = data_long_cont,
+                   response = c("Y"),
+                   LatentInitial = 6,LatentTransition = "X2",
                    LatentInitialStart = FALSE)
 fm
 

@@ -261,6 +261,9 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
         Bic[k] = out[[k]]$bic
       }
     }
+    out[[k]]$data = data
+    attributes(out[[k]])$responsesFormula = responsesFormula
+    attributes(out[[k]])$latentFormula = latentFormula
   }
   Aic <- Aic[kv]
   Bic <- Bic[kv]

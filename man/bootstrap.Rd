@@ -76,25 +76,23 @@ boot2 <- bootstrap(out2)
 
 # LM model for continous responses without covariates 
 
-require(mmm)
-data(multiLongGaussian)
+data(data_long_cont)
 
-t <- rep(1:4, times  = max(multiLongGaussian$ID))
-multiLongGaussian <- data.frame(t = t, multiLongGaussian)
-
-out3 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out3 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k =3,
                   modBasic=1,
                   tol=10^-5)
 
 boot3 <- bootstrap(out3)
 
-out4 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  latentFormula = ~ X + time,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+# LM model for continous responses with covariates 
+
+out4 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  latentFormula = ~ X1 + X2,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 3,
                   output=TRUE)
                   

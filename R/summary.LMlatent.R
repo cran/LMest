@@ -2,7 +2,7 @@ summary.LMlatent<-function(object,...){
 cat("Call:\n")
 print(object$call)
 cat("\nCoefficients:\n")
-if(object$call$k>1){
+if(object$k>1){
   cat("\n Be - Parameters affecting the logit for the initial probabilities:\n")
 	print(round(object$Be,4))
 	if(is.null(object$seBe)==FALSE){

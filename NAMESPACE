@@ -2,7 +2,7 @@ useDynLib(LMest, .registration = TRUE)
 
 #exportPattern("^[[:alpha:]]+")
 
-import("MASS", "MultiLCIRT", "stats", "mvtnorm", "mmm",
+import("MASS", "MultiLCIRT", "stats", "mvtnorm",
        "mix","Formula", "diagram", "scatterplot3d")
 
 importFrom("mvtnorm", "dmvnorm")

@@ -44,13 +44,12 @@ lmestData(data, id = NULL, time = NULL,
 
 \examples{
 
-require(mmm)
-data(multiLongGaussian)
-str(multiLongGaussian)
+data(data_long_cont)
+str(data_long_cont)
 
 ## Data with continous resposes
 
-dt <- lmestData(data = multiLongGaussian, id = "ID")
+dt <- lmestData(data = data_long_cont, id = "id",time="time")
 str(dt)
 
 ## Summary of each variable and for each time

@@ -54,16 +54,11 @@ Mu <- matrix(c(-2,-2,0,0,2,2), r, k)
 Si <- diag(r)
 out <- drawLMbasiccont(piv, Pi, Mu, Si, n)
 
+data(data_long_cont)
 
-require(mmm)
-data(multiLongGaussian)
-
-t <- rep(1:4, times = max(multiLongGaussian$ID))
-multiLongGaussian <- data.frame(t = t, multiLongGaussian)
-
-est <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                 index = c("ID", "t"),
-                 data = multiLongGaussian,
+est <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                 index = c("id", "time"),
+                 data = data_long_cont,
                  k = 3,
                  modBasic = 1,
                  tol = 10^-5)

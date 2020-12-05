@@ -37,16 +37,16 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
 
   ## Check and inpute for missing data
 
-  if(miss)
-  {
-    Yv = cbind(1,Yv)
-    pYv = prelim.mix(Yv,1)
-    thhat = em.mix(prelim.mix(Yv,1))
-    rngseed(1)
-    Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
-    Y = array(Yv,c(n,TT,r))
-    cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
-  }
+  # if(miss)
+  # {
+  #   Yv = cbind(1,Yv)
+  #   pYv = prelim.mix(Yv,1)
+  #   thhat = em.mix(prelim.mix(Yv,1))
+  #   rngseed(1)
+  #   Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
+  #   Y = array(Yv,c(n,TT,r))
+  #   cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
+  # }
 
   # Covariate structure and related matrices: initial probabilities
   if(k == 2){
@@ -417,15 +417,13 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
 
   # adjust output
   lk = as.vector(lk)
-  if(output){
-    dimnames(Piv)=list(subject=1:n,state=1:k)
-    dimnames(PI)=list(state=1:k,state=1:k,subject=1:n,time=1:TT)
-  }
+  dimnames(Piv)=list(subject=1:n,state=1:k)
+  dimnames(PI)=list(state=1:k,state=1:k,subject=1:n,time=1:TT)
   nameY <- dimnames(Y)[[3]]
   dimnames(Mu) <- list(nameY,state=1:k)
   if(r==1) colnames(Si) <- nameY else dimnames(Si) <- list(nameY,nameY)
   
-  out = list(lk=lk,Be=Be,Ga=Ga,Mu=Mu,Si=Si,np=np,k = k,aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
+  out = list(lk=lk,Be=Be,Ga=Ga,Mu=Mu,Si=Si,Piv=Piv,PI=PI,np=np,k = k,aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
   if(out_se){
     seMu = matrix(seMu,r,k)
     seSi2 = matrix(0,r,r)
@@ -443,8 +441,6 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
   # final output
   if(miss) out$Y = Y
   if(output){
-    out$PI = PI
-    out$Piv = Piv
     out$Ul = Ul
   }
   cat("------------|-------------|-------------|-------------|-------------|-------------|\n");

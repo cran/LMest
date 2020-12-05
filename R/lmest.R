@@ -202,7 +202,7 @@ data.new <- data[,-c(id.which,tv.which), drop = FALSE]
                        "LMbasic" = lmbasic(S = Y,yv = freq,k = k[kv],start = start,modBasic = modBasic,tol = tol,
                                                 maxit = maxit,out_se = out_se,piv = parInit$piv,Pi = parInit$Pi,Psi = parInit$Psi,miss = miss, R = R),
                        "LMlatent" = lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,
-                                                      start = start,k = k[kv],tol = tol,maxit = maxit,paramLatent = paramLatent,output = TRUE,
+                                                      start = start,k = k[kv],tol = tol,maxit = maxit,paramLatent = paramLatent,output = output,
                                                       Psi = parInit$Psi,Be = parInit$Be,Ga = parInit$Ga,fort = fort,out_se = out_se,fixPsi = ifelse(is.null(parInit$fixPsi),FALSE,parInit$fixPsi), miss = miss, R = R),
                        "LMmanifest" = lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, modManifest = modManifest,k = k[kv],tol = tol,maxit = maxit, q = q,
                                                           start = start,out_se = out_se,mu = parInit$mu,al = parInit$al,be = parInit$be,si = parInit$si,rho = parInit$rho,la = parInit$la,PI = parInit$PI, output = output))

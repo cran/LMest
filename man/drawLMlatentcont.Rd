@@ -49,21 +49,17 @@ drawLMlatentcont(Mu, Si, Be, Ga, latentFormula, data, index,
 \examples{
 
 \dontrun{
-require(mmm)
-data(multiLongGaussian)
+data(data_long_cont)
 
-t <- rep(1:4, times  = max(multiLongGaussian$ID))
-multiLongGaussian <- data.frame(t = t, multiLongGaussian)
-
-est <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                 latentFormula = ~ X + time,
-                 index = c("ID", "t"),
-                 data = multiLongGaussian,
+est <- lmestCont(responsesFormula = Y1 + Y2 + Y3~ NULL,
+                 latentFormula = ~ X1 + X2,
+                 index = c("id", "time"),
+                 data = data_long_cont,
                  k = 3)
 
 out <- drawLMlatentcont(est = est,format = "matrices", seed = 4321)
-out1 <- drawLMlatentcont(latentFormula = ~ X + time,data = multiLongGaussian,
-                         index = c("ID", "t"),
+out1 <- drawLMlatentcont(latentFormula = ~ X1 + X2, data = data_long_cont,
+                         index = c("id", "time"),
                          Mu = est$Mu,Si = est$Si,
                          Be = est$Be,Ga = est$Ga, fort=TRUE, seed = 4321, format = "matrices")
 

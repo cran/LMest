@@ -33,7 +33,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors (By default is set to FALSE)}
-  \item{output}{to return additional output (\code{V}, \code{PI}, \code{Piv}, \code{Ul}) (\code{\link{LMlatentcont-class}})}
+  \item{output}{to return additional output (\code{V}, \code{Ul}) (\code{\link{LMlatentcont-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasiccont-class}} and \code{\link{LMlatentcont-class}}}
   \item{fort}{to use fortran routines when possible (By default is set to TRUE)}
   \item{seed}{an integer value with the random number generator state}
@@ -90,17 +90,14 @@ Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models 
 
 \examples{
 \dontrun{
-require(mmm)
-data(multiLongGaussian)
 
-t <- rep(1:4, times  = max(multiLongGaussian$ID))
-multiLongGaussian <- data.frame(t = t, multiLongGaussian)
+data(data_long_cont)
 
 # Basic LM model
 
-out <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                 index = c("ID", "t"),
-                 data = multiLongGaussian,
+out <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                 index = c("id", "time"),
+                 data = data_long_cont,
                  k = 3,
                  modBasic = 1,
                  tol = 10^-5)
@@ -108,13 +105,11 @@ out <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
 out
 summary(out)
 
-
-
 # Basic LM model with model selection using BIC
 
-out1 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out1 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 1:5,
                   modBasic = 1,
                   tol = 10^-5)
@@ -124,9 +119,9 @@ out1$Bic
 
 # Basic LM model with model selection using AIC
 
-out2 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out2 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 1:5,
                   modBasic = 1,
                   modSel = "AIC",
@@ -137,20 +132,20 @@ out2$Aic
 
 # LM model with covariates in the latent model
 
-out3 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  latentFormula = ~ X + time,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out3 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  latentFormula = ~ X1 + X2,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 3,
                   output = TRUE)
 
 out3
 summary(out3)
 
-out4 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  latentFormula = ~ X + time | X + time,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out4 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  latentFormula = ~ X1 + X2 | X1 + X2,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 3,
                   output = TRUE)
 

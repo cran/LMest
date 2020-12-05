@@ -2,6 +2,7 @@ lmbasic.cont <- function(Y,k,start=0,
                          modBasic=0,tol=10^-8,
                          maxit=1000,out_se=FALSE,
                          piv=NULL,Pi=NULL,Mu=NULL,Si=NULL, miss = FALSE, fort = TRUE){
+
   # Preliminaries
   check_der = FALSE  # to check derivatives
   sY = dim(Y)

@@ -4,10 +4,11 @@
 \alias{plot.LMbasiccont}
 \alias{plot.LMlatent}
 \alias{plot.LMlatentcont}
+\alias{plot.LMsearch}
 
 \title{Plots for Generalized Latent Markov Models}
 
-\description{Plots for outputs of LMest objects: \code{LMbasic}, \code{LMbasiccont}, \code{LMlatent}, and \code{LMlatentcont}}
+\description{Plots for outputs of LMest objects: \code{LMbasic}, \code{LMbasiccont}, \code{LMlatent}, \code{LMlatentcont}, and \code{LMsearch}}
 
 \usage{
 
@@ -23,12 +24,13 @@
 \method{plot}{LMlatentcont}(x,
                                  what = c("modSel", "density", "transitions","marginal"),
                                  components, verbose=interactive(),...)
+\method{plot}{LMsearch}(x,...)
 }
 
 
 
 \arguments{
-  \item{x}{an object of class \code{LMbasic}, \code{LMlatent}, \code{LMbasiccont} or \code{LMlatentcont}}
+  \item{x}{an object of class \code{LMbasic}, \code{LMlatent}, \code{LMbasiccont}, \code{LMlatentcont} or \code{LMsearch}}
   \item{what}{a string indicating the type of plot. A detailed description is provided in the ‘Details’ section.}
   \item{components}{An integer or a vector of integers specifying the components (latent states) to be selected for the "density" plot.}
   \item{verbose}{A logical controlling if a text progress bar is displayed during the
@@ -38,9 +40,13 @@
 }
 \details{The type of plots are the following:
 \tabular{ll}{
-\code{"modSel"} \tab plot of values of the Bayesian Information Criterion and of the Akaike Information Criterion for model selection\cr
+\code{"modSel"} \tab plot of values of the Bayesian Information Criterion and of the Akaike Information \cr 
+\tab Criterion for model selection\cr
 \code{"CondProb"} \tab plot of the estimated  conditional response probabilities\cr
-\code{"density"} \tab plot of the overall estimated density for continuous responses, with weights given by the estimated marginal distribution of the latent variable. For multivariate continuous responses a  contour plot is provided. If the argument \code{components} is specified, the density plot for the selected components results \cr
+\code{"density"} \tab plot of the overall estimated density for continuous responses, with weights given by \cr
+\tab the estimated marginal distribution of the latent variable. For multivariate continuous \cr 
+\tab responses a contour plot is provided. If the argument \code{components} is specified, the \cr 
+\tab density plot for the selected components results \cr
 \code{"transitions"} \tab path diagram of the estimated transition probabilities \cr
 \code{"marginal"} \tab plot of the estimated marginal distribution of the latent variable \cr
  }
@@ -75,18 +81,16 @@ plot(out)
 
 ### Plot of basic LM model for continuous responses
 
-require(mmm)
-data(multiLongGaussian)
+data(data_long_cont)
 
-t <- rep(1:4, times  = max(multiLongGaussian$ID))
-multiLongGaussian <- data.frame(t = t, multiLongGaussian)
-
-out1 <- lmestCont(responsesFormula = resp1 + resp2 ~ NULL,
-                  index = c("ID", "t"),
-                  data = multiLongGaussian,
+out1 <- lmestCont(responsesFormula = Y1 + Y2 + Y3 ~ NULL,
+                  index = c("id", "time"),
+                  data = data_long_cont,
                   k = 1:5,
                   modBasic=1,
                   tol=10^-5)
+
+plot(out1,what="modSel")
 
 plot(out1,what="density")
 plot(out1,what="density",components=c(1,3))

@@ -18,6 +18,12 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
     while(choice != 0){
       if(what[choice] == "modSel"){
         par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        if(is.null(object$Aic)){
+          object$Aic <- object$aic
+          names(object$Aic) <- paste("k",k,sep = "=")
+          object$Bic <- object$bic
+          names(object$Bic) <- paste("k",k,sep = "=")
+        }
         ylim1 =  min(c(object$Aic,object$Bic))
         ylim2 = max(c(object$Aic,object$Bic))*1.05
         kv <-as.numeric(substr(names(object$Bic),3,3))
@@ -64,7 +70,7 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
         }
         par(mar=c(2,1,5,1),mfrow=c(1,1))
         PM <- round(apply(object$Pi[,,2:TT],c(1,2),mean),2)
-        plotmat(PM,relsize=0.7,box.col="lightblue",lwd = 1,
+        plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
                 box.lwd = 1,self.cex = 0.8,
                 cex.txt = 0.8, box.size = 0.1,box.prop = 0.5,main="Averaged transition probabilities")
 
@@ -88,6 +94,12 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
   else{
     if(any(what == "modSel")){
       par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+      if(is.null(object$Aic)){
+        object$Aic <- object$aic
+        names(object$Aic) <- paste("k",k,sep = "=")
+        object$Bic <- object$bic
+        names(object$Bic) <- paste("k",k,sep = "=")
+      }
       ylim1 =  min(object$Aic,object$Bic)
       ylim2 = max(object$Aic,object$Bic)*1.05
       kv <-as.numeric(substr(names(object$Bic),3,3))
@@ -180,7 +192,7 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
       par(mar=c(2,1,5,1),mfrow=c(1,1))
       TT <- dim(object$Pi)[3]
       PM <- round(apply(object$Pi[,,2:TT],c(1,2),mean),2)
-        plotmat(PM,relsize=0.7,box.col="lightblue",lwd = 1,
+        plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
            box.lwd = 1,self.cex = 0.8,
            cex.txt = 0.8, box.size = 0.1,box.prop = 0.5,main="Averaged transition probabilities")
 

@@ -1,4 +1,3 @@
-
 lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
                       data, index, k = 1:4, start = 0,
                       modSel = c("BIC", "AIC"), modBasic = 0,

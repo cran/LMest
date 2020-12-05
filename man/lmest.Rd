@@ -33,7 +33,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors}
   \item{q}{number of support points for the AR(1) process (if modManifest ="FM")}
-   \item{output}{to return additional output: \code{PRED0}, \code{PRED1} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}}) and  \code{V}, \code{PI}, \code{Piv}, \code{Ul} for the LM with covariates on the latent model (\code{\link{LMlatent-class}})}
+   \item{output}{to return additional output: \code{PRED0}, \code{PRED1} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}}) and  \code{V}, \code{Ul} for the LM with covariates on the latent model (\code{\link{LMlatent-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasic-class}}, \code{\link{LMlatent-class}} and \code{\link{LMmanifest-class}}}
   \item{fort}{to use fortran routines when possible}
   \item{seed}{an integer value with the random number generator state}
