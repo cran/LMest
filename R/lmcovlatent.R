@@ -29,7 +29,6 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   n = sum(yv)
   if(length(sS)==2) r = 1
   else r = sS[3]
-
   if(ns!=length(yv)) stop("dimensions mismatch between S and yv")
 
   Sv = matrix(S,ns*TT,r)

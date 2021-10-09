@@ -145,14 +145,18 @@ lmestDecoding.LMbasic <- function(est, sequence = NULL, fort = TRUE, ...)
   Yvp = matrix(1/pv,n,k)
   M = matrix(1,n,k)
   V[,,TT] = Yvp*L[,,TT]
-  for(t in seq(TT-1,2,-1)){
-    M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1])
-    V[,,t] = Yvp*L[,,t]*M
+  if(TT>2){
+    for(t in seq(TT-1,2,-1)){
+      M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1])
+      V[,,t] = Yvp*L[,,t]*M
+    }
   }
   M = (Phi[,,2]*M)%*%t(Pi[,,2])
   V[,,1] = Yvp*L[,,1]*M
   # local deconding
+ 
   Ul = matrix(0,n,TT)
+
   for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
   if(n==1) Ul = as.vector(Ul)
   # global deconding (Viterbi)
@@ -1010,7 +1014,9 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
   V = out$V
   # local deconding
   Ul = matrix(0,n,TT)
-  for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
+ 
+  for(i in 1:n) for(t in 1:TT)  Ul[i,t] = which.max(V[i,,t])
+   
   if(n==1) Ul = as.vector(Ul)
   # global deconding (Viterbi)
   R = L; Ug = matrix(0,n,TT)

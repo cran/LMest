@@ -31,7 +31,7 @@
   }
 }
 
-\source{\url{http://psidonline.isr.umich.edu}}
+\source{\url{https://psidonline.isr.umich.edu}}
 
 
 \references{This dataset is downloadable through the package `psidR`.}

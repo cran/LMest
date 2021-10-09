@@ -96,7 +96,7 @@ str(RLMSlong)
 
 ## Data: PSIDlong
 
-This dataset, already in the `LMest` package, is derived from the Panel Study of Income Dynamics (http://psidonline.isr.umich.edu).
+This dataset, already in the `LMest` package, is derived from the Panel Study of Income Dynamics (https://psidonline.isr.umich.edu).
 The data used in the following application concern $n$ = 1,446 women who were followed from 1987 to 1993.
 There are two binary response variables:
 `Y1Fertility` (indicating whether a woman had given birth to a child in a certain year) and

@@ -1,4 +1,4 @@
-ae79c355f99def28cfce23bd1169cfaa *DESCRIPTION
+21a5fdbbcec364fb1a505f60bd59c5f0 *DESCRIPTION
 93bc49f18492391db69ce9b1286225b2 *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 e53e9c6d94232ef02a2c704139696c1f *R/blkdiag.R
@@ -36,15 +36,15 @@ d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 4901d73b199c2b00cbce5784a88d80a7 *R/lk_sta.R
 8ca1ed5c87474210aa6181f80108aa7e *R/lmbasic.R
 bcaf85b254aec66e5c58ef261a2687d4 *R/lmbasic.cont.MISS.R
-0a8e1d11a58460b81607c8655ab00fcf *R/lmbasic.cont.R
-543a6957773c42ef076de665a539e459 *R/lmcovlatent.R
+b022a73fb7fcf561681f999e9e8b7dd4 *R/lmbasic.cont.R
+19a7816d5b5d49b9b7736681ba63ba5f *R/lmcovlatent.R
 57e7221701fb3f966dd11ed98d5e7314 *R/lmcovlatent.cont.R
 74aade66eb54e838ba3079ffd748bc1d *R/lmcovmanifest.R
 6507163803462c00032b874c2833a5e6 *R/lmest.R
-f2e1b2af6b9e22f786c0dd4f12dfcfff *R/lmestCont.R
+dc23e49559fc4c876a5c51159244d07a *R/lmestCont.R
 09a343b4f15be877cf081320f6385a83 *R/lmestContMISS.R
 913d7692df68e2253a21f9ad7c0f331d *R/lmestData.R
-a590637652fb9412d44c911d1ab9f4f3 *R/lmestDecoding.R
+4028dedad4b3851cf2922808ccca7c32 *R/lmestDecoding.R
 34a58a47f7fa462a90e7e103ca8f952c *R/lmestFormula.R
 497d30f2c5445c63819dac3e7feb5829 *R/lmestMc.R
 59bca8b4ae7cc901a22e09b0efdf672f *R/lmestMixed.R
@@ -85,7 +85,7 @@ f7925fcc9666c8ea77100bea073f339f *R/summary.LMsearch.R
 0e56e00de7cb8e3cd3563ed31c6349e0 *R/summary.MClatent.R
 6d2b7d916aebd1dd130d4e6ce052e5ff *R/trans_par.R
 36171bca13f6cb2f33718b72383458b2 *R/zzz.R
-88a285a1bfc1b6e313989f18ff0e9f89 *build/vignette.rds
+f296db36c9071d149d79429cf86cd8ef *build/vignette.rds
 276cf862ee9369579aee29d4c35618ba *data/NLSYlong.rda
 8314490501642db4d42954cc053f9e4d *data/PSIDlong.rda
 0912936dce5ba2296dd009e55c730ed3 *data/RLMSdat.rda
@@ -96,11 +96,11 @@ b41286306dac3e8a122eefd3817f635f *data/RLMSlong.rda
 67f236b95da12217752411b605327b70 *data/data_long_cont.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 957326e6da3222457e3c494f79a3b7a3 *inst/doc/vignetteLMest.R
-19d49838bc85d47589aea3dca670f588 *inst/doc/vignetteLMest.Rmd
-8eb3c22bebe2d553c57dca350647fcb3 *inst/doc/vignetteLMest.html
+702700e352571cfa41e8beec7e92fc72 *inst/doc/vignetteLMest.Rmd
+4410c922cac3829936faec7674fc5b57 *inst/doc/vignetteLMest.html
 edc10efd5e286b6174a5279b12fd0f22 *man/LMbasic-class.Rd
 36c662f75e50580a553a06e45a381c97 *man/LMbasiccont-class.Rd
-a3a51300750a2bcfb6b44cac1a04c870 *man/LMest-package.Rd
+0d93dff52230b4b1e1d5526877f965c9 *man/LMest-package.Rd
 123e40145f8a2cb8632847e2ac25034e *man/LMlatent-class.Rd
 ab0f13e80cac8ebe8dafcf37c8166004 *man/LMlatentcont-class.Rd
 c91819239c8632dd76e6e7326ac9052c *man/LMmanifest-class.Rd
@@ -108,7 +108,7 @@ fc78f977cdf501bae0028639485dbebf *man/LMmixed-class.Rd
 d0cb77636bb6d8fbb3be8895cbb6fa48 *man/MCbasic-class.Rd
 c8b5e5f0ca643d5b545ce3609b7ad1ca *man/MCcov-class.Rd
 a5bfc804a684ce5b63a155fa9152031f *man/NLSYlong.Rd
-81efa3f9e23a68a1d96e3b015f7e5cd6 *man/PSIDlong.Rd
+3f24f8c0cb966a9e3b8d69734b037c38 *man/PSIDlong.Rd
 1a61f802e207abb991868643c640cbcb *man/RLMSdat.Rd
 2ce92372314362e4e4665fbd8be9a916 *man/RLMSlong.Rd
 7418f5e0e03531906745f491ee56250e *man/bootstrap.Rd
@@ -167,4 +167,4 @@ fab4c81f8b13dbcaa62c88a7d773d659 *src/nr_multilogit.f
 401da8b131b5a0d9ac6df46fd711d5a5 *src/prodnorm.f
 1d181fc1e0102604aa29cc66bd9f685a *src/sum_Y.f
 bc2cd9a0cf398c5c7de6396b9fae2b36 *src/updatevar.f
-19d49838bc85d47589aea3dca670f588 *vignettes/vignetteLMest.Rmd
+702700e352571cfa41e8beec7e92fc72 *vignettes/vignetteLMest.Rmd

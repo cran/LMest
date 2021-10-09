@@ -187,7 +187,8 @@ miss = TRUE
     }
     # print(c(4,proc.time()-t0))
     # Update piv and Pi
-    piv = colSums(V[,,1])/n
+    if(n==1) piv = V[,,1]/n
+    else piv = colSums(V[,,1])/n
     U = pmax(U,10^-300)
     if(mod==0) for(t in 2:TT) Pi[,,t] = diag(1/rowSums(U[,,t]))%*%U[,,t]
     if(mod==1){
