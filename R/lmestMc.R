@@ -1,4 +1,3 @@
-
 lmestMc <- function(responsesFormula = NULL,
                     data, index, start = 0,
                     modBasic = 0, weights = NULL,

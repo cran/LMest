@@ -339,7 +339,7 @@ C <- length(unique(whichC))
       #dt1 <- dt[,-1]
       temp1 <- data.frame(lapply(dt, factor))
       nle <- max(sapply(temp1,nlevels))
-      temp1 <- summary(temp1)
+      temp1 <- summary(temp1,maxsum=50)
       temp <- matrix(NA, nrow = 150, ncol = x$d+1)
       #temp[1:x$TT,1] <- paste(1:x$TT,summary(dt[,1]),sep = ":")
       temp[1:x$TT,1] <- temp1[1:x$TT,1]

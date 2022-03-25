@@ -1,4 +1,3 @@
-
 lmestMixed <- function(responsesFormula = NULL,
                        data, index, k1, k2, start = 0,
                        weights = NULL, tol = 10^-8, maxit = 1000,

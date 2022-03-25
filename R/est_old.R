@@ -84,7 +84,7 @@ est_lm_basic <-
       bic = -2*lk+np*log(n)
       out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,aic=aic,bic=bic,lkv=NULL,J=NULL,V=NULL,th=NULL,sc=NULL,call=match.call())
       class(out)="LMbasic"
-      (out)
+      return(out)
     }
     # Starting values
     if(start == 0){
@@ -825,7 +825,23 @@ est_lm_cov_latent_cont <-
       XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
     }
 
-
+#---- only one state ----
+    if(k==1){
+      Y1 = matrix(Y,n*TT,r)
+      Mu = colMeans(Y1)
+      Tmp = Y1-rep(1,n*TT)%o%Mu
+      Si = t(Tmp)%*%Tmp/(n*TT)
+      lk = sum(dmvnorm(Y1,Mu,Si,log=TRUE))
+      np = r+r*(r+1)/2
+      aic = -2*lk+2*np
+      bic = -2*lk+log(n)*np
+      lkv = lk
+      Be = Ga = NULL
+      out = list(lk=lk,Be=Be,Ga=Ga,Mu=Mu,Si=Si,np=np,aic=aic,bic=bic,lkv=lkv,
+                 call=match.call(),param=param)
+      return(out)
+    }
+    
     # for the transition probabilities
     if(is.null(X2)){
       if(param=="difflogit"){

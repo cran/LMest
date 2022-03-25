@@ -171,19 +171,25 @@ print.LMsearch <-function(x, modSel = "BIC",...){
   # cat("lk = ",x$lkv,"\n")
   # cat("aic = ",x$aicv,"\n")
   # cat("bic = ",x$bicv,"\n")
-  cat("\nTable:\n")
+  # cat("\nTable:\n")
   k = sapply(x[[1]], function(l) l$k)
-  dt <- data.frame(lk = x$lkv, aic = x$Aic, bic = x$Bic, row.names = paste0("k=",k))
-  print(dt)
+  	if(!is.null(x$aicv)){
+	  Aic = x$aicv
+	  Bic = x$bicv
+	}else{
+	  Aic = x$Aic
+	  Bic = x$Bic
+	}
+  dt = data.frame(states=x$k,lk=x$lkv,aic=Aic,bic=Bic)
+#  dt <- data.frame(lk = x$lkv, aic = x$aicv, bic = x$bicv, row.names = paste0("k=",k))
   cat("\nBest model:\n")
   bs <- ifelse(modSel == "AIC", which.min(dt$aic), which.min(dt$bic))
   modbs <- x[[1]][[bs]]
-  if(is.null(modbs$TT))
-  {
+  if(is.null(modbs$TT)){
     warning("search.model.LM function is no longer maintained. Please look at lmestSearch function",call. = FALSE)
-    print(cbind(LogLik=modbs$lk,np=modbs$np,AIC=modbs$aic, BIC=modbs$bic))
+    print(cbind(k=x$k[bs],LogLik=modbs$lk,np=modbs$np,AIC=modbs$aic, BIC=modbs$bic))
   }else{
-    print(data.frame(LogLik=modbs$lk,np=modbs$np, k = modbs$k, AIC=modbs$aic, BIC=modbs$bic, n = modbs$n, TT = modbs$TT, row.names = " "))
+    print(data.frame(k=x$k[bs],LogLik=modbs$lk,np=modbs$np, k = modbs$k, AIC=modbs$aic, BIC=modbs$bic, n = modbs$n, TT = modbs$TT, row.names = " "))
   }
 }
 

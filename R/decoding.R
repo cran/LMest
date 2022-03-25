@@ -15,7 +15,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 
 
 # est_lm_basic
-	if(class(est)=="LMbasic"){
+	if(inherits(est,"LMbasic")){
 		miss = any(is.na(Y))
 		if(miss){
         	R = 1 * (!is.na(Y))
@@ -64,7 +64,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	}
 
 # est_lm_cov_latent
-	if(class(est)=="LMlatent"){
+	if(inherits(est,"LMlatent")){
 		param = est$param
 		miss = any(is.na(Y))
 		if(miss){
@@ -186,7 +186,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	}
 
 # est_lm_mixed
-	if(class(est)=="LMmixed"){
+	if(inherits(est,"LMmixed")){
 		if(dim(est$Psi)[3]==1){
 			if(is.vector(Y)) Y = t(Y)
 			if(is.matrix(Y)) Y =  array(Y,c(dim(Y),1))
@@ -234,7 +234,7 @@ decoding <- function(est,Y,X1=NULL,X2=NULL,fort=TRUE){
 	}
 
 #est_lm_manifest
-if(class(est)=="LMmanifest"){
+if(inherits(est,"LMmanifest")){
 	if(!is.null(est$rho)) stop("decoding allowed only for mod=LM")
 	S = Y; X = X1
 	lev = length(est$mu)+1

@@ -1,4 +1,3 @@
-
 mccov <- function(S,X1=NULL,X2=NULL,
                   yv=rep(1,nrow(S)),
                   start=0,tol=10^-8,maxit=1000,

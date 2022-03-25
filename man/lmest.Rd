@@ -149,15 +149,15 @@ out2$Aic
 data(data_criminal_sim)
 data_criminal_sim = data.frame(data_criminal_sim)
 
-responsesFormula <- lmestFormula(data data_criminal_sim, response = "y")$responsesFormula
+responsesFormula <- lmestFormula(data = data_criminal_sim,response = "y")$responsesFormula
 
-out3 <- lmest(responsesFormula responsesFormula,
+
+out3 <- lmest(responsesFormula = responsesFormula,
               index = c("id","time"),
               data =data_criminal_sim,
               k = 1:7,
               modBasic = 1,
               tol = 10^-4)
-
 out3
 
 # Example of drug consumption data
