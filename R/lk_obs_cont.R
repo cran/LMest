@@ -58,6 +58,7 @@ lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
    	Yvp = matrix(1/pv,n,k)
   	M = matrix(1,n,k);
    	V[,,TT] = Yvp*L[,,TT]
+ 
    	U[,,TT] = (t(L[,,TT-1])%*%(Yvp*Phi[,,TT]))*Pi[,,TT]
    	for(t in seq(TT-1,2,-1)){
    		M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1]);
@@ -76,7 +77,10 @@ lk_obs_cont <- function(th,Bm,Cm,k,Y,TT,r,mod){
 
     # Update Si
     tmp=0
-    for(u in 1:k) tmp = tmp+t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
+    for(u in 1:k){
+      Tmp = Yv-rep(1,n*TT)%*%t(Mu[,u])
+      tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)
+    }
     tmp = iSi%*%tmp%*%iSi
 
     tmp = tmp-(n*TT)*iSi

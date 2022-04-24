@@ -228,6 +228,7 @@ miss = TRUE
     if(mod==1) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,2]))
 
     th0 = th-10^-5/2
+    
     out = lk_obs_cont(th0,Bm,Cm,k,Y,TT,r,mod)
     lk0 = out$lk; sc0 = out$sc
     lth = length(th)

@@ -69,9 +69,11 @@ lk_obs_latent_cont <- function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
 
    	# Update Si
    	tmp=0
-   	for(u in 1:k) tmp = tmp+t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
+   	for(u in 1:k){
+   	  Tmp = Yv-rep(1,n*TT)%*%t(Mu[,u])
+   	  tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)
+   	}
    	tmp = iSi%*%tmp%*%iSi
-
    	tmp = tmp-(n*TT)*iSi
    	diag(tmp) = diag(tmp)/2
    	sc = c(sc,tmp[upper.tri(tmp,TRUE)])
@@ -93,7 +95,7 @@ lk_obs_latent_cont <- function(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
    	    sc = c(sc,out$sc)
    	  }
    	}else if(param=="difflogit"){
-   	  Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
+   	  Tmp = aperm(U[,,,2:TT,drop=FALSE],c(1,3,4,2))
    	  Tmp = matrix(Tmp,n*k*(TT-1),k)
    	  out = est_multilogit(Tmp,ZZdis,Zlab,Ga,PIdis,fort=fort,ex=TRUE)
    	  sc = c(sc,out$sc)

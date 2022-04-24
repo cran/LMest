@@ -594,7 +594,10 @@ est_lm_basic_cont <-
       for(u in 1:k) Mu[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
       # Update Si
       Si = matrix(0,r,r)
-      for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
+      for(u in 1:k){
+        Tmp = Yv-rep(1,n*TT)%o%Mu[,u]
+        Si= Si+ t(Tmp)%*%(Vv[,u]*Tmp)
+      }
       Si = Si/(n*TT)
 
       #print(proc.time()-time)
@@ -1040,8 +1043,10 @@ est_lm_cov_latent_cont <-
       for(u in 1:k) Mu[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
       # Update Si
       Si = matrix(0,r,r)
-      for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%o%Mu[,u])%*%diag(Vv[,u])%*%
-        as.matrix(Yv-rep(1,n*TT)%o%Mu[,u])
+      for(u in 1:k){
+        Tmp = Yv-rep(1,n*TT)%o%Mu[,u]
+        Si = Si+ t(Tmp)%*%(Vv[,u]*Tmp)
+      }
       Si = Si/(sum(yv)*TT)
       # Update piv
       out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis)
@@ -1059,7 +1064,7 @@ est_lm_cov_latent_cont <-
           PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,n,TT-1)); Ga[,h] = out$be
         }
       }else if(param=="difflogit"){
-        Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
+        Tmp = aperm(U[,,,2:TT,drop=FALSE],c(1,3,4,2))
         Tmp = matrix(Tmp,n*k*(TT-1),k)
         out = est_multilogit(Tmp,ZZdis,Zlab,Ga,PIdis)
         PIdis = out$Pdis; Ga = out$be
@@ -1081,7 +1086,6 @@ est_lm_cov_latent_cont <-
     }
     if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
 
-
     if(out_se){
       th = NULL
       th = c(th,as.vector(Mu))
@@ -1090,14 +1094,11 @@ est_lm_cov_latent_cont <-
       if(param=="multilogit"){
         for(h in 1:k) th = c(th, Ga[,h])
       }else if(param=="difflogit") th = c(th,Ga)
-
       #	  th0 = th-10^-5/2
       out = lk_obs_latent_cont(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param)
       lk0 = out$lk; sc0 = out$sc
-
       lth = length(th)
       scn = rep(0,lth); Fn = matrix(0,lth,lth)
-
       for(h in 1:lth){
         thh = th; thh[h] = thh[h]+10^-5
         outh = lk_obs_latent_cont(thh,Y,yv,XXdis,Xlab,ZZdis,Zlab,param)
@@ -1598,7 +1599,7 @@ est_lm_cov_latent <-
           PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1)); Ga[,h] = out$be
         }
       }else if(param=="difflogit"){
-        Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
+        Tmp = aperm(U[,,,2:TT,drop=FALSE],c(1,3,4,2))
         Tmp = matrix(Tmp,ns*k*(TT-1),k)
         out = est_multilogit(Tmp,ZZdis,Zlab,Ga,PIdis,fort=fort)
         PIdis = out$Pdis; Ga = out$be
@@ -1726,7 +1727,7 @@ est_lm_cov_latent <-
           sc = c(sc,out$sc); Fi = blkdiag(Fi,out$Fi)
         }
       }else if(param=="difflogit"){
-        Tmp = aperm(U[,,,2:TT],c(1,3,4,2))
+        Tmp = aperm(U[,,,2:TT,drop=FALSE],c(1,3,4,2))
         Tmp = matrix(Tmp,ns*k*(TT-1),k)
         out = est_multilogit(Tmp,ZZdis,Zlab,Ga,PIdis,fort=fort,ex=TRUE)
         sc = c(sc,out$sc); Fi = blkdiag(Fi,out$Fi)
@@ -2141,7 +2142,6 @@ est_lm_cov_manifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,mod=c("LM","FM"
   }
   PIs = (PI%x%matrix(1,q,q))*WEI
 
-  t0 = proc.time()
   # to do in Fortran
   # find non-redundant X configurations (may be very slow)
   # Xd = array(X,c(ne,nc,n*TT))

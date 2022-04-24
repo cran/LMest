@@ -104,7 +104,10 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod){
 
 # score for Si
 	    tmp=0
-    	for(u in 1:k) tmp = tmp+t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%diag(Vv[,u])%*%as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))
+    	for(u in 1:k){
+    	  Tmp = Yv-rep(1,n*TT)%*%t(Mu[,u])
+    	  tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)
+    	}
     	tmp = iSi%*%tmp%*%iSi
 	    tmp = tmp-(n*TT)*iSi
     	diag(tmp) = diag(tmp)/2

@@ -1,4 +1,4 @@
-ec9c6a1ab43f35e1c6ffe6d365d550d9 *DESCRIPTION
+87def558ab82ca809337683693db1abe *DESCRIPTION
 93bc49f18492391db69ce9b1286225b2 *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 e53e9c6d94232ef02a2c704139696c1f *R/blkdiag.R
@@ -18,7 +18,7 @@ dc27d74d3130f4689e8d000462aaafbd *R/draw_lm_cov_latent.R
 6d624b5f040b856fe0bd3d3b8aefeb8a *R/draw_lm_cov_latent_cont.R
 96f6708a67744c592bf39ca678f3c6a5 *R/draw_lm_mixed.R
 e53f7e6632c5dede3295ad1709ec6448 *R/est_multilogit.R
-5d840b7d8d4ca981f3463ae18d6bd447 *R/est_old.R
+3cc7afc8e95bfd2db979c5d9ff9fb83b *R/est_old.R
 648e51ef26ed0fa6f9e138973cfbb20e *R/expit.R
 7f49e740b2dff9c5cec2f01900db78ed *R/expit1.R
 1abf457bc57af64c2a488280b90f4775 *R/functions.R
@@ -27,16 +27,16 @@ e53f7e6632c5dede3295ad1709ec6448 *R/est_multilogit.R
 c9e2dbec96a13a887f6e861a1807da26 *R/lk_comp_latent.R
 5bb817eafe65eea9043ba179299a3c62 *R/lk_comp_latent_cont.R
 e968d1e2c214412eacb41dd49e5f0323 *R/lk_obs.R
-f47f44c275b1714c9c4f67b2327a3e6e *R/lk_obs_cont.R
-12884ed2b1db628058eadd9e222e4299 *R/lk_obs_cont_miss.R
+44c85c44c9f0f79689494e99608d10ea *R/lk_obs_cont.R
+d38d645cb56958046f773eb07978180f *R/lk_obs_cont_miss.R
 86cc4042bdbe76142d53a62719df5a58 *R/lk_obs_latent.R
-65de6bc8f056859bd5e66bee9d2b67fe *R/lk_obs_latent_cont.R
+bc83cf53b10bc85ffce31373cf4697b3 *R/lk_obs_latent_cont.R
 79c31a6d7aff32b935e1f1ffd9501778 *R/lk_obs_manifest.R
 d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 4901d73b199c2b00cbce5784a88d80a7 *R/lk_sta.R
 8ca1ed5c87474210aa6181f80108aa7e *R/lmbasic.R
 bcaf85b254aec66e5c58ef261a2687d4 *R/lmbasic.cont.MISS.R
-b022a73fb7fcf561681f999e9e8b7dd4 *R/lmbasic.cont.R
+2da203ecd70673719c50a16db9a0b77e *R/lmbasic.cont.R
 19a7816d5b5d49b9b7736681ba63ba5f *R/lmcovlatent.R
 57e7221701fb3f966dd11ed98d5e7314 *R/lmcovlatent.cont.R
 74aade66eb54e838ba3079ffd748bc1d *R/lmcovmanifest.R
@@ -97,7 +97,7 @@ b41286306dac3e8a122eefd3817f635f *data/RLMSlong.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 957326e6da3222457e3c494f79a3b7a3 *inst/doc/vignetteLMest.R
 702700e352571cfa41e8beec7e92fc72 *inst/doc/vignetteLMest.Rmd
-3ed9d4be9e48cf239fed0fe6c21d4821 *inst/doc/vignetteLMest.html
+98074469d51ecbf18edd6cb05b55831d *inst/doc/vignetteLMest.html
 edc10efd5e286b6174a5279b12fd0f22 *man/LMbasic-class.Rd
 36c662f75e50580a553a06e45a381c97 *man/LMbasiccont-class.Rd
 0d93dff52230b4b1e1d5526877f965c9 *man/LMest-package.Rd
