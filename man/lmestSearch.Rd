@@ -10,7 +10,7 @@ lmestSearch(responsesFormula = NULL, latentFormula = NULL,
             data, index, k,
             version = c("categorical", "continuous"),
             weights = NULL, nrep = 2, tol1 = 10^-5,
-            tol2 = 10^-10, out_se = FALSE, seed = NULL, ...)
+            tol2 = 10^-10, out_se = FALSE, miss.imp = FALSE, seed = NULL, ...)
 }
 \arguments{
   \item{responsesFormula}{a symbolic description of the model to fit. A detailed description is given in the ‘Details’ section of \code{\link{lmest}}
@@ -27,6 +27,7 @@ lmestSearch(responsesFormula = NULL, latentFormula = NULL,
   \item{tol1}{tolerance level for checking convergence of the algorithm in the random initializations}
   \item{tol2}{tolerance level for checking convergence of the algorithm in the last deterministic initialization}
   \item{out_se}{to compute the information matrix and standard errors (FALSE is the default option)}
+  \item{miss.imp}{Only for continuous responses: how to deal with missing values (TRUE for imputation through the imp.mix function, FALSE for missing at random assumption)}
   \item{seed}{an integer value with the random number generator}
   \item{\dots}{additional arguments to be passed to functions \code{\link{lmest}} or \code{\link{lmestCont}}}
 }

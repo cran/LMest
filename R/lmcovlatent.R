@@ -1,6 +1,6 @@
-lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,paramLatent="multilogit",
-                        Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,fixPsi=FALSE,
-                        miss = FALSE, R = NULL){
+lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,maxit=1000,
+                        paramLatent="multilogit",Psi,Be,Ga,fort=TRUE,output=FALSE,out_se=FALSE,
+                        fixPsi=FALSE,miss = FALSE, R = NULL, ntry = 0){
   # Fit the LM model with individual covariates in the distribution of the latent process
   #
   # INPUT:
@@ -19,7 +19,26 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   # out_se  = TRUE for computing the information and standard errors
   # fixPsi = TRUE if Psi is given in input and is not updated anymore
 
-  # Preliminaries
+# ---- Repeat estimation if necessary ----
+  if(ntry>0){
+    cat("* Deterministic inditialization *\n")
+    out = lmcovlatent(S,X1,X2,yv,k,start=0,tol,maxit,paramLatent,fort=fort,output=output,
+                      out_se=out_se,miss=miss,R=R)
+    lkv_glob = out$lk
+    for(it0 in 1:(k*ntry)){
+      cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
+      outr = try(lmcovlatent(S,X1,X2,yv,k,start=1,tol,maxit,paramLatent,fort=fort,output=output,
+                             out_se=out_se,miss=miss,R=R))
+      if(!inherits(outr,"try-error")){
+        lkv_glob = c(lkv_glob,outr$lk)
+        out = outr
+      }
+    }
+    out$lkv_glob = lkv_glob
+    return(out)
+  }
+
+#---- Preliminaries ----
   check_der = FALSE # to check score and info
   param <- paramLatent
   if(fort!=TRUE) fort = FALSE
@@ -666,9 +685,15 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }
   # final output
   if(output){
-    out$V = V1
-    out$Ul = Ul
-  }
+    if(k>1){
+      PMarg <- array(0,c(n,k,TT))
+      PMarg[,,1] <- as.matrix(Piv)
+      for(i in 1:n) for(t in 2:TT) PMarg[i,,t]= t(PI[,,i,t])%*%PMarg[i,,t-1]
+      Pmarg <-apply(PMarg,c(2,3),mean)
+    }else Pmarg<- NULL
+    out = c(out,list(V = V1, Ul = Ul, S = S, yv=yv, Pmarg=Pmarg))
+  } 
+    
   cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
   class(out)="LMlatent"
   return(out)

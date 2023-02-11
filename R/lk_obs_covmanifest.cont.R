@@ -1,14 +1,25 @@
-lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
+lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
 
 # compute corresponding parameters
   if(is.null(R)) miss = FALSE else miss = any(!R)
   n = dim(Y)[1]
-  th1 = th[1:(k*r)]; th = th[-(1:(k*r))]
-  Mu = matrix(th1,r,k)
+  nt = n*TT
+  th1 = th[1:((ncov+k)*r)]; th = th[-(1:((ncov+k)*r))]
+  Be = matrix(th1,ncov+k,r)
+  if(k==1){
+    Mu = X%*%Be
+  }else{
+    Mu = array(0,c(nt,r,k))
+    for(u in 1:k){
+      uv = rep(0,k); uv[u] = 1
+      Xu = cbind(rep(1,nt)%o%uv,X[,-1])
+      Mu[,,u] = Xu%*%Be
+    }
+  }
   th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
   Si = matrix(0,r,r)
   if(r==1){
-    Si = th1
+    Si[1,1] = th1
   }else{
     Si[upper.tri(Si,TRUE)] = th1
     Si = Si+t(Si-diag(diag(Si)))
@@ -55,22 +66,26 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
 
 # compute log-likelihood
   if(k==1){
-    Yv = matrix(Y,n*TT,r)
+    Yv = matrix(aperm(Y,c(2,1,3)),n*TT,r)
+    if(miss) Rv = matrix(aperm(R,c(2,1,3)),n*TT,r)
+    nt = nrow(Yv)
     if(miss){
       lk = 0
-      for (i in 1:n) for(t in 1:TT){
-        indo = R[i,t,]
-        if(sum(R[i,t,])==1){
-          lk = lk + dnorm(Y[i,t,][indo],Mu[indo],sqrt(Si[indo,indo]),log=TRUE)
-        }else if(sum(R[i,t,])>1){
-          lk = lk + dmvnorm(Y[i,t,][indo],Mu[indo],Si[indo,indo],log=TRUE)
+      for (i in 1:nt){
+        indo = Rv[i,]
+        if(sum(indo)==1){
+          lk = lk + dnorm(Yv[i,indo],Mu[i,indo],sqrt(Si[indo,indo]),log=TRUE)
+        }else if(sum(indo)>1){
+          lk = lk + dmvnorm(Yv[i,indo],Mu[i,indo],Si[indo,indo],log=TRUE)
         }
       }
     }else{
-      lk = sum(dmvnorm(Yv,Mu,as.matrix(Si),log=TRUE))
+      lk = 0
+      if(r==1) for(i in 1:nt) lk = lk+dnorm(Yv[i,],Mu[i,],sqrt(Si),log=TRUE)
+      else for(i in 1:nt) lk = lk+dmvnorm(Yv[i,],Mu[i,],Si,log=TRUE)
     }
   }else{
-    out = complk_cont_miss(Y,R,piv,Pi,Mu,Si,k)
+    out = complk_covmanifest.cont(Y,R,piv,Pi,Mu,Si,k)
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   }
   sc = NULL
@@ -78,18 +93,19 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
 # ---- E-step ----
   if(k==1){
     if(miss){
-      Yimp = Y; Vc = matrix(0,r,r)
-      for(i in 1:n) for(t in 1:TT){
-        indo = R[i,t,]
+      Yvimp = Yv; Vc = matrix(0,r,r)
+      for(i in 1:nt){
+        indo = Rv[i,]
         if(sum(indo)==0){
-          Yimp[i,t,] = c(Mu)
+          Yvimp[i,] = Mu[i,]
           Vc = Vc+Si
         }else if(sum(indo)<r){
           iSi = ginv(Si[indo,indo])
-          Yimp[i,t,!indo] = Mu[!indo]+Si[!indo,indo]%*%iSi%*%(Y[i,t,indo]-Mu[indo])
+          Yvimp[i,!indo] = Mu[i,!indo]+Si[!indo,indo]%*%iSi%*%(Yv[i,indo]-Mu[i,indo])
           Vc[!indo,!indo] = Vc[!indo,!indo]+Si[!indo,!indo]-Si[!indo,indo]%*%iSi%*%Si[indo,!indo]
         }
       }
+      Yimp = aperm(array(Yvimp,c(TT,n,r)),c(2,1,3))
     }
   }else{
 # Compute V and U
@@ -139,12 +155,11 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
       Yimp = Y
       Vc = 0
     }
-    Yvimp = matrix(Yimp,n*TT,r)
-    nt= n*TT
+    Yvimp = matrix(aperm(Yimp,c(2,1,3)),n*TT,r)
+    nt = n*TT
     iSi = solve(Si)
-    sc = iSi%*%(colSums(Yvimp)-c(n*TT*Mu))
-    Mu = as.matrix(colMeans(Yvimp,na.rm=TRUE))
-    Tmp = Yvimp-rep(1,nt)%o%c(Mu)
+    sc = iSi%*%t(Yvimp-Mu)%*%X
+    Tmp = Yvimp-Mu
     tmp = t(Tmp)%*%Tmp+Vc
     tmp = iSi%*%tmp%*%iSi
     tmp = tmp-(n*TT)*iSi
@@ -152,47 +167,55 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
     sc = c(sc,tmp[upper.tri(tmp,TRUE)])
   }else{
     iSi = solve(Si)
-    Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
+    Vv = matrix(aperm(V,c(3,1,2)),nt,k)
     if(miss){
       Sitmp = matrix(0,r,r)
+      Y1 = array(Y,c(n,TT,r,k))
       Var = array(0,c(n,TT,r,r))
-      tmp=0
-      for(u in 1:k){
-        Y1 = Y
-        for(i in 1:n) for(t in 1:TT){
-          nr = sum(R[i,t,])
-          if(nr==0){
-            Y1[i,t,] = Mu[,u]
-            Var[i,t,,] = Si
-          }else if(nr<r){
-            indo = R[i,t,]; indm = !R[i,t,]
-            Tmp = Si[indm,indo]%*%solve(Si[indo,indo])
-            Y1[i,t,][indm] = Mu[indm,u]+Tmp%*%(Y[i,t,][indo]-Mu[indo,u])
-            Var[i,t,,][indm,indm] = Si[indm, indm]-Tmp%*%Si[indo,indm]
-          }
+      j = 0
+      for(i in 1:n) for(t in 1:TT){
+        j = j+1
+        nr = sum(R[i,t,])
+        if(nr==0){
+          Y1[i,t,,] = Mu[j,,]
+          Var[i,t,,] = Si
+        }else if(nr<r){
+          indo = R[i,t,]; indm = !R[i,t,]
+          Tmp = Si[indm,indo]%*%solve(Si[indo,indo])
+          Var[i,t,indm,indm] = Si[indm, indm]-Tmp%*%Si[indo,indm]
+          for(u in 1:k) Y1[i,t,indm,u] = Mu[j,indm,u]+Tmp%*%(Y[i,t,indo]-Mu[j,indo,u])
         }
-        Yv1 = matrix(Y1,n*TT)
-        Var1 = array(Var,c(n*TT,r,r))
-# score for Mu and Si	
-        sc = c(sc,iSi%*%(t(Yv1)%*%Vv[,u]-sum(Vv[,u])*Mu[,u]))
-        Tmp = Yv1-rep(1,n*TT)%*%t(Mu[,u])
+      }
+# score for Mu and Si
+      sc = rep(0,r*(ncov+k))
+      tmp = matrix(0,r,r)
+      Y1v = array(aperm(Y1,c(2,1,3,4)),c(nt,r,k))
+      Var1 = array(Var,c(n*TT,r,r))
+      for(u in 1:k){
+        uv = rep(0,k); uv[u] = 1
+        Xu = cbind(rep(1,nt)%o%uv,X[,-1])
+        Tmp = Y1v[,,u]-Mu[,,u]
         tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)+apply(Vv[,u]*Var1,c(2,3),sum)
+        sc = sc+c(t(Xu)%*%(Vv[,u]*Tmp)%*%iSi)
       }
       tmp = iSi%*%tmp%*%iSi
-      tmp = tmp-(n*TT)*iSi
+      tmp = tmp-nt*iSi
       diag(tmp) = diag(tmp)/2
       sc = c(sc,tmp[upper.tri(tmp,TRUE)])
     }else{
-# score for Mu
-      Yv = matrix(Y,n*TT,r)
-      Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
-      for(u in 1:k) sc = c(sc,iSi%*%(t(Yv)%*%Vv[,u]-sum(Vv[,u])*Mu[,u]))
-# score for Si
-      tmp=0
+# score for Be
+      Yv = matrix(aperm(Y,c(2,1,3)),nt,r)
+      Vv = matrix(aperm(V,c(3,1,2)),nt,k)
+      sc = rep(0,r*(ncov+k))
+      tmp = matrix(0,r,r)
       for(u in 1:k){
-        Tmp = Yv-rep(1,n*TT)%*%t(Mu[,u])
+        uv = rep(0,k); uv[u] = 1
+        Xu = cbind(rep(1,nt)%o%uv,X[,-1])
+        Tmp = Yv-Mu[,,u]
         tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)
+        sc = sc+c(t(Xu)%*%(Vv[,u]*Tmp)%*%iSi)
       }
+# score for Si
       tmp = iSi%*%tmp%*%iSi
       tmp = tmp-(n*TT)*iSi
       diag(tmp) = diag(tmp)/2

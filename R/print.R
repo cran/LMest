@@ -50,9 +50,45 @@ print.LMbasiccont <-function(x, ...){
   }else{
     print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
   }
-
 }
 
+print.LMmanifestcont <-function(x, ...){
+  cat("\nBasic Latent Markov model for continuous outcomes with covariates 
+      affecting the manifest distribution\n")
+  if(!is.null(x$call))
+  {
+    cat("Call:\n")
+    print(x$call)
+  }
+  cat("\nAvailable objects:\n")
+  print(names(x))
+  cat("\nConvergence info:\n")
+  if(is.null(x$TT))
+  {warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
+    print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
+  }else{
+    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+  }
+}
+
+print.LMbasiccontMISS <-function(x, ...){
+  cat("\nBasic Latent Markov model for continuous outcomes and missing responses (MAR) \n")
+  if(!is.null(x$call))
+  {
+    cat("Call:\n")
+    print(x$call)
+  }
+  cat("\nAvailable objects:\n")
+  print(names(x))
+  cat("\nConvergence info:\n")
+  if(is.null(x$TT))
+  {
+    warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
+    print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
+  }else{
+    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+  }
+}
 
 # print.LMlatent <-function(x,...){
 #   cat("Call:\n")
@@ -107,6 +143,24 @@ print.LMlatentcont <-function(x,...){
   }
 }
 
+print.LMlatentcontMISS <-function(x,...){
+  cat("\nBasic Latent Markov model for continuous outcomes with covariates in the latent model and missing responses (MAR)\n")
+  if(!is.null(x$call))
+  {
+    cat("Call:\n")
+    print(x$call)
+  }
+  cat("\nAvailable objects:\n")
+  print(names(x))
+  cat("\nConvergence info:\n")
+  if(is.null(x$TT))
+  {
+    warning("est_lm_cov_latent_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
+    print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
+  }else{
+    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+  }
+}
 # print.LMmanifest <-function(x,...){
 #   cat("Call:\n")
 #   print(x$call)

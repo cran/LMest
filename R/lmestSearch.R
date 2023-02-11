@@ -2,7 +2,7 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
                         data, index, k,
                         version = c("categorical", "continuous"),
                         weights = NULL, nrep = 2, tol1 = 10^-5,
-                        tol2 = 10^-10, out_se = FALSE, seed = NULL, ...){
+                        tol2 = 10^-10, out_se = FALSE, miss.imp = FALSE, seed = NULL, ...){
   # function that search for the global maximum of the log-likelihood
   # vector of kv to try for
   # nrep = number repetitions with random starting values
@@ -153,14 +153,14 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
 
 
   miss = any(is.na(Y))
-  if(miss)
-  {
+  if(miss & miss.imp){
     Yv = cbind(1,Y)
     pYv = prelim.mix(Yv,1)
     thhat = em.mix(prelim.mix(Yv,1))
     rngseed(1)
     Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
     Y = array(Yv,dim(Y))
+    Yimp = Y
     cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
   }
 
@@ -176,8 +176,8 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
     if(version=="LMbasic") out[[k]] = try(  lmbasic(S = Y,yv = freq,k = k,start = 0,tol = tol1,miss = miss, R = R, ...))
     if(version=="LMlatent") out[[k]] = try(  lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,start = 0, k = k,tol = tol1, miss = miss, R = R, ...))
     if(version=="LMmanifest") out[[k]] = try(  lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, k = k,tol = tol1,start = 0,...))
-    if(version=="LMbasiccont") out[[k]] = try(  lmbasic.cont(Y = Y,k = k,start = 0, tol = tol1, miss = miss, ...))
-    if(version=="LMlatentcont") out[[k]] = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k,start = 0,tol = tol1, miss = miss, ...))
+    if(version=="LMbasiccont") out[[k]] = try(  lmbasic.cont(Y = Y,k = k,start = 0, tol = tol1, ntry = 0, ...))
+    if(version=="LMlatentcont") out[[k]] = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k,start = 0,tol = tol1, ntry = 0, ...))
 
     if(!inherits(out[[k]],"try-error")){
       errv[[k]] = FALSE
@@ -189,8 +189,8 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
     if(version=="LMbasic") outh = try(  lmbasic(S = Y,yv = freq,k = k,start = 0,tol = tol1,miss = miss, R = R, ...))
     if(version=="LMlatent") outh = try(  lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,start = 0, k = k,tol = tol1, miss = miss, R = R, ...))
     if(version=="LMmanifest") outh = try(  lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, k = k,tol = tol1,start = 0, ...))
-    if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 0, tol = tol1, miss = miss, ...))
-    if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k,start = 0,tol = tol1, miss = miss, ...))
+    if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 0, tol = tol1, ntry = 0 , ...))
+    if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k,start = 0,tol = tol1, ntry = 0, ...))
 
 
     lktrace = out[[k]]$lk
@@ -208,8 +208,8 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
         if(version=="LMbasic") outh = try(  lmbasic(S = Y,yv = freq,k = k,start = 1, tol = tol1,miss = miss, R = R, ...))
         if(version=="LMlatent") outh = try(  lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,start = 1, k = k,tol = tol1, miss = miss, R = R, ...))
         if(version=="LMmanifest") outh = try(  lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, k = k,tol = tol1,start = 1, ...))
-        if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 1, tol = tol1, miss = miss, ...))
-        if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k,start = 1,tol = tol1, miss = miss, ...))
+        if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 1, tol = tol1, ntry = 0, ...))
+        if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k,start = 1,tol = tol1, ntry = 0, ...))
         if(!inherits(outh,"try-error")){
           lktrace = c(lktrace,outh$lk)
           if(outh$lk>out[[k]]$lk) out[[k]] = outh
@@ -229,8 +229,8 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
           if(version=="LMbasic") outh = try(  lmbasic(S = Y,yv = freq,k = k,start = 1, tol = tol1,miss = miss, R = R, ...))
           if(version=="LMlatent") outh = try(  lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,start = 1, k = k,tol = tol1, miss = miss, R = R, ...))
           if(version=="LMmanifest") outh = try(  lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, k = k,tol = tol1,start = 1, ...))
-          if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 1, tol = tol1, miss = miss, ...))
-          if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k,start = 1,tol = tol1, miss = miss, ...))
+          if(version=="LMbasiccont") outh = try(  lmbasic.cont(Y = Y,k = k,start = 1, tol = tol1, ntry = 0 , ...))
+          if(version=="LMlatentcont") outh = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k,start = 1,tol = tol1, ntry = 0, ...))
           if(!inherits(outh,"try-error")){
             lktrace = c(lktrace,outh$lk)
             if(outh$lk>out[[k]]$lk) out[[k]] = outh
@@ -249,8 +249,8 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
       if(version=="LMbasic") outn = try(  lmbasic(S = Y,yv = freq,k = k,start = 2,tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Psi=out[[k]]$Psi,out_se=out_se,miss = miss, R = R, ...))
       if(version=="LMlatent") outn = try(  lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,start = 2, k = k,tol=tol2,Psi=out[[k]]$Psi,Be=out[[k]]$Be,Ga=out[[k]]$Ga,out_se=out_se, miss = miss, R = R, ...))
       if(version=="LMmanifest") outn = try(  lmcovmanifest(S = as.matrix(Y[,,1]),X = Xmanifest, yv = freq, k = k,tol=tol2,mu=out[[k]]$mu,al=out[[k]]$al,be=out[[k]]$be,la=out[[k]]$la,PI=out[[k]]$PI,rho=out[[k]]$rho,si=out[[k]]$si,out_se=out_se,start = 2, ...))
-      if(version=="LMbasiccont") outn = try(  lmbasic.cont(Y = Y,k = k,start = 2, tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Mu=out[[k]]$Mu,Si=out[[k]]$Si, miss = miss, ...))
-      if(version=="LMlatentcont") outn = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,k = k,start = 2,tol=tol2,Mu=out[[k]]$Mu,Si=out[[k]]$Si,Be=out[[k]]$Be,Ga=out[[k]]$Ga, miss = miss, ...))
+      if(version=="LMbasiccont") outn = try(  lmbasic.cont(Y = Y,k = k,start = 2, tol=tol2,piv=out[[k]]$piv,Pi=out[[k]]$Pi,Mu=out[[k]]$Mu,Si=out[[k]]$Si, ntry = 0, ...))
+      if(version=="LMlatentcont") outn = try(  lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k,start = 2,tol=tol2,Mu=out[[k]]$Mu,Si=out[[k]]$Si,Be=out[[k]]$Be,Ga=out[[k]]$Ga, ntry = 0, ...))
 
       if(!inherits(outn,"try-error")){
         lktrace = c(lktrace,outn$lk)
@@ -262,6 +262,7 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
       }
     }
     out[[k]]$data = data
+    if(miss & miss.imp) out[[k]]$Yimp = Yimp
     attributes(out[[k]])$responsesFormula = responsesFormula
     attributes(out[[k]])$latentFormula = latentFormula
     attributes(out[[k]])$whichid = id.which

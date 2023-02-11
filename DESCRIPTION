@@ -1,9 +1,9 @@
 Package: LMest
 Title: Generalized Latent Markov Models
 Description: Latent Markov models for longitudinal continuous and categorical data. See Bartolucci, Pandolfi, Pennoni (2017)<doi:10.18637/jss.v081.i04>.
-Version: 3.0.4
-Date: 2022-04-24
-Authors@R: c(person("Francesco", "Bartolucci", role = c("aut","cre"), email = "bart@stat.unipg.it"),
+Version: 3.1.0
+Date: 2023-02-03
+Authors@R: c(person("Francesco", "Bartolucci", role = c("aut","cre"), email = "francesco.bartolucci@unipg.it"),
 	person("Silvia", "Pandolfi", role = "aut", email = "silvia.pandolfi@unipg.it"),
 	person("Fulvia", "Pennoni", role = "aut", email = "fulvia.pennoni@unimib.it"),
        person("Alessio", "Farcomeni", role="ctb"),person("Alessio", "Serafini", role="ctb"))
@@ -12,7 +12,7 @@ Author: Francesco Bartolucci [aut, cre],
   Fulvia Pennoni [aut],
   Alessio Farcomeni [ctb],
   Alessio Serafini [ctb]
-Maintainer: Francesco Bartolucci <bart@stat.unipg.it>
+Maintainer: Francesco Bartolucci <francesco.bartolucci@unipg.it>
 Depends: R (>= 3.5.0)
 Imports: MASS, MultiLCIRT, stats, mvtnorm, Formula(>= 1.2-3), mix,
         utils, graphics, diagram(>= 1.6.4), mclust(>= 5.4.6),
@@ -25,5 +25,5 @@ LazyLoad: yes
 Encoding: UTF-8
 ByteCompile: true
 License: GPL (>= 2)
-Packaged: 2022-04-24 17:55:15 UTC; francescobartolucci
-Date/Publication: 2022-04-24 18:10:02 UTC
+Packaged: 2023-02-10 20:56:23 UTC; francescobartolucci
+Date/Publication: 2023-02-11 07:10:02 UTC

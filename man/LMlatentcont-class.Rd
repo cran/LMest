@@ -24,12 +24,16 @@
    \item{seSi}{standard errors for the var-cov matrix}
   \item{seBe}{standard errors for \code{Be}}
   \item{seGa}{standard errors for Ga}
+  \item{sc}{score vector}
+  \item{J}{information matrix}
   \item{PI}{estimate of transition probability matrices}
     \item{Piv}{estimate of initial probability matrix}
-  \item{Ul}{matrix containing the predicted sequence of latent states by the local decoding method}
      \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
     	\item{Bic}{vector containing the values of the BIC of the LM model with each \code{k} (latent states)}
   \item{Aic}{vector containing the values of the AIC of the LM model with each \code{k} (latent states)}
+    \item{V}{array containing the posterior distribution of the latent states for each units and time occasion}
+  \item{Ul}{matrix containing the predicted sequence of latent states by the local decoding method}
+   	\item{Pmarg}{matrix containing the marginal distribution of the latent states} 
   \item{call}{command used to call the function}
   \item{data}{data frame given in input}
 }

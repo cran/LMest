@@ -1,11 +1,10 @@
-long2matrices.internal <- function(Y, id, time, yv = NULL,
-                                   Xinitial = NULL, Xmanifest = NULL, Xtrans = NULL, cont = FALSE)
-{
-  # preliminaries
+long2matrices.internal <- function(Y, id, time, yv = NULL, Xinitial = NULL, Xmanifest = NULL,
+                                   Xtrans = NULL, cont = FALSE){
+
+# ---- Preliminaries ----
   idu = unique(id)
   n = length(idu)
   TT = max(time)
-
   XXinitial = NULL
   XXmanifest = NULL
   XXtrans = NULL
@@ -13,8 +12,7 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
   manifest = FALSE
   trans = FALSE
   if(!is.null(Xinitial)){
-    if(dim(Xinitial)[2] == 0)
-    {
+    if(dim(Xinitial)[2] == 0){
       Xinitial <- NULL
     }else{
       Xinitial = as.matrix(Xinitial)
@@ -23,11 +21,8 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
     }
     init = TRUE
   }
-
   if(!is.null(Xtrans)){
-
-    if(dim(Xtrans)[2] == 0)
-    {
+    if(dim(Xtrans)[2] == 0){
       Xtrans <- NULL
     }else{
       Xtrans = as.matrix(Xtrans)
@@ -36,50 +31,34 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
     }
     trans = TRUE
   }
-
   if(!is.null(Xmanifest)){
     Xmanifest = as.matrix(Xmanifest)
     nxMan = ncol(Xmanifest)
     XXmanifest = array(NA,c(n,TT,nxMan))
     manifest = TRUE
   }
-
-  if(isTRUE(init) | isTRUE(trans))
-  {
-    if(isTRUE(manifest))
-    {
+  if(isTRUE(init) | isTRUE(trans)){
+    if(isTRUE(manifest)){
       model <- "LMlatentManifest"
       stop("covariates on both Latent and Manifest are not allowed",call. = FALSE)
     }else{
       model <- "LMlatent"
-      if(cont)
-      {
-        model = "LMlatentcont"
-      }
+      if(cont) model = "LMlatentcont"
     }
-
-  }else if (isTRUE(manifest))
-  {
+  }else if (isTRUE(manifest)){
     model <- "LMmanifest"
-    if(ncol(Y) > 1){
-      warning("multivariate data are not allowed; only the first response variable is considered", call. = FALSE)
-    }
+    if(cont) model <- "LMmanifestcont"
   }else{
-
     model <- "LMbasic"
-    if(isTRUE(cont))
-    {
-      model = "LMbasiccont"
-    }
+    if(isTRUE(cont)) model = "LMbasiccont"
   }
   Y = as.matrix(Y)
   ny = ncol(Y)
-  # create matrices
+
+# ---- create matrices ----
   freq <- NULL
-  if(model == "LMbasic" | model == "LMbasiccont")
-  {
-    if(is.null(yv) && !cont)
-    {
+  if(model == "LMbasic" | model == "LMbasiccont"){
+    if(is.null(yv) && !cont){
       temp <- aggr_data_long(data = Y, id = id, time = time, NAs = 999)
       freq = temp$freq
       id <- temp$Y[,1]
@@ -90,87 +69,66 @@ long2matrices.internal <- function(Y, id, time, yv = NULL,
       id <- id
       time <- time
     }
-
     idu = unique(id)
     n = length(idu)
-
     YY = array(NA,c(n,TT,ny))
     for(i in 1:n){
       ind = which(id==idu[i])
-
       tmp = 0
       for(t in time[ind]){
         tmp=tmp+1
         YY[i,t,] = Y[ind[tmp],]
       }
     }
-  }else if(model == "LMlatent" | model == "LMlatentcont")
-  {
+    dimnames(YY)[[3]] = colnames(Y)
+  }else if(model == "LMlatent" | model == "LMlatentcont"){
     YY = array(NA,c(n,TT,ny))
     for(i in 1:n){
       ind = which(id==idu[i])
       timeid <- time[ind]
-      if(!is.null(Xinitial))
-      {
+      if(!is.null(Xinitial)){
         timeid1 <- ind[timeid==1]
-        if(!length(timeid1)==0)
-        {
-          XXinitial[i,] = Xinitial[timeid1,]
-        }
-
+        if(!length(timeid1)==0) XXinitial[i,] = Xinitial[timeid1,]
       }
+      colnames(XXinitial) = colnames(Xinitial)
       tmp = 0
       for(t in timeid){
         tmp=tmp+1
         indTemp <- ind[tmp]
-        if(!length(indTemp)==0)
-        {
-
-        if(!is.null(Xtrans))
-        {
-          XXtrans[i,t,] = Xtrans[indTemp,]
-        }
-        YY[i,t,] = Y[indTemp,]
+        if(!length(indTemp)==0){
+          if(!is.null(Xtrans)) XXtrans[i,t,] = Xtrans[indTemp,]
+          YY[i,t,] = Y[indTemp,]
         }
       }
     }
+    dimnames(XXtrans)[[3]] = colnames(Xtrans)
+    dimnames(YY)[[3]] = colnames(Y)
     XXtrans <- XXtrans[,-1,, drop = FALSE]
     freq = rep(1,nrow(YY))
-  }else if(model == "LMmanifest")
-  {
+  }else if(model == "LMmanifest" | model == "LMmanifestcont"){
     YY = array(NA,c(n,TT,ny))
     for(i in 1:n){
       ind = which(id==idu[i])
-
       tmp = 0
       for(t in time[ind]){
         tmp=tmp+1
-        if(!is.null(Xmanifest))
-        {
-          XXmanifest[i,t,] = Xmanifest[ind[tmp],]
-        }
+        if(!is.null(Xmanifest)) XXmanifest[i,t,] = Xmanifest[ind[tmp],]
         YY[i,t,] = Y[ind[tmp],]
       }
     }
     freq = rep(1,nrow(YY))
-
   }
 
-
-  # output
-  out = list(Y = YY,
-             Xinitial = XXinitial,
-             Xmanifest = XXmanifest,
-             Xtrans = XXtrans,
-             model = model,
-             freq = freq)
+# ---- output ----
+  out = list(Y = YY,Xinitial = XXinitial,Xmanifest = XXmanifest,
+             Xtrans = XXtrans,model = model,freq = freq)
   return(out)
-
 }
 
+# -
 
-getResponses <- function(data, formula)
-{
+getResponses <- function(data, formula){
+
   if(is.null(formula))
   {
     Y <- data
@@ -193,79 +151,64 @@ getResponses <- function(data, formula)
   return(out)
 }
 
+# -
 
-getLatent <- function(data, latent, responses)
-{
+getLatent <- function(data, latent, responses){
   formula <- update(Formula(responses),Formula(latent))
   formula <- Formula(formula)
   ll <- length(formula)
-
   Xinitial <- NULL
   Xtrans <- NULL
-
-if(length(Formula(latent))[2] == 1 && all(as.character(latent[[2]]) != "|"))
-{
-
-
-if(!is.null(latent[[2]]))
-{
-  Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-  Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-  Xinitial <- data.matrix(Xinitial)
-  Xtrans <- data.matrix(Xtrans)
-  attributes(Xinitial)$onlyintercept = FALSE
-  attributes(Xtrans)$onlyintercept = FALSE
-
-}
-
-
-}else{
-
+  if(length(Formula(latent))[2] == 1 && all(as.character(latent[[2]]) != "|")){
+    if(!is.null(latent[[2]])){
+#      Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+#      Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+      Xinitial <- data.matrix(Xinitial)
+      Xtrans <- data.matrix(Xtrans)
+      attributes(Xinitial)$onlyintercept = FALSE
+      attributes(Xtrans)$onlyintercept = FALSE
+    }
+  }else{
+    
   # if(length(Formula(latent))[2] == 1 && !is.null(latent[[2]]))
   # {
   #   Xinitial <- model.part(formula, data = model.frame(formula, data = data), rhs = 1)
   #   Xtrans <- model.part(formula, data = model.frame(formula, data = data), rhs = 1)
   # }
 
-  if(length(Formula(latent))[2] == 2)
-  {
-    Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-    Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 2)
-    Xinitial <- data.matrix(Xinitial)
-    Xtrans <- data.matrix(Xtrans)
-    attributes(Xinitial)$onlyintercept = FALSE
-    attributes(Xtrans)$onlyintercept = FALSE
-  }else{
-    if(!is.null(latent[[2]][[2]]))
-    {
-      #Xinitial <- model.matrix(formula(formula, rhs = 1),data)
+    if(length(Formula(latent))[2] == 2){
       Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 2)
       Xinitial <- data.matrix(Xinitial)
-      attributes(Xinitial)$onlyintercept = FALSE
-      #Xtrans <- NULL
-    }
-
-    if(!is.null(latent[[2]][[3]]))
-    {
-      #Xinitial <- NULL
-      #Xtrans <- model.matrix(formula(formula, rhs = 1),data)
-      Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
       Xtrans <- data.matrix(Xtrans)
+      attributes(Xinitial)$onlyintercept = FALSE
       attributes(Xtrans)$onlyintercept = FALSE
-
+    }else{
+      if(!is.null(latent[[2]][[2]])){
+        #Xinitial <- model.matrix(formula(formula, rhs = 1),data)
+#        Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+        Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+        Xinitial <- data.matrix(Xinitial)
+        attributes(Xinitial)$onlyintercept = FALSE
+        #Xtrans <- NULL
+      }
+      if(!is.null(latent[[2]][[3]])){
+        #Xinitial <- NULL
+        #Xtrans <- model.matrix(formula(formula, rhs = 1),data)
+        # Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+        Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+        Xtrans <- data.matrix(Xtrans)
+        attributes(Xtrans)$onlyintercept = FALSE
+      }
     }
   }
 
-
-}
-if(is.null(Xtrans))
-{
-  Xtrans = model.part(Formula(~ 1), data = model.frame(Formula(~ 1), data = data,na.action = NULL), rhs = 1)
-}
-if(is.null(Xinitial))
-{
-  Xinitial =  model.part(Formula(~ 1), data = model.frame(Formula(~ 1), data = data,na.action = NULL), rhs = 1)
-}
+  if(is.null(Xtrans)) Xtrans = model.part(Formula(~ 1),
+                                          data = model.frame(Formula(~ 1), data = data,na.action = NULL), rhs = 1)
+  if(is.null(Xinitial)) Xinitial =  model.part(Formula(~ 1),
+                                               data = model.frame(Formula(~ 1), data = data,na.action = NULL), rhs = 1)
  # if(ll[2] == 2)
  #    {
  #      # Xinitial <- model.matrix(formula(formula, rhs = 1),data)
@@ -309,12 +252,7 @@ if(is.null(Xinitial))
  #        }
  #      }
 
-
-
-  out <- list(Xinitial = Xinitial,
-              Xtrans = Xtrans)
-
-
+  out <- list(Xinitial = Xinitial,Xtrans = Xtrans)
   return(out)
 
 }

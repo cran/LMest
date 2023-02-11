@@ -1,4 +1,5 @@
 rec3 <- function(Q,yv,PI,Pio,pim){
+
 # preliminaries
   out = dim(Pio)
   ns = out[1]; k = out[2]; TT = out[3]

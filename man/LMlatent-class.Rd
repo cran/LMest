@@ -21,14 +21,17 @@
     \item{n}{number of observations in the data}
   \item{TT}{number of time occasions}
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
-  \item{V}{array containing the posterior distribution of the latent states for each response configuration and time occasion}
-  \item{Ul}{matrix containing the predicted sequence of latent states by the local decoding method}
   \item{sePsi}{standard errors for the conditional response matrix}
   \item{seBe}{standard errors for \code{Be}}
   \item{seGa}{standard errors for \code{Ga}}
      \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
   \item{Bic}{vector containing the values of the BIC for each \code{k}}
   \item{Aic}{vector containing the values of the AIC for each \code{k}}
+  \item{V}{array containing the posterior distribution of the latent states for each response configuration and time occasion}
+  \item{Ul}{matrix containing the predicted sequence of latent states by the local decoding method}
+   	\item{S}{array containing the available response configurations}
+ 	  \item{yv}{vector of frequencies of the available configurations}
+ 	\item{Pmarg}{matrix containing the marginal distribution of the latent states} 
   \item{call}{command used to call the function}
   \item{data}{Data frame given in input}
 }

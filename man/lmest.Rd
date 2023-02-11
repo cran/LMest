@@ -15,7 +15,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
                      al = NULL, be = NULL, si = NULL,
                      rho = NULL, la = NULL, PI = NULL,
                      fixPsi = FALSE),
-      fort = TRUE, seed = NULL)
+      fort = TRUE, seed = NULL, ntry = 0)
 }
 \arguments{
   \item{responsesFormula}{a symbolic description of the model to fit. A detailed description is given in the ‘Details’ section}
@@ -33,10 +33,11 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors}
   \item{q}{number of support points for the AR(1) process (if modManifest ="FM")}
-   \item{output}{to return additional output: \code{PRED0}, \code{PRED1} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}}) and  \code{V}, \code{Ul} for the LM with covariates on the latent model (\code{\link{LMlatent-class}})}
+   \item{output}{to return additional output: \code{V}, \code{Ul}, \code{S}, \code{yv}, \code{Pmarg} for the basic LM model and for the LM with covariates on the latent model (\code{\link{LMbasic-class}} and \code{\link{LMlatent-class}}) and \code{V}, \code{PRED1}, \code{S}, \code{yv}, \code{Pmarg} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasic-class}}, \code{\link{LMlatent-class}} and \code{\link{LMmanifest-class}}}
   \item{fort}{to use fortran routines when possible}
   \item{seed}{an integer value with the random number generator state}
+  \item{ntry}{to set the number of random initializations}
 }
 \details{
 \code{lmest} is a general function for estimating LM models for categorical responses. The function requires data in long format and two additional columns indicating the unit identifier and the time occasions.
@@ -48,7 +49,7 @@ Covariates are allowed to affect manifest distribution (measurement model) or  t
 \itemize{
 \item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr  the LM model without covariates and two responses (\code{y1} and \code{y2}) is specified;
 \item{\code{responsesFormula = NULL}}\cr  all the columns in the data except the \code{"id"} and \code{"time"} columns are used as responses to estimate the LM model without covariates;
-\item{\code{responsesFormula = y1 + y2 ~ x1 + x2}}\cr the LM model with two responses (\code{y1} and \code{y2}) and two covariates (\code{x1} and \code{x2}) in the measurement model is specified;
+\item{\code{responsesFormula = y1 ~ x1 + x2}}\cr the univariate LM model with  response (\code{y1}) and two covariates (\code{x1} and \code{x2}) in the measurement model is specified;
 }
 
 \item{\code{latentFormula}} is used to specify the LM model with covariates in the latent model:
@@ -127,7 +128,7 @@ out1 <- lmest(responsesFormula = srhs ~ NULL,
               k = 1:5,
               tol = 1e-8,
               modBasic = 1,
-              seed = 123)
+              seed = 123, ntry = 2)
 out1
 out1$Bic
 
@@ -140,7 +141,7 @@ out2 <- lmest(responsesFormula = srhs ~ NULL,
               tol = 1e-8,
               modBasic = 1,
               modSel = "AIC",
-              seed = 123)
+              seed = 123, ntry = 2)
 out2
 out2$Aic
 

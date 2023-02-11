@@ -1,6 +1,6 @@
 stationary <- function(tau,k,G2,IPI){
 
-  # converto to Pi
+# converto to Pi
   Pi = matrix(0,k,k);
   Pi[IPI] = exp(G2%*%tau)
   Pi = Pi/rowSums(Pi)

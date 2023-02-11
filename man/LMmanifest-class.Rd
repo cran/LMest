@@ -26,8 +26,11 @@
  	\item{sebe}{standard errors for the regression parameters be}
  	\item{selrho}{standard errors for logit type transformation of rho}
  	\item{J1}{information matrix}
- 	\item{PRED0}{prediction of latent state}
+ 	\item{V}{array containing the posterior distribution of the latent states for each units and time occasion}
  	\item{PRED1}{prediction of the overall latent effect}
+ 	   	\item{S}{array containing the available response configurations}
+ 	  \item{yv}{vector of frequencies of the available configurations}
+ 	  \item{Pmarg}{matrix containing the marginal distribution of the latent states}
  	   \item{Lk}{vector containing the values of the log-likelihood of the LM model with each \code{k} (latent states)}
  	\item{Bic}{vector containing the values of the BIC for each \code{k}}
   \item{Aic}{vector containing the values of the AIC for each \code{k}}

@@ -7,5 +7,5 @@ rec1 <- function(Pio,las,PI){
   Q[,,1] = Pio[,,1]*La
   for(t in 2:TT) Q[,,t] = Pio[,,t]*(Q[,,t-1]%*%PI)
   Q
- 
+
 }

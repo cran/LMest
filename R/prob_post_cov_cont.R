@@ -1,36 +1,44 @@
-prob_post_cov_cont <- function(Y,yv,Mu,Si,Piv,PI,Phi,L,pv,der=FALSE,
+prob_post_cov_cont <- function(Y,Mu,Si,Piv,PI,Phi,L,pv,der=FALSE,
                           dlPhi=NULL,dlPiv=NULL,dlPI=NULL,dlL=NULL,dlL2=NULL,dlpv=NULL){
 	
 # prelimiaries
-   	sY = dim(Y)
-  	n = sY[1]
-  	TT = sY[2]
-  	if(length(sY)==2) r = 1	else r = sY[3]
-    k = ncol(Piv)
-    
+  sY = dim(Y)
+  n = sY[1]
+  TT = sY[2]
+  if(length(sY)==2) r = 1	else r = sY[3]
+  k = ncol(Piv)
+
 # use backward recursion for potesterior probabilities	
-   	V = array(0,c(n,k,TT)); U = array(0,c(k,k,n,TT))
-   	V1 = V
-   	Pv = matrix(1/pv,n,k)
-	Yv = matrix(yv,n,k); Yvp = Yv*Pv   		
-   	# last step
-	V1[,,TT] = L[,,TT]*Pv; V[,,TT] = Yv*V1[,,TT]
-	AA = Yvp*Phi[,,TT]
-	for(i in 1:n) U[,,i,TT] = outer(L[i,,TT-1],AA[i,])
-	M = matrix(1,n,k)
-	# backward
-	if(TT>2) for(t in seq(TT-1,2,-1)){
-		MP = Phi[,,t+1]*M
-		for(i in 1:n) M[i,] = PI[,,i,t+1]%*%MP[i,]
-		AA = Yvp*Phi[,,t]*M
-		for(i in 1:n) U[,,i,t] = outer(L[i,,t-1],AA[i,])
-   		V1[,,t] = L[,,t]*M*Pv; V[,,t] = Yv*V1[,,t]
-    }
-    U = U*PI
-    MP = Phi[,,2]*M
-    for(i in 1:n) M[i,] = PI[,,i,2]%*%MP[i,]
-    V1[,,1] = L[,,1]*M*Pv; V[,,1] = Yv*V1[,,1]
-       
+  V = array(0,c(n,k,TT)); U = array(0,c(k,k,n,TT))
+  V1 = V
+  Pv = matrix(1/pv,n,k)
+  # Yv = matrix(yv,n,k); Yvp = Yv*Pv   		
+  # last step
+  V1[,,TT] = L[,,TT]*Pv
+  # V[,,TT] = Yv*V1[,,TT]
+  V[,,TT] = V1[,,TT]
+  # AA = Yvp*Phi[,,TT]
+  AA = Pv*Phi[,,TT]
+  for(i in 1:n) U[,,i,TT] = outer(L[i,,TT-1],AA[i,])
+  M = matrix(1,n,k)
+  # backward
+  if(TT>2) for(t in seq(TT-1,2,-1)){
+    MP = Phi[,,t+1]*M
+    for(i in 1:n) M[i,] = PI[,,i,t+1]%*%MP[i,]
+    AA = Pv*Phi[,,t]*M
+    # AA = Yvp*Phi[,,t]*M
+    for(i in 1:n) U[,,i,t] = outer(L[i,,t-1],AA[i,])
+    V1[,,t] = L[,,t]*M*Pv
+    # V[,,t] = Yv*V1[,,t]
+    V[,,t] = V1[,,t]
+  }
+  U = U*PI
+  MP = Phi[,,2]*M
+  for(i in 1:n) M[i,] = PI[,,i,2]%*%MP[i,]
+  V1[,,1] = L[,,1]*M*Pv
+  # V[,,1] = Yv*V1[,,1]
+  V[,,1] = V1[,,1]
+  
 # compute derivarives
 # if the derivative is required
   	if(der){

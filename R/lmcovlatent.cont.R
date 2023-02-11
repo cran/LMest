@@ -1,54 +1,76 @@
-lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
-                             yv = rep(1,nrow(Y)),k,start=0,
-                             tol=10^-8,maxit=1000,
-                             paramLatent="multilogit",
-                             Mu=NULL,Si=NULL,Be=NULL,Ga=NULL,
-                             output=FALSE, out_se=FALSE, miss = FALSE){
+lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,k,start=0,tol=10^-8,maxit=1000,
+                                  paramLatent="multilogit",Mu=NULL,Si=NULL,Be=NULL,Ga=NULL,
+                                  output=FALSE, out_se=FALSE,fort=TRUE,ntry=0){
 
-  # Fit the LM model for continuous outcomes with individual covariates in the distribution of the latent process
-  #
-  # INPUT:
-  # Y = array of available continuous outcome (n x TT x r)
-  # X1 = matrix of covariates affecting the initial probabilities
-  # X2 = array of covariates affecting the transition probabilities
-  # yv = vector of frequencies
-  # k = number of latent states
-  # start = initialization (0 = deterministic, 1 = random, 2 = initial values in input)
-  # maxit = maximum number of iterations
-  # param = type of parametrization for the transition probabilities:
-  #         multilogit = standard multinomial logit for every row of the transition matrix
-  #         difflogit  = multinomial logit based on the difference between two sets of parameters
-  # Mu = conditional means of the response variables (if start=2)
-  # Si = var-cov matrix common to all states (if start=2)
-  # Be = parameters on the initial probabilities (if start=2)
-  # Ga = parameters on the transition probabilities (if start=2)
-  # output = to return additional output
+# Fit the LM model for continuous outcomes with individual covariates in the distribution of the latent process
+#
+# INPUT:
+# Y = array of available continuous outcome (n x TT x r)
+# X1 = matrix of covariates affecting the initial probabilities
+# X2 = array of covariates affecting the transition probabilities
+# k = number of latent states
+# start = initialization (0 = deterministic, 1 = random, 2 = initial values in input)
+# maxit = maximum number of iterations
+# param = type of parametrization for the transition probabilities:
+#         multilogit = standard multinomial logit for every row of the transition matrix
+#         difflogit  = multinomial logit based on the difference between two sets of parameters
+# Mu = conditional means of the response variables (if start=2)
+# Si = var-cov matrix common to all states (if start=2)
+# Be = parameters on the initial probabilities (if start=2)
+# Ga = parameters on the transition probabilities (if start=2)
+# output = to return additional output
 
-  # Preliminaries
+  # ---- Repeat estimation if necessary ----
+  if(ntry>0){
+    cat("* Deterministic inditialization *\n")
+    out = lmcovlatent.cont(Y,X1=X1,X2=X2,k=k,start=0,tol=tol,maxit=maxit,
+                                paramLatent=paramLatent,
+                                out_se=out_se,output=output,fort=fort)
+    lkv_glob = out$lk
+    for(it0 in 1:(k*ntry)){
+      cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
+      outr = try(lmcovlatent.cont(Y,X1=X1,X2=X2,k=k,start=1,tol=tol,maxit=maxit,
+                                       paramLatent=paramLatent,
+                                       out_se=out_se,output=output,fort=fort))
+      if(!inherits(outr,"try-error")){
+        lkv_glob = c(lkv_glob,outr$lk)
+        out = outr
+      }
+    }
+    out$lkv_glob = lkv_glob
+    return(out)
+  }
+
+# ---- When there is just 1 latent class ----
+  if(k == 1){
+    cat("Use basic model without covariates\n")
+    out = lmbasic.cont(Y,k,start=start,tol=tol,maxit=maxit,out_se=out_se,
+                            Mu=Mu,Si=Si,output=output,fort=fort)
+    return(out)
+  }
+
+# ---- Preliminaries ----
   check_der = FALSE # to check score and info
   param <- paramLatent
   sY = dim(Y)
-  n = sY[1]
-  TT = sY[2]
+  n = as.integer(sY[1])
+  k = as.integer(k)
+  TT = as.integer(sY[2])
   if(length(sY)==2) r = 1
   else r = sY[3]
-
   Yv = matrix(Y,n*TT,r)
 
-  ## Check and inpute for missing data
+# Check and inpute for missing data
+  miss = any(is.na(Y))
+  R= NULL
+  if(miss){
+    R = (!is.na(Y))
+    if(fort) RR = array(as.integer(1*R),c(n,TT,r))
+    Y[is.na(Y)] = 0
+    cat("Missing data in the dataset dealt with as MAR\n")
+  }
 
-  # if(miss)
-  # {
-  #   Yv = cbind(1,Yv)
-  #   pYv = prelim.mix(Yv,1)
-  #   thhat = em.mix(prelim.mix(Yv,1))
-  #   rngseed(1)
-  #   Yv = as.matrix(imp.mix(pYv, da.mix(pYv,thhat,steps=100), Yv)[,-1])
-  #   Y = array(Yv,c(n,TT,r))
-  #   cat("Missing data in the dataset. imp.mix function (mix package) used for imputation.\n")
-  # }
-
-  # Covariate structure and related matrices: initial probabilities
+# Covariate structure and related matrices: initial probabilities
   if(k == 2){
     GBe = as.matrix(c(0,1))
   }else{
@@ -75,8 +97,7 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
   }
 
-
-  # for the transition probabilities
+# for the transition probabilities
   if(is.null(X2)){
     if(param=="difflogit"){
       warning("with X2=NULL parametrization difflogit not considered")
@@ -87,7 +108,6 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     nameGa = NULL
     Zndis = max(Zlab)
   }else{
-
     #if(TT==2) X2 = array(X2,c(n,1,dim(X2)[2]))
     #if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
     nc2 = dim(X2)[3] # number of covariates on the transition probabilities
@@ -132,31 +152,11 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     }
   }
 
-  # When there is just 1 latent class
-  if(k == 1){
-    Piv = rep(1,n); Pi = 1
-    yvv = rep(yv,TT)
-    Mu = colSums(yvv*Yv)/sum(yvv)
-    Di = Yv-rep(1,n*TT)%o%Mu
-    Si = t(Di)%*%(yvv*Di)/sum(yvv)
-    lk = sum(yvv*dmvnorm(Yv,Mu,Si,log=TRUE))
-    np = k*r+r*(r+1)/2
-    aic = -2*lk+np*2
-    bic = -2*lk+np*log(n)
-    Mu = matrix(Mu,r,k)
-    nameY <- dimnames(Y)[[3]]
-    dimnames(Mu) <- list(nameY,state=1:k)
-    out = list(lk=lk,Piv=Piv,Pi=Pi,Mu=Mu,Si=Si,np=np,k = k, aic=aic,bic=bic,lkv=NULL,V=NULL, n = n, TT = TT, paramLatent=param )
-    class(out)="LMlatentcont"
-    return(out)
-  }
-  # Starting values: deterministic initialization
+# ---- Starting values ----
+# deterministic initialization
   if(start == 0){
-    yvv = rep(yv,TT)
-    mu = colSums(yvv*Yv)/sum(yvv)
-    Di = Yv-rep(1,n*TT)%o%mu
-    Si = t(Di)%*%(yvv*Di)/sum(yvv)
-    std = sqrt(diag(Si))
+    mu = colMeans(Yv,na.rm=TRUE)
+    Si = cov(Yv,use = "complete.obs"); std = sqrt(diag(Si))
     qt = qnorm((1:k)/(k+1))
     Mu = matrix(0,r,k)
     for(u in 1:k) Mu[,u] = qt[u]*std+mu
@@ -185,11 +185,11 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     }
   }
 
-  # random initialization
+# random initialization
   if(start==1){
     Mu = matrix(0,r,k)
-    mu = colMeans(Yv)
-    Si = cov(Yv)
+    mu = colMeans(Yv,na.rm=TRUE)
+    Si = cov(Yv,use = "complete.obs")
     for(u in 1:k) Mu[,u] = rmvnorm(1,mu,Si)
     # parameters on initial probabilities
     be = c(rnorm(1),rep(0,nc1))
@@ -239,8 +239,9 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
       PI = aperm(PI,c(2,1,3,4))
     }
   }
-  ###### standard EM #####
-  out = lk_comp_latent_cont(Y,yv,Piv,PI,Mu,Si,k)
+
+# ---- EM algorithm ----
+  out = lk_comp_latent_cont(Y,R,Piv,PI,Mu,Si,k,fort=fort)
   lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   it = 0; lko = lk-10^10; lkv = NULL
   par = c(as.vector(Piv),as.vector(PI),as.vector(Mu),as.vector(Si))
@@ -255,21 +256,72 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
   while((lk-lko)/abs(lk)>tol & it<maxit){
     Mu0 = Mu; Si0 = Si; Piv0 = Piv; PI0 = PI
     it = it+1
-    # ---- E-step ----
+
+# ---- E-step ----
     # Compute V and U
-    out = prob_post_cov_cont(Y,yv,Mu,Si,Piv,PI,Phi,L,pv)
+    out = prob_post_cov_cont(Y,Mu,Si,Piv,PI,Phi,L,pv)
     U = out$U; V = out$V
     # If required store parameters
-    # ---- M-step ----
-    # Update Mu
+
+# ---- M-step ----
+# Update Mu and Si
     Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
-    for(u in 1:k) Mu[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
-    # Update Si
-    Si = matrix(0,r,r)
-    for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%o%Mu[,u])%*%diag(Vv[,u])%*%
-      as.matrix(Yv-rep(1,n*TT)%o%Mu[,u])
-    Si = Si/(sum(yv)*TT)
-    # Update piv
+    if(miss){
+      # print(c(3.5,proc.time()-t0))
+      Mu00 = Mu; itc = 0  #FB: corretto update di Mu
+      while((max(abs(Mu00-Mu))>10^-10 || itc==0) & itc<10){
+        Mu00 = Mu; itc = itc+1
+        Y1 = array(Y,c(n,TT,r,k))
+        Var = array(0,c(n,TT,r,r))
+        if(fort){
+          out = .Fortran("updatevar",Y,RR,n,TT,r,k,Mu,Si,Y1=Y1,Var=Var)
+          Y1 = out$Y1; Var = out$Var
+        }else{
+          for(i in 1:n) for(t in 1:TT){
+            nr = sum(R[i,t,])
+            if(nr==0){
+              Y1[i,t,,] = Mu
+              Var[i,t,,] = Si
+            }else if(nr<r){
+              indo = R[i,t,]; indm = !R[i,t,]
+              Tmp = Si[indm,indo]%*%solve(Si[indo,indo])
+              Var[i,t,indm,indm] = Si[indm, indm]-Tmp%*%Si[indo,indm]
+              for(u in 1:k) Y1[i,t,indm,u] = Mu[indm,u]+Tmp%*%(Y[i,t,indo]-Mu[indo,u])
+            }
+          }
+        }
+        Mub = matrix(0,r,k)
+        for(u in 1:k){
+          Yv1 = matrix(Y1[,,,u],n*TT)
+          Mub[,u] = (t(Yv1)%*%Vv[,u])/sum(Vv[,u])
+        }
+        Mu = Mub
+        Sitmp = matrix(0,r,r)
+        for(u in 1:k){
+          Yv1 = matrix(Y1[,,,u],n*TT)
+          Var1 = array(Var,c(n*TT,r,r))
+          Tmp = Yv1-rep(1,n*TT)%*%t(Mu[,u])
+          Sitmp = Sitmp+t(Tmp)%*%(Vv[,u]*Tmp)+apply(Vv[,u]*Var1,c(2,3),sum)
+        }
+        Si = Sitmp/(n*TT)
+        Mu00 = Mu
+      }
+      #  print(c(itc,max(abs(Mu-Mu00))))
+    }else{
+      Mu00 = Mu; itc = 0  
+      Mub = matrix(0,r,k)
+      for(u in 1:k) Mub[,u] = (t(Yv)%*%Vv[,u])/sum(Vv[,u])
+      while((max(abs(Mu00-Mu))>10^-10 || itc==0) & itc<10){
+        Mu00 = Mu; itc = itc+1
+        Mu = Mub
+        Si = matrix(0,r,r)
+        for(u in 1:k) Si= Si+ t(Yv-rep(1,n*TT)%*%t(Mu[,u]))%*%(Vv[,u]*as.matrix(Yv-rep(1,n*TT)%*%t(Mu[,u]))) #FB: velocizzato togliendo diag
+        Si = Si/(n*TT)
+        Mu00 = Mu
+      }
+    }
+
+# Update piv
     out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis)
     be = out$be; Pivdis = out$Pdi; Piv = out$P
     # Update Pi
@@ -292,19 +344,19 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
       Tmp = array(out$P,c(k,n,TT-1,k))
       PI[,,,2:TT] = aperm(Tmp,c(1,4,2,3))
     }
-    # Compute log-likelihood
+
+# Compute log-likelihood
     paro = par; par = c(as.vector(Piv),as.vector(PI),as.vector(Mu),as.vector(Si))
     if(any(is.na(par))) par = par[-which(is.na(par))]
     lko = lk
-    out = lk_comp_latent_cont(Y,yv,Piv,PI,Mu,Si,k)
+    out = lk_comp_latent_cont(Y,R,Piv,PI,Mu,Si,k)
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     # Display output
-    if(it/10 == floor(it/10)){
-      cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
-    }
+    if(it%%10==0) cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
     lkv = c(lkv,lk)
   }
-  if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
+  if(it%%10>0)  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
+  cat("------------|-------------|-------------|-------------|-------------|-------------|\n")
   if(out_se){
     th = NULL
     th = c(th,as.vector(Mu))
@@ -313,24 +365,33 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     if(param=="multilogit"){
       for(h in 1:k) th = c(th, Ga[,h])
     }else if(param=="difflogit") th = c(th,Ga)
-
-    out = lk_obs_latent_cont(th,Y,yv,XXdis,Xlab,ZZdis,Zlab,param)
+    out = lk_obs_latent_cont(th,Y,R,XXdis,Xlab,ZZdis,Zlab,param,fort=fort)
     lk0 = out$lk; sc0 = out$sc
-
     lth = length(th)
     scn = rep(0,lth); Fn = matrix(0,lth,lth)
-
     for(h in 1:lth){
-      thh = th; thh[h] = thh[h]+10^-5
-      outh = lk_obs_latent_cont(thh,Y,yv,XXdis,Xlab,ZZdis,Zlab,param)
-      scn[h] = (outh$lk-lk0)/10^-5
-      Fn[,h] = (outh$sc-sc0)/10^-5
+      thh = th; thh[h] = thh[h]+10^-6
+      outh = lk_obs_latent_cont(thh,Y,R,XXdis,Xlab,ZZdis,Zlab,param)
+      scn[h] = (outh$lk-lk0)/10^-6
+      Fn[,h] = (outh$sc-sc0)/10^-6
     }
-
     J = -(Fn+t(Fn))/2
-    iJ = ginv(J)
-    se = sqrt(diag(iJ))
-
+    if(check_der){
+      print(c(lk,lk0))
+      print(round(cbind(scn,sc0,round(scn-sc0,4)),5))
+    }
+    iJ = try(solve(J))
+    if(inherits(iJ,"try-error")){
+      ind = NULL
+      for(j in 1:nrow(J)){
+        tmp = try(solve(J[c(ind,j),c(ind,j)]),silent = TRUE)
+        if(!inherits(tmp,"try-error")) ind = c(ind,j)
+      }
+      iJ = matrix(0,nrow(J),nrow(J))
+      iJ[ind,ind] = solve(J[ind,ind])
+    }
+    if(any(diag(iJ)<0)) warning("negative elements in the estimated variance")
+    se = sqrt(abs(diag(iJ)))
     nMu = r*k
     nSi = r*(r+1)/2
     nbe = (1+nc1)*(k-1)
@@ -341,32 +402,30 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     sega = se[nMu+nSi+nbe+(1:nga)]
   }
 
-  # Compute number of parameters
+# Compute number of parameters
   np = k*r+r*(r+1)/2
   np = np+(k-1)*(nc1+1)
   if(param=="multilogit") np = np+(k-1)*(nc2+1)*k else if(param=="difflogit")  np = np+(k-1)*(nc2+k)
   aic = -2*lk+np*2
   bic = -2*lk+np*log(n)
-  # local decoding
+# local decoding
   Ul = matrix(0,n,TT)
-  for(i in 1:n) for(t in 1:TT){
-    Ul[i,t] = which.max(V[i,,t])
-  }
+  for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
 
   Be = matrix(be,nc1+1,k-1)
   if (is.null(nameBe)){
-    if(nc1==0) nameBe = c("Intercept") else nameBe = c("intercept",paste("X1",1:nc1,sep=""))
+    if(nc1==0) nameBe = c("(Intercept)") else nameBe = c("(Intercept)",paste("X1",1:nc1,sep=""))
   }else{
-    nameBe = c("intercept",nameBe)
+    nameBe = c("(Intercept)",nameBe)
   }
 
   dimnames(Be) = list(nameBe,logit=2:k)
   if(out_se) {seBe = matrix(sebe,nc1+1,k-1); dimnames(seBe) = list(nameBe,logit=2:k)}
   if(param=="multilogit"){
     if(is.null(nameGa)){
-      if(nc2==0) nameGa = c("Intercept") else nameGa = c("intercept", paste("X2",1:nc2,sep=""))
+      if(nc2==0) nameGa = c("(Intercept)") else nameGa = c("(Intercept)", paste("X2",1:nc2,sep=""))
     }else{
-      nameGa = c("intercept",nameGa)
+      nameGa = c("(Intercept)",nameGa)
     }
     if(k>2) {
       Ga = array(as.vector(Ga),c(nc2+1,k-1,k))
@@ -415,14 +474,13 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     }
   }
 
-  # adjust output
+# adjust output
   lk = as.vector(lk)
   dimnames(Piv)=list(subject=1:n,state=1:k)
   dimnames(PI)=list(state=1:k,state=1:k,subject=1:n,time=1:TT)
   nameY <- dimnames(Y)[[3]]
   dimnames(Mu) <- list(nameY,state=1:k)
-  if(r==1) colnames(Si) <- nameY else dimnames(Si) <- list(nameY,nameY)
-  
+  # if(r==1) colnames(Si) <- nameY else dimnames(Si) <- list(nameY,nameY)
   out = list(lk=lk,Be=Be,Ga=Ga,Mu=Mu,Si=Si,Piv=Piv,PI=PI,np=np,k = k,aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
   if(out_se){
     seMu = matrix(seMu,r,k)
@@ -431,8 +489,7 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
     if(r>1) seSi2 = seSi2+t(seSi2-diag(diag(seSi2)))
     seSi = seSi2
     dimnames(seMu)=list(nameY,state=1:k)
-    if(r==1) colnames(seSi) <- nameY else dimnames(seSi) <- list(nameY,nameY)
-    
+    # if(r==1) colnames(seSi) <- nameY else dimnames(seSi) <- list(nameY,nameY)
     out$seMu = seMu
     out$seSi = seSi
     out$seBe = seBe
@@ -441,9 +498,18 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,
   # final output
   if(miss) out$Y = Y
   if(output){
-    out$Ul = Ul
+    if(k>1){
+      PMarg <- array(0,c(n,k,TT))
+      PMarg[,,1] <- as.matrix(Piv)
+      for(i in 1:n) for(t in 2:TT) PMarg[i,,t]= t(PI[,,i,t])%*%PMarg[i,,t-1]
+      Pmarg <-apply(PMarg,c(2,3),mean)
+    }else Pmarg <- NULL
+    out = c(out,list(V = V, Ul = Ul, Pmarg=Pmarg))
+  } 
+  if(out_se){
+    out$sc = sc0
+    out$J = J
   }
-  cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
   class(out)="LMlatentcont"
   return(out)
 }

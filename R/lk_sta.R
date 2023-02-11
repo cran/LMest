@@ -11,7 +11,5 @@ lk_sta <- function(tau,u,V,G2,outl=TRUE){
   la = la/sum(la)
   lk = u%*%log(la)+sum(V*log(PI))
   flk = -lk
-  if (outl) out = list(flk=flk,la=la,PI=PI)	else flk	
+  if (outl) out = list(flk=flk,la=la,PI=PI)	else flk
 }
-
-

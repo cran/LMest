@@ -1,4 +1,4 @@
-summary.LMbasiccont<-function(object,...){
+summary.LMmanifestcont <- function(object,...){
 
   piv = cbind(est_piv = object$piv)
   k = length(piv)
@@ -30,11 +30,17 @@ summary.LMbasiccont<-function(object,...){
       }else print(round(object$sePi[,,2:TT],4))
     }	
   }	
-  cat("\n Mu - Conditional response means:\n")
-  print(round(object$Mu,4))
-  if(is.null(object$seMu)==FALSE){
-    cat("\n Standard errors for the conditional response means:\n")
-    print(round(object$seMu,4))
+  cat("\n Al - Intercepts:\n")
+  print(round(object$Al,4))
+  if(is.null(object$seAl)==FALSE){
+    cat("\n Standard errors for the intercepts:\n")
+    print(round(object$seAl,4))
+  }
+  cat("\n Be - Regression parameters:\n")
+  print(round(object$Be,4))
+  if(is.null(object$seBe)==FALSE){
+    cat("\n Standard errors for the regression parameters:\n")
+    print(round(object$seBe,4))
   }
 
   cat("\n Si - Variance-covariance matrix:\n")

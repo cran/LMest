@@ -33,7 +33,10 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
       }
       if(what[choice] == "density"){
         par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
-        temp <- getResponses(data = object$data,formula =attributes(object)$responsesFormula)
+        miss <- any(is.na(out$data))
+        if(miss) datatmp <-  matrices2long(object$Yimp)
+        else datatmp <- object$data
+        temp <- getResponses(data = datatmp,formula =attributes(object)$responsesFormula)
          if(r==1){
             minY <- c(min(out$Mu)-2.5*sqrt(out$Si))
             maxY <- c(max(out$Mu)+2.5*sqrt(out$Si))
@@ -108,7 +111,11 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
       legend("topright",legend=c("BIC","AIC"),col=c(2,4),lty=1,bty="n")
     }
     if(any(what == "density")){
-      temp <- getResponses(data = object$data,formula =attributes(object)$responsesFormula)
+      miss <- any(is.na(out$data))
+      if(miss) datatmp <-  matrices2long(object$Yimp)
+      else datatmp <- object$data
+      temp <- getResponses(data = datatmp,formula =attributes(object)$responsesFormula)
+      
      if(is.null(components)){
        par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
        if(r==1){

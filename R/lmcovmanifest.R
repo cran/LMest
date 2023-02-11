@@ -1,9 +1,6 @@
-lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),
-                          k,q=NULL,modManifest=c("LM","FM"),
-                          tol=10^-8,maxit=1000,start=0,
-                          mu=NULL,al=NULL,
-                          be=NULL,si=NULL,rho=NULL,
-                          la=NULL,PI=NULL,output=FALSE,out_se=FALSE){
+lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,modManifest=c("LM","FM"),tol=10^-8,
+                          maxit=1000,start=0,mu=NULL,al=NULL,be=NULL,si=NULL,rho=NULL,la=NULL,
+                          PI=NULL,output=FALSE,out_se=FALSE,ntry=0){
 
   #
   # Fit the model of Bacci, Bartolucci and Pennoni (2014) with global logits
@@ -43,9 +40,29 @@ lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),
   # bic:   BIC index
   # sebe:  standard errors for the regression parameters be
   # selrho: standard errors for logit type transformation of rho
-  # PRED0: prediction of latent state
+  # V:      prediction of latent state
   # PRED1: prediction of the overall latent effect
-  # preliminaries
+
+# ---- Repeat estimation if necessary ----
+  if(ntry>0){
+    cat("* Deterministic inditialization *\n")
+    
+    
+    out = lmcovmanifest(S,X,yv,k,q,modManifest,tol,maxit,start=0,output=output,out_se=out_se)
+    lkv_glob = out$lk
+    for(it0 in 1:(k*ntry)){
+      cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
+      outr = try(lmcovmanifest(S,X,yv,k,q,modManifest,tol,maxit,start=1,output=output,out_se=out_se))
+      if(!inherits(outr,"try-error")){
+        lkv_glob = c(lkv_glob,outr$lk)
+        out = outr
+      }
+    }
+    out$lkv_glob = lkv_glob
+    return(out)
+  }
+
+#---- Preliminaries ----
   mod = match.arg(modManifest)
   if(mod=="LM") mod=0 else mod=1
   if(mod==0) q = 1
@@ -540,10 +557,12 @@ lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),
     out$J1=J1
   }
   if(output){
-    out$Phi = Pio
-    out$PRED0 = PRED0
-    out$PRED1 = PRED1
-  }
+    if(k>1){
+      Pmarg <- as.matrix(la)
+      for(t in 2:TT) Pmarg= cbind(Pmarg,t(PI)%*%Pmarg[,t-1])
+    }else Pmarg=NULL
+    out = c(out,list(V = PRED0, PRED1 = PRED1, S=S,yv=yv, Pmarg=Pmarg))
+  } 
   if(mod==0){
     cat("------------|-------------|-------------|-------------|-------------|-------------|\n");
   }else{

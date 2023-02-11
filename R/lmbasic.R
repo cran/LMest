@@ -1,9 +1,26 @@
-lmbasic <- function(S,yv,k,start=0,
-                    modBasic=0,tol=10^-8,maxit=1000,
-                    out_se=FALSE,piv=NULL,Pi=NULL,Psi=NULL,
-                    miss = FALSE, R = NULL){
+lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,
+                    Psi=NULL,miss = FALSE, R = NULL,output=FALSE, ntry=0){
 
-  # Preliminaries
+# ---- Repeat estimation if necessary ----
+  if(ntry>0){
+    cat("* Deterministic inditialization *\n")
+    out = lmbasic(S,yv,k,start=0,modBasic=modBasic,tol=tol,maxit=maxit,
+                  out_se=out_se,miss=miss,R=R)
+    lkv_glob = out$lk
+    for(it0 in 1:(k*ntry)){
+      cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
+      outr = try(lmbasic(S,yv,k,start=1,modBasic=modBasic,tol=tol,maxit=maxit,
+                         out_se=out_se,miss=miss,R=R))
+      if(!inherits(outr,"try-error")){
+        lkv_glob = c(lkv_glob,outr$lk)
+        out = outr
+      }
+    }
+    out$lkv_glob = lkv_glob
+    return(out)
+  }
+
+#---- Preliminaries ----
   check_der = FALSE  # to check derivatives
   mod <- modBasic
   n = sum(yv)
@@ -394,13 +411,14 @@ lmbasic <- function(S,yv,k,start=0,
   bic = -2*lk+np*log(n)
   cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
   # adjust output
+  Ul = matrix(0,ns,TT)
+  for(i in 1:ns) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
   if(any(yv!=1)) V = V/yv
-
   lk = as.vector(lk)
   dimnames(Pi)=list(state=1:k,state=1:k,time=1:TT)
   dimnames(Psi)=list(category=0:b,state=1:k,item=1:r)
-
-  out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,k = k, aic=aic,bic=bic,lkv=lkv,V=V, n = n, TT = TT, modBasic = mod )
+  out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,k=k,aic=aic,bic=bic,lkv=lkv,
+             n=n,TT=TT,modBasic=mod)
   if(out_se){
     sePsi0 = sePsi
     sePsi = array(NA,c(b+1,k,r))
@@ -424,12 +442,18 @@ lmbasic <- function(S,yv,k,start=0,
     }
     dimnames(sePsi) = list(category=0:b,state=1:k,item=1:r)
     dimnames(sePi) = list(state=1:k,state=1:k,time=1:TT)
-
     out$sepiv = sepiv
     out$sePi = sePi
     out$sePsi = sePsi
   }
-
+  if(output){
+    if(k>1){
+      Pmarg <- as.matrix(piv)
+      for(t in 2:TT) Pmarg= cbind(Pmarg,t(Pi[,,t])%*%Pmarg[,t-1])
+    }else Pmarg=NULL
+    out = c(out,list(V=V,Ul=Ul,S=S,yv=yv,Pmarg=Pmarg))
+  } 
+    
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
   class(out)="LMbasic"
   return(out)

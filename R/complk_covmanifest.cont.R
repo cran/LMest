@@ -1,4 +1,4 @@
-complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
+complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
 
 # ---- Preliminaries ----
   if(!fort){
@@ -22,30 +22,34 @@ complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
   if(miss){
     if(fort){
       RR = array(as.integer(1*R),c(n,TT,r))
-      out = .Fortran("normmiss",Y,RR,n,TT,r,k,Mu,Si,Phi=Phi)
+      out = .Fortran("normmiss2",Y,RR,n,TT,r,k,Mu,Si,Phi=Phi)
       Phi = out$Phi
     }else{
+      j = 0
       for(i in 1:n) for(t in 1:TT){
+        j = j+1
         if(all(!R[i,t,])){
           Phi[i,,t] = 1
         }else{
           indo = R[i,t,]
-          if(sum(R[i,t,])==1) for(u in 1:k) Phi[i,u,t] = pmax(dnorm1(Y[i,t,][indo],Mu[indo,u],Si[indo,indo]),0.1^300)
-          else for(u in 1:k) Phi[i,u,t] = pmax(dmvnorm1(Y[i,t,][indo],Mu[indo,u],Si[indo,indo]),0.1^300)
+          if(sum(R[i,t,])==1) for(u in 1:k) Phi[i,u,t] = pmax(dnorm1(Y[i,t,indo],Mu[j,indo,u],Si[indo,indo]),0.1^300)
+          else for(u in 1:k) Phi[i,u,t] = pmax(dmvnorm1(Y[i,t,indo],Mu[j,indo,u],Si[indo,indo]),0.1^300)
         }
       }
     }
   }else{
-    for(u in 1:k) for(t in 1:TT){
+    j = 0
+    for(i in 1:n) for(t in 1:TT){
+      j = j+1
       if(r==1){
-        Phi[,u,t] = pmax(dnorm(Y[,t,],Mu[,u],sqrt(Si)),0.1^300)
+        for(u in 1:k) Phi[i,u,t] = pmax(dnorm(Y[i,t,],Mu[j,,u],sqrt(Si)),0.1^300)
       }else{
-        Phi[,u,t] =  pmax(dmvnorm(matrix(Y[,t,],n,r),Mu[,u],Si),0.1^300)
+        for(u in 1:k) Phi[i,u,t] =  pmax(dmvnorm(Y[i,t,],Mu[j,,u],Si),0.1^300)
       }
     }
   }
   # print(c(2,1,proc.time()-t0))
-  
+
 # ---- forward recursion ----
   L[,,1] = Phi[,,1]%*%diag(piv)
   if(n==1) Lt = sum(L[,,1])
