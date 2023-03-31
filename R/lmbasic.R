@@ -5,12 +5,12 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
   if(ntry>0){
     cat("* Deterministic inditialization *\n")
     out = lmbasic(S,yv,k,start=0,modBasic=modBasic,tol=tol,maxit=maxit,
-                  out_se=out_se,miss=miss,R=R)
+                  out_se=out_se,miss=miss,R=R,output=output)
     lkv_glob = out$lk
     for(it0 in 1:(k*ntry)){
       cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
       outr = try(lmbasic(S,yv,k,start=1,modBasic=modBasic,tol=tol,maxit=maxit,
-                         out_se=out_se,miss=miss,R=R))
+                         out_se=out_se,miss=miss,R=R,output=output))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
         out = outr

@@ -686,9 +686,9 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   # final output
   if(output){
     if(k>1){
-      PMarg <- array(0,c(n,k,TT))
+      PMarg <- array(0,c(ns,k,TT))
       PMarg[,,1] <- as.matrix(Piv)
-      for(i in 1:n) for(t in 2:TT) PMarg[i,,t]= t(PI[,,i,t])%*%PMarg[i,,t-1]
+      for(i in 1:ns) for(t in 2:TT) PMarg[i,,t]= t(PI[,,i,t])%*%PMarg[i,,t-1]
       Pmarg <-apply(PMarg,c(2,3),mean)
     }else Pmarg<- NULL
     out = c(out,list(V = V1, Ul = Ul, S = S, yv=yv, Pmarg=Pmarg))
