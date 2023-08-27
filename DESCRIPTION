@@ -1,12 +1,12 @@
 Package: LMest
 Title: Generalized Latent Markov Models
 Description: Latent Markov models for longitudinal continuous and categorical data. See Bartolucci, Pandolfi, Pennoni (2017)<doi:10.18637/jss.v081.i04>.
-Version: 3.1.1
-Date: 2023-03-31
+Version: 3.1.2
+Date: 2023-08-27
 Authors@R: c(person("Francesco", "Bartolucci", role = c("aut","cre"), email = "francesco.bartolucci@unipg.it"),
 	person("Silvia", "Pandolfi", role = "aut", email = "silvia.pandolfi@unipg.it"),
 	person("Fulvia", "Pennoni", role = "aut", email = "fulvia.pennoni@unimib.it"),
-       person("Alessio", "Farcomeni", role="ctb"),person("Alessio", "Serafini", role="ctb"))
+        person("Alessio", "Farcomeni", role="ctb"),person("Alessio", "Serafini", role="ctb"))
 Author: Francesco Bartolucci [aut, cre],
   Silvia Pandolfi [aut],
   Fulvia Pennoni [aut],
@@ -25,5 +25,5 @@ LazyLoad: yes
 Encoding: UTF-8
 ByteCompile: true
 License: GPL (>= 2)
-Packaged: 2023-03-31 13:11:26 UTC; francescobartolucci
-Date/Publication: 2023-03-31 14:10:07 UTC
+Packaged: 2023-08-27 14:18:13 UTC; francescobartolucci
+Date/Publication: 2023-08-27 14:50:02 UTC

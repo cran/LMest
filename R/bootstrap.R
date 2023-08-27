@@ -128,10 +128,10 @@ bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...)
   }else if(param=="difflogit"){
     mGa = vector("list",2)
     m2Ga = vector("list",2)
-    mGa[[1]] = matrix(0,dim(Ga[[1]]))
-    mGa[[2]] = matrix(0,dim(Ga[[2]]))
-    m2Ga[[1]] = matrix(0,dim(Ga[[1]]))
-    m2Ga[[2]] = matrix(0,dim(Ga[[2]]))
+    mGa[[1]] = array(0,dim(Ga[[1]]))
+    mGa[[2]] = array(0,dim(Ga[[2]]))
+    m2Ga[[1]] = array(0,dim(Ga[[1]]))
+    m2Ga[[2]] = array(0,dim(Ga[[2]]))
   }
 
   dPsi = dim(Psi)

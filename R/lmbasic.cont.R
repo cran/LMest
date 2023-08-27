@@ -279,7 +279,6 @@ lmbasic.cont  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FAL
       }
       if(TT>2){
         for(t in seq(TT-1,2,-1)){
-          #browser()
           M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1])
           M = M/rowSums(M)
           V[,,t] = L[,,t]*M
@@ -367,7 +366,8 @@ lmbasic.cont  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FAL
 
       # print(c(4,proc.time()-t0))
 # Update piv and Pi
-      piv = colSums(V[,,1])/n
+      if(n==1) piv = (V[,,1])/n 
+      else piv = colSums(V[,,1])/n
       U = pmax(U,10^-300)
       if(mod==0) for(t in 2:TT) Pi[,,t] = diag(1/rowSums(U[,,t]))%*%U[,,t]
       if(mod==1){
@@ -410,7 +410,6 @@ lmbasic.cont  <- function(Y,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FAL
       if(mod==0) for(t in 2:TT) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,t]))
       if(mod==1) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,2]))
       th0 = th
-      #   browser()
       out = lk_obs_cont_miss(th0,Bm,Cm,k,Y,R,TT,r,mod,fort)
       lk0 = out$lk; sc0 = out$sc
       lth = length(th)

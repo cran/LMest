@@ -1,8 +1,8 @@
-ab22832cd49e562ce9aa061fdde2b0c5 *DESCRIPTION
+e3ffdf8dd2a67de0700aefe7c4bb8e93 *DESCRIPTION
 7c84005d605362c2a397de7ae886ac15 *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 20c75dc1f3b91035d87b549019c3fe25 *R/blkdiag.R
-4a597b3d04ca77fc963e1b49718924ce *R/bootstrap.R
+a384cc099442445d02e36c76fb90cc2d *R/bootstrap.R
 0f3a295c0316a2f1dacdca139057ce2c *R/bootstrap_lm_basic.R
 88de12fe63e20a86055ae42b6939df95 *R/bootstrap_lm_basic_cont.R
 23432fcc62cb2d27d3dc2eb70703caea *R/bootstrap_lm_cov_latent.R
@@ -37,7 +37,7 @@ f12b2a8dda773cb935bfee8da37cab5b *R/lk_obs_latent_cont.R
 d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 c53cd84605a2a82fdc9b2a1013072e75 *R/lk_sta.R
 5e286cb0d64a8af29b0d61021d464692 *R/lmbasic.R
-6adefaf8a16fcb53a267fb89a632a63e *R/lmbasic.cont.R
+4479780befaadfc67a383aa6fc650163 *R/lmbasic.cont.R
 482e4cbc3369045bfc9debecad1d27ac *R/lmcovlatent.R
 5e9868a1ea16243dbc4fccdb73b228bf *R/lmcovlatent.cont.R
 56a871bfefc40baaf63986d197497223 *R/lmcovmanifest.R
@@ -87,7 +87,7 @@ f7925fcc9666c8ea77100bea073f339f *R/summary.LMsearch.R
 0e56e00de7cb8e3cd3563ed31c6349e0 *R/summary.MClatent.R
 5991a3e873c21ca635dc30c512ba046a *R/trans_par.R
 36171bca13f6cb2f33718b72383458b2 *R/zzz.R
-4a7d6abda18cc95ae50ef8e536825d21 *build/vignette.rds
+cac198251428cdf9e6877d89eb48a99e *build/vignette.rds
 276cf862ee9369579aee29d4c35618ba *data/NLSYlong.rda
 8314490501642db4d42954cc053f9e4d *data/PSIDlong.rda
 0912936dce5ba2296dd009e55c730ed3 *data/RLMSdat.rda
@@ -99,7 +99,7 @@ b41286306dac3e8a122eefd3817f635f *data/RLMSlong.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 957326e6da3222457e3c494f79a3b7a3 *inst/doc/vignetteLMest.R
 702700e352571cfa41e8beec7e92fc72 *inst/doc/vignetteLMest.Rmd
-40f6a01faff865b116803a5e2487cbd5 *inst/doc/vignetteLMest.html
+4d3f6fdfd5689571db6e5ff30a5ebf74 *inst/doc/vignetteLMest.html
 cb8399c926acd44691264b19b5ce8271 *man/LMbasic-class.Rd
 7565f9fdbee41118cecfeecc144e702d *man/LMbasiccont-class.Rd
 ca08a607cb10596d2858ac11f089a41d *man/LMest-package.Rd
