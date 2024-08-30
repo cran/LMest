@@ -1,4 +1,4 @@
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 knitr::opts_chunk$set(collapse = T, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 library(LMest)
@@ -11,7 +11,7 @@ opts_chunk$set(fig.align = "center",
                highlight = FALSE)
 set.seed(1945)
 
-## ---- message = FALSE, echo=1-------------------------------------------------
+## ----message = FALSE, echo=1--------------------------------------------------
 library(LMest)
 cat(LMest:::Startup.Message(), sep="")
 
@@ -57,12 +57,12 @@ fmLatent2 <- lmestFormula(data = PSIDlong, response = "Y",
                           LatentInitial = c("X1Race","X2Age","X3Age2","X9Income"), 
                           LatentTransition =c("X1Race","X2Age","X3Age2","X9Income"))
 
-## ---- eval=TRUE, add=TRUE, warning=FALSE,  results='hide'---------------------
+## ----eval=TRUE, add=TRUE, warning=FALSE,  results='hide'----------------------
 mod <- lmest(responsesFormula = fmLatent$responsesFormula,
              index = c("id","time"),
              data = PSIDlong, k = 2) 
 
-## ---- eval=TRUE, add=TRUE, warning=FALSE, results='hide'----------------------
+## ----eval=TRUE, add=TRUE, warning=FALSE, results='hide'-----------------------
 mod <- lmest(responsesFormula = fmLatent$responsesFormula,
              index = c("id","time"),
              data = PSIDlong, k = 1:3) 
@@ -73,7 +73,7 @@ print(mod)
 ## -----------------------------------------------------------------------------
 se(mod)
 
-## ---- eval=TRUE, add=TRUE, warning=FALSE--------------------------------------
+## ----eval=TRUE, add=TRUE, warning=FALSE---------------------------------------
 mod2 <- lmest(responsesFormula = fmLatent$responsesFormula,
              latentFormula =  fmLatent$latentFormula,
              index = c("id","time"),
@@ -81,10 +81,10 @@ mod2 <- lmest(responsesFormula = fmLatent$responsesFormula,
              paramLatent = "multilogit",
              start = 0, out_se=TRUE) 
 
-## ---- echo=TRUE, eval=TRUE, include=TRUE--------------------------------------
+## ----echo=TRUE, eval=TRUE, include=TRUE---------------------------------------
 summary(mod2)
 
-## ---- fig.width = 5, fig.height = 4-------------------------------------------
+## ----fig.width = 5, fig.height = 4--------------------------------------------
 plot(mod2, what = "CondProb")
 
 ## -----------------------------------------------------------------------------
@@ -94,6 +94,8 @@ plot(mod2, what="transitions")
 plot(mod2, what="marginal")
 
 ## ----results='hide', warning=FALSE--------------------------------------------
+dt$data$id = as.numeric(dt$data$id)
+dt$data$time = as.numeric(dt$data$time)
 modc <- lmestCont(responsesFormula = anti + self  ~ NULL,
                   latentFormula = ~ gender + childage + hispanic + black + pov +
                     momwork + married|   gender + childage + hispanic + black+ pov+
@@ -167,13 +169,13 @@ head(dec$Ul)
 
 head(dec$Ug)
 
-## ---- include=TRUE, results='hide'--------------------------------------------
+## ----include=TRUE, results='hide'---------------------------------------------
 mboot <- bootstrap(modc, n = 581, B = 2, seed = 172)
 
 ## -----------------------------------------------------------------------------
 mboot$seMu
 
 ## -----------------------------------------------------------------------------
-draw3 <- drawLMbasic(est = mod4, format = "matrices", seed = 4321, n = 100)
+draw3 <- draw(est = mod4, format = "matrices", seed = 4321, n = 100)
 head(draw3$Y)
 

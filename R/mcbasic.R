@@ -10,16 +10,13 @@ mcbasic <- function(S,yv,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE){
   b = max(S)
   U = Pi  = array(0,c(b+1,b+1,TT))
 
-  piv = table(factor(rep(S[,1],yv),levels = min(S):max(S)))/n ## Modifica Alessio
-
+  # piv = table(factor(rep(S[,1],yv),levels = min(S):max(S)))/n ## Modifica Alessio
+  piv = rep(0,b+1)
+  for(y in 0:b) piv[y+1] = sum(yv[S[,1]==y])/n
 
   if(out_se) sepiv = sqrt(piv*(1-piv)/n)
 
-  for(t in 2:TT){
-    for(j1 in 0:b) for(j2 in 0:b){
-      U[j1+1,j2+1,t] = sum((rep(S[,t-1],yv)==j1)*(rep(S[,t],yv)==j2))
-    }
-  }
+  for(t in 2:TT) for(j1 in 0:b) for(j2 in 0:b) U[j1+1,j2+1,t] = sum(yv[S[,t-1]==j1 & S[,t]==j2])
   U = pmax(U,10^-300)
 
   if(out_se) sePi = array(0,c(b+1,b+1,TT))
@@ -50,7 +47,6 @@ mcbasic <- function(S,yv,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE){
 
   # Compute log-likelihood
   lk = sum(yv*log(piv[S[,1]+1]))+sum(U[,,2:TT]*log(Pi[,,2:TT]))
-
   Phi = array(1,c(ns,b+1,TT))
   Phi[,,1] = Phi[,,1]%*%diag(piv)
   for(t in 2:TT) Phi[,,t] = Phi[,,t]*(Phi[,,t-1]%*%Pi[,,t])
@@ -68,16 +64,13 @@ mcbasic <- function(S,yv,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE){
   bic = -2*lk+np*log(n)
   dimnames(Pi)=list(category=0:b,category=0:b,time=1:TT)
   dimnames(Fy) = list(time=1:TT,category=0:b)
-  out = list(lk=lk,piv=piv,Pi=Pi,np=np,aic=aic,bic=bic,Fy=Fy, n = n, TT = TT, modBasic = mod)
+  out = list(lk=lk,piv=piv,Pi=Pi,np=np,aic=aic,bic=bic,Fy=Fy,n=n,TT=TT,modBasic=mod,
+             ns=ns,yv=yv)
   if(out_se){
-
     dimnames(sePi) = list(category=0:b,category=0:b,time=1:TT)
-
     out$sepiv = sepiv
     out$sePi = sePi
-
   }
-
   class(out)="MCbasic"
   return(out)
 }

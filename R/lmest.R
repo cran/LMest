@@ -84,6 +84,8 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
     Xinitial_names <- colnames(Xinitial)
     Xtrans_names <- colnames(Xtrans)
   }
+  Xinitial0 = Xinitial; Xtrans0 = Xtrans
+  if(is.null(weights)) weights = rep(1,length(unique(id)))
   tmp <- long2matrices.internal(Y = Y, id = id, time = tv, yv = weights,
                                 Xinitial = Xinitial, Xmanifest = Xmanifest, Xtrans = Xtrans)
   model <- tmp$model
@@ -122,6 +124,12 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
   }
 
   dimnames(Y)[[3]] <- Y_names
+  
+  if(any(is.na(Xinitial) & !any(is.na(Xinitial0))))
+    for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
+  if(any(is.na(Xtrans) & !any(is.na(Xtrans0)))) 
+    for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
+  
   if(!is.null(Xmanifest)){
     if(any(is.na(Xmanifest))) stop("missing data in the covariates affecting the measurement model are not allowed")
   }

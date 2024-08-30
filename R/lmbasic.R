@@ -82,7 +82,15 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     np = r*b
     aic = -2*lk+np*2
     bic = -2*lk+np*log(n)
-    out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np, k = k, aic=aic,bic=bic,lkv=NULL,J=NULL,V=NULL,n = n, TT = TT, modBasic = mod,th=NULL,sc=NULL )
+    if(out_se){
+      sePsi = matrix(0,b+1,r)
+      for(j in 1:r) sePsi[,j] = sqrt(diag(ginv(n*(diag(Psi[,j])-Psi[,j]%o%Psi[,j]))))
+      dimnames(sePsi)=list(category=0:b,item=1:r)
+    }
+    out = list(lk=lk, piv=piv, Pi=Pi, Psi=Psi, np=np, k = k, aic=aic, bic=bic, lkv=NULL, 
+               J=NULL, V=NULL, n=n, TT = TT, modBasic=mod, th=NULL, sc=NULL, ns= ns,
+               yv=yv)
+    if(out_se) out$sePsi = sePsi
     class(out)="LMbasic"
     return(out)
   }
@@ -140,8 +148,9 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
   # Iterate until convergence
   while((lk-lko)/abs(lk)>tol & it<maxit){
     Psi0 = Psi; piv0 = piv; Pi0 = Pi
-    it = it+1;
-    # ---- E-step ----
+    it = it+1
+
+# ---- E-step ----
     # Compute V and U
     V = array(0,c(ns,k,TT)); U = array(0,c(k,k,TT))
     Yvp = matrix(yv/pv,ns,k)
@@ -418,7 +427,7 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
   dimnames(Pi)=list(state=1:k,state=1:k,time=1:TT)
   dimnames(Psi)=list(category=0:b,state=1:k,item=1:r)
   out = list(lk=lk,piv=piv,Pi=Pi,Psi=Psi,np=np,k=k,aic=aic,bic=bic,lkv=lkv,
-             n=n,TT=TT,modBasic=mod)
+             n=n,TT=TT,modBasic=mod,yv=yv,ns=ns)
   if(out_se){
     sePsi0 = sePsi
     sePsi = array(NA,c(b+1,k,r))
@@ -451,7 +460,7 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
       Pmarg <- as.matrix(piv)
       for(t in 2:TT) Pmarg= cbind(Pmarg,t(Pi[,,t])%*%Pmarg[,t-1])
     }else Pmarg=NULL
-    out = c(out,list(V=V,Ul=Ul,S=S,yv=yv,Pmarg=Pmarg))
+    out = c(out,list(V=V,Ul=Ul,S=S,Pmarg=Pmarg))
   } 
     
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");

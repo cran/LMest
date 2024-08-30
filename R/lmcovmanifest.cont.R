@@ -1,4 +1,4 @@
-lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
+lmcovmanifest.cont  <- function(Y,X,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
                                 out_se=FALSE,piv=NULL,Pi=NULL,Mu=NULL,Si=NULL,
                                 output=FALSE,fort=TRUE,ntry=0){
 
@@ -26,14 +26,13 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
 # ---- Preliminaries ----
   check_der = FALSE  # to check derivatives
   sY = dim(Y)
-  n = as.integer(sY[1])
+  ns = as.integer(sY[1])
   k = as.integer(k)
+  n = sum(yv)
   ncov = ncol(X)-1
   TT = as.integer(sY[2])
   mod <- modBasic
-  if(is.data.frame(Y)){
-    warning("Data frame not allowed for Y")
-  }
+  if(is.data.frame(Y)) warning("Data frame not allowed for Y")
   if(length(sY)==2){
     r = 1
     if(is.matrix(Y)) Y = array(Y,c(dim(Y),1))
@@ -45,14 +44,14 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
   R = NULL
   if(miss){
     R = (!is.na(Y))
-    if(fort) RR = array(as.integer(1*R),c(n,TT,r))
+    if(fort) RR = array(as.integer(1*R),c(ns,TT,r))
     Y[is.na(Y)] = 0
     cat("Missing data in the dataset dealt with as MAR\n")
-    Rv = matrix(aperm(R,c(2,1,3)),n*TT,r)
+    Rv = matrix(aperm(R,c(2,1,3)),ns*TT,r)
   }
 
 # Preliminary objects
-  Yv = matrix(aperm(Y,c(2,1,3)),n*TT,r)
+  Yv = matrix(aperm(Y,c(2,1,3)),ns*TT,r)
   th = NULL; sc = NULL; J = NULL
   if(out_se){
     B = cbind(-rep(1,k-1),diag(k-1))
@@ -117,7 +116,7 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
             Vc[!indo,!indo] = Vc[!indo,!indo]+Si[!indo,!indo]-Si[!indo,indo]%*%iSi%*%Si[indo,!indo]
           }
         }
-        Yimp = aperm(array(Yvimp,c(TT,n,r)),c(2,1,3))
+        Yimp = aperm(array(Yvimp,c(TT,ns,r)),c(2,1,3))
         Be = solve(t(X)%*%X)%*%t(X)%*%Yvimp
         Mu = X%*%Be
         iSi = solve(Si)
@@ -146,9 +145,10 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
       Be = solve(t(X)%*%X)%*%t(X)%*%Yv
       Mu = X%*%Be
       Tmp = Yv-Mu
-      Si = (t(Tmp)%*%Tmp)/nt
+      yvv = rep(yv,each=TT)
+      Si = (t(Tmp)%*%(yvv*Tmp))/(n*TT)
       lk = 0
-      for(i in 1:nt) lk = lk+dmvnorm(Yv[i,],Mu[i,],Si,log=TRUE)
+      for(i in 1:nt) lk = lk+dmvnorm(Yv[i,],Mu[i,],Si,log=TRUE)*yvv[i]
       lkv = lk
     }
 
@@ -162,14 +162,14 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
       th = as.vector(Be)
       th = c(th,Si[upper.tri(Si,TRUE)])
       th0 = th
-      out = lk_obs_covmanifest.cont(th0,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
+      out = lk_obs_covmanifest.cont(th0,yv,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
       lk0 = out$lk; sc0 = out$sc
       lth = length(th)
       scn = rep(0,lth)
       J = matrix(0,lth,lth)
       for(j in 1:lth){
         thj = th0; thj[j] = thj[j]+10^-6
-        out = lk_obs_covmanifest.cont(thj,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
+        out = lk_obs_covmanifest.cont(thj,yv,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
         scn[j] = (out$lk-lk0)/10^-6
         J[,j] = (out$sc-sc0)/10^-6
       }
@@ -274,7 +274,8 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
 # ---- EM algorithm ----
   Mu = array(0,c(nt,r,k))
   for(u in 1:k) Mu[,,u] = X%*%rbind(Al[u,],Be)
-  out = complk_covmanifest.cont(Y,R,piv,Pi,Mu,Si,k, fort = fort)
+  out = complk_covmanifest.cont(Y,R,yv,piv,Pi,Mu,Si,k, fort = fort)
+  #out = complk_covmanifest.cont(Y,R,yv,piv,Pi,Mu,Si,k, fort = FALSE)
   lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n")
   cat("     mod    |      k      |    start    |     step    |     lk      |    lk-lko   | discrepancy |\n")
@@ -292,19 +293,19 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
 
 # ---- E-step ----
     # Compute V and U
-    V = array(0,c(n,k,TT)); U = array(0,c(k,k,TT))
-    M = matrix(1,n,k)
+    V = array(0,c(ns,k,TT)); U = array(0,c(k,k,TT))
+    M = matrix(1,ns,k)
     if(n==1){
       V[,,TT] = L[,,TT]/sum(L[1,,TT])
     }else{
-      V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+      V[,,TT] = yv*L[,,TT]/rowSums(L[,,TT])
     }
     if(fort){
-      U[,,TT] = .Fortran("prodnorm",L[,,TT-1],Phi[,,TT],Pi[,,TT],n,k,D=matrix(0,k,k))$D
+      U[,,TT] = .Fortran("prodnormw",L[,,TT-1],Phi[,,TT],Pi[,,TT],ns,k,D=matrix(0,k,k),yv)$D
     }else{
-      for(i in 1:n){
+      for(i in 1:ns){
         Tmp = (L[i,,TT-1]%o%Phi[i,,TT])*Pi[,,TT]
-        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)
+        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)*yv[i]
       }
     }
     if(TT>2){
@@ -314,13 +315,13 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
         M = M/rowSums(M)
         V[,,t] = L[,,t]*M
         if(n==1) V[,,t] = V[,,t]/sum(V[1,,t])
-        else V[,,t] = V[,,t]/rowSums(V[,,t])
+        else V[,,t] = yv*V[,,t]/rowSums(V[,,t])
         if(fort){
-          U[,,t] = .Fortran("prodnorm",L[,,t-1],Phi[,,t]*M,Pi[,,t],n,k,D=matrix(0,k,k))$D
+          U[,,t] = .Fortran("prodnormw",L[,,t-1],Phi[,,t]*M,Pi[,,t],ns,k,D=matrix(0,k,k),yv)$D
         }else{
-          for(i in 1:n){
+          for(i in 1:ns){
             Tmp = (L[i,,t-1]%o%(Phi[i,,t]*M[i,]))*Pi[,,t]
-            U[,,t] = U[,,t]+Tmp/sum(Tmp)
+            U[,,t] = U[,,t]+Tmp/sum(Tmp)*yv[i]
           }
         }
       }
@@ -330,28 +331,28 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
     M = M/rowSums(M)
     V[,,1] = L[,,1]*M
     if(n==1) V[,,1] = V[,,1]/sum(V[1,,1])
-    else V[,,1] = V[,,1]/rowSums(V[,,1])
+    else V[,,1] = yv*V[,,1]/rowSums(V[,,1])
     # print(c(3,proc.time()-t0))
     # If required store parameters
 
 # ---- M-step ----
 # Update Mu
-    Vv = matrix(aperm(V,c(3,1,2)),n*TT,k)
+    Vv = matrix(aperm(V,c(3,1,2)),ns*TT,k)
     if(miss){
       # print(c(3.5,proc.time()-t0))
       Bec = rbind(Al,Be)
       Bec00 = Bec; itc = 0  #FB: corretto update di Mu
       while((max(abs(Bec00-Bec))>10^-10 || itc==0) & itc<10){
         Bec00 = Bec; itc = itc+1
-        Y1 = array(Y,c(n,TT,r,k))
-        Var = array(0,c(n,TT,r,r))
+        Y1 = array(Y,c(ns,TT,r,k))
+        Var = array(0,c(ns,TT,r,r))
         if(fort){
-          out = .Fortran("updatevar2",Y,RR,n,TT,r,k,Mu,Si,Y1=Y1,Var=Var)
+          out = .Fortran("updatevar2",Y,RR,ns,TT,r,k,Mu,Si,Y1=Y1,Var=Var)
           Y1 = out$Y1; Var = out$Var
           Y10 = Y1
         }else{
           j = 0
-          for(i in 1:n) for(t in 1:TT){
+          for(i in 1:ns) for(t in 1:TT){
             j = j+1
             nr = sum(R[i,t,])
             if(nr==0){
@@ -365,7 +366,7 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
             }
           }
         }
-        Y1v = array(aperm(Y1,c(2,1,3,4)),c(nt,r,k))
+        Y1v = array(aperm(Y1,c(2,1,3,4)),c(ns*TT,r,k))
         NUM = matrix(0,ncov+k,r)
         DEN = matrix(0,ncov+k,ncov+k)
         for(u in 1:k){
@@ -380,11 +381,11 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
         for(u in 1:k) Mu[,,u] = X%*%rbind(Al[u,],Be)
         Sitmp = matrix(0,r,r)
         for(u in 1:k){
-          Var1 = array(Var,c(n*TT,r,r))
+          Var1 = array(Var,c(ns*TT,r,r))
           Tmp = Y1v[,,u]-Mu[,,u]
           Sitmp = Sitmp+t(Tmp)%*%(Vv[,u]*Tmp)+apply(Vv[,u]*Var1,c(2,3),sum)
         }
-        Si = Sitmp/nt
+        Si = Sitmp/(n*TT)
       }
     }else{
       NUM = matrix(0,ncov+k,r)
@@ -402,10 +403,10 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
       Si = matrix(0,r,r)
       for(u in 1:k){
         Tmp = Yv-Mu[,,u]
-        Si = Si+t(Tmp)%*%(Vv[,u]*Tmp)/nt
+        Si = Si+t(Tmp)%*%(Vv[,u]*Tmp)/(n*TT)
       }
     }
-    # # print(c(4,proc.time()-t0))
+    # print(c(4,proc.time()-t0))
 # Update piv and Pi
     piv = colSums(V[,,1])/n
     U = pmax(U,10^-300)
@@ -422,12 +423,14 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
       Pi[,,2:mod] = array(diag(1/rowSums(Ut1,2))%*%Ut1,c(k,k,mod-1))
       Pi[,,(mod+1):TT] = array(diag(1/rowSums(Ut2,2))%*%Ut2,c(k,k,TT-mod))
     }
-    # Compute log-likelihood
+    
+# Compute log-likelihood
     paro = par; par = c(piv,as.vector(Pi),as.vector(Mu),as.vector(Si))
     if(any(is.na(par))) par = par[-which(is.na(par))]
     lko = lk
     # print(c(4.5,proc.time()-t0))
-    out = complk_covmanifest.cont(Y,R,piv,Pi,Mu,Si,k, fort = fort)
+  #  out = complk_covmanifest.cont(Y,R,yv,piv,Pi,Mu,Si,k, fort = FALSE)
+     out = complk_covmanifest.cont(Y,R,yv,piv,Pi,Mu,Si,k, fort = fort)
     # print(c(4.7,proc.time()-t0))
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
     if(it%%10 == 0) cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
@@ -437,7 +440,7 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
   if(it%%10 > 0) cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
   cat("------------|-------------|-------------|-------------|-------------|-------------|-------------|\n");
   V2 = aperm(V,c(1,3,2))
-  V2 = aperm(array(V2,c(n,TT,k,r)),c(1,2,4,3))
+  V2 = aperm(array(V2,c(ns,TT,k,r)),c(1,2,4,3))
   if(miss) Yimp = apply(Y1*V2,c(1,2,3),sum) 
 
 # ---- Information matrix ----
@@ -449,18 +452,20 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
     if(mod==1) for(u in 1:k) th = c(th,C[,,u]%*%log(Pi[u,,2]))
     th0 = th
     #   browser()
-    out = lk_obs_covmanifest.cont(th0,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
+    out = lk_obs_covmanifest.cont(th0,yv,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
     lk0 = out$lk; sc0 = out$sc
+
     lth = length(th)
     scn = rep(0,lth)
     J = matrix(0,lth,lth)
     for(j in 1:lth){
       thj = th0; thj[j] = thj[j]+10^-6
-      out = lk_obs_covmanifest.cont(thj,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
+      out = lk_obs_covmanifest.cont(thj,yv,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort)
       scn[j] = (out$lk-lk0)/10^-6
       J[,j] = (out$sc-sc0)/10^-6
     }
     J = -(J+t(J))/2
+  
     if(check_der){
       print(c(lk,lk0))
       print(round(cbind(scn,sc0,round(scn-sc0,4)),5))
@@ -530,7 +535,7 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
   bic = -2*lk+np*log(n)
 # local decoding
   Ul = matrix(0,n,TT)
-  for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
+  for(i in 1:ns) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
 
 # adjust output
     #	if(any(yv!=1)) V = V/yv
@@ -542,7 +547,7 @@ lmcovmanifest.cont  <- function(Y,X,k,start=0,modBasic=0,tol=10^-8,maxit=1000,
   dimnames(Al) <- list(state=1:k,nameY)
   dimnames(Be) <- list(nameX[-1],nameY)
   out = list(lk=lk, piv=piv, Pi=Pi, Al=Al, Be=Be, Si=Si, np=np, k=k, aic=aic, bic=bic, lkv=lkv,
-             n = n, TT = TT, modBasic = mod)
+             n = n, TT = TT, modBasic = mod, ns=ns, yv=yv)
   if(miss){
     out$Y = Y
     out$Yimp = Yimp  ##SP:modificato qui

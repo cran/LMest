@@ -32,14 +32,40 @@ set.seed(1945)
 
 ## Introduction 
 
-The package `LMest` allows us to specify and fit Latent (or Hidden) Markov (LM) models for the analysis of longitudinal continuous and categorical data. 
-It contains functions for parameter estimation, via the Expectation-Maximization (EM) algorithm, of the basic LM model and its extensions with individual covariates that are included by means of suitable parameterizations. 
-It also includes functions for simulation from these models, for performing model selection (that also includes the search for the global maximum likelihood), and for local and global decoding.
-Finally, standard errors for model parameters are available, which are based on numerical or exact methods and on parametric bootstrap.
+The package `LMest` allows users
+to specify and fit Latent (or Hidden) Markov (LM) models for the analysis of longitudinal continuous data, 
+categorical data and time-series.
+It 
+includes
+functions for parameter estimation, via the Expectation-Maximization (EM) algorithm, 
+covering
+the basic LM model and its extensions with individual covariates 
+through
+suitable parameterizations. 
+Additionally, it provides
+functions for 
+simulated data 
+from these models, 
+performing model selection 
+(including searching 
+for the global maximum likelihood), and 
+conducting 
+local and global decoding.
+The package also offer 
+standard errors for model parameters which, 
+can be obtained using 
+numerical or exact methods 
+as well as 
+parametric bootstrap
+techniques.
 
-This document introduces the `LMest`'s basic set of tools, and shows how to apply them for the different model specifications allowed in the package, with data frames in different formats. 
+This document introduces the `LMest`'s basic set of tools, and 
+demonstrates how to apply them for the different model specifications,
+using data frames in 
+various formats. 
 
-`LMest` contains the following main functions having specific tasks:
+`LMest` contains the following main functions 
+each with specific tasks:
 
 | Functions | Description|
 |------------|------------|
@@ -48,14 +74,14 @@ This document introduces the `LMest`'s basic set of tools, and shows how to appl
 |`lmest()`| to estimate LM models for categorical responses with or without covariates |
 |`se()`| to obtain standard errors for the estimated LM model |
 |`lmestCont()`| to estimate LM models for continuous outcomes with or without covariates|
-|`lmestMixed()`| to estimate LM models for categorical responses with initial and transition probabilities of the latent process  allowed to vary across different latent subpopulations|
+|`lmestMixed()`| to estimate LM models for categorical responses with initial and transition probabilities of the latent process  allowed to vary across different latent sub-populations|
 |`lmestSearch()`| to search for the global maximum of the model log-likelihood and to select the optimal number of latent states|
 |`lmestDecoding()`| to perform local and global decoding (**Viterbi** algorithm)|
 |`bootstrap()`| to  perform bootstrap parametric resampling to compute standard errors for the parameter estimates|
-|`drawLMbasic()`|  to draw samples from the basic LM model with categorical responses
+|`draw()`|  to draw samples from the LM models 
 |------------------------------------------
 
-Data available are:
+Data available are the following:
 
 | Name | Description|
 |------------|------------|
@@ -66,6 +92,9 @@ Data available are:
 |`RLMSdat`|Longitudinal dataset deriving from the Russia Longitudinal Monitoring Survey (RLMS) about job satisfaction|
 |`RLMSlong`|Longitudinal dataset deriving from the Russia Longitudinal Monitoring Survey (RLMS) about job satisfaction in long format|
 |`NLSYlong`|Longitudinal dataset deriving from the National Longitudinal Survey of Youth (NLSY) about antisocial behavior and self-esteem|
+|`data_employment_sim`|Simulated dataset assuming interviews conducted among a nationally representative sample of graduates to investigate their employment status after graduation|
+|`data_market_sim`|Simulated dataset assuming observations of customers of four different brands along with the prices of each transaction.
+|`data_heart_sim`|Simulated dataset assuming an observational retrospective study to assess the health state progression of individuals after treatment.
 |------------------------------------------
 
 
@@ -81,7 +110,11 @@ cat(LMest:::Startup.Message(), sep="")
 
 ## Data: RLMSlong
 
-This dataset, already in the `LMest` package, concerns the evaluation of job satisfaction of $n$ = 1,718 individuals followed at $T$ = 7 years from 2008 to 2014.
+This dataset, 
+included 
+in the `LMest` package, concerns the evaluation of job satisfaction of $n$ = 1,718 individuals followed
+over
+$T$ = 7 years from 2008 to 2014.
 The data come from the [Russia Longitudinal Monitoring Survey](https://www.hse.ru/org/hse/rlms), and are documented in `?RLMSlong`. 
 The response variable (named `value`), corresponding to the reported job satisfaction at different time occasions, has five ordered categories from `1: absolutely satisfied` to `5: absolutely not satisfied`. 
 The longitudinal dataset is in long format:
@@ -96,7 +129,8 @@ str(RLMSlong)
 
 ## Data: PSIDlong
 
-This dataset, already in the `LMest` package, is derived from the Panel Study of Income Dynamics (https://psidonline.isr.umich.edu).
+This dataset 
+is derived from the Panel Study of Income Dynamics (https://psidonline.isr.umich.edu).
 The data used in the following application concern $n$ = 1,446 women who were followed from 1987 to 1993.
 There are two binary response variables:
 `Y1Fertility` (indicating whether a woman had given birth to a child in a certain year) and
@@ -112,8 +146,12 @@ str(PSIDlong)
 
 ## Data: data_criminal_sim
 
-This simulated dataset, already in the `LMest` package, contains $n$ = 60,000 observations related to the complete conviction histories of a cohort of offenders followed from the age of criminal responsibility, 10 years, until 40 years, and also includes the proportion of non-offenders.
-We consider $T=6$ age bands of length equal to five years.  For every age band, we dispose of a binary variable equal to 1 if the subject has been convicted for a crime of the following  ten typologies and to 0 otherwise. 
+This simulated dataset
+contains $n$ = 60,000 observations related to the complete conviction histories of a cohort of offenders followed from the age of criminal responsibility, 10 years, until 40 years. It  also includes the proportion of non-offenders.
+We consider $T=6$ age bands 
+each of five years in length.
+For every age band, we 
+have a binary variable equal to 1 if the subject has been convicted for a crime of one of the following  ten typologies and to 0 otherwise. 
 The  typologies of crime are: `y1 violence against the person`, `y2 sexual offenses`, `y3 burglary`, `y4 robbery`, `y5 theft and handling stolen goods`, `y6 fraud and forgery`, `y7 criminal damage`, `y8 drug offenses`, `y9 motoring offenses`, `y10 other offenses`.
 `Gender` is a covariate coded equal to 1 for male and 2 for female:
 
@@ -130,7 +168,7 @@ str(data_criminal_sim)
 This dataset in the `LMest` package, also downloadable from the package `panelr`, is derived from the National Longitudinal Survey of Youth (https://www.nlsinfo.org/content/cohorts/nlsy79).
 The data are a subset concerning  $n$ = 581 individuals who were followed from 1990 to 1994.
 We consider two response variables: `anti`, providing a measure of antisocial behavior (measured on a scale ranging from 0 to 6), `self`, which is a measure of self-esteem  (measured on a scale ranging from 6 to 24).
-The covariates are the following:  `momage`, a continuous variable indicating the age of the mother at birth; `gender`, a dummy variable equal to 1 for females;   `childage`, a continuous variable indicating the age of the child at the first interview;  `momwork`, a dummy variable equal to 1 if mother works; `married`, a dummy variable equal to 1 if parents are married;  `hispanic` and `black`, two dummy variables for ethnicity; `pov`, a time-varying binary variable indicating the poverty status of the family at years 1990, 1992 and 1994.
+The covariates are the following:  `momage`, a continuous variable indicating the age of the mother at birth; `gender`, a dummy variable equal to 1 for females;   `childage`, a continuous variable indicating the age of the child at the first interview;  `momwork`, a dummy variable equal to 1 if mother works; `married`, a dummy variable equal to 1 if parents are married;  `hispanic` and `black`, two dummy variables for ethnicity; `pov`, a time-varying binary variable indicating the poverty status of the family in the years 1990, 1992 and 1994.
 
 
 ```{r}
@@ -150,7 +188,7 @@ dt <- lmestData(data = NLSYlong, id = "id", time="time",
 summary(dt, dataSummary="responses", varType=rep("c",ncol(dt$Y)))
 ```
 
-We can display the summary of every response variable for each time occasion.
+We can display the summary of each response variable for every time occasion.
 For the criminal data, if we select only females, we have:
 
 ```{r}
@@ -178,7 +216,11 @@ fmLatent <- lmestFormula(data = PSIDlong, response = "Y",
 
 in which the column names start with "Y" ar "X".
 
-Alternatively, it is possible to specify subsets of covariates influencing the initial and transition probabilities of the latent process that can be also different.
+Alternatively, it is possible to specify subsets of covariates 
+that influence 
+the initial and transition probabilities of the latent process 
+which
+can be also different.
 For example:
 
 ```{r}
@@ -189,10 +231,17 @@ fmLatent2 <- lmestFormula(data = PSIDlong, response = "Y",
 
 ## Latent Markov models for categorical responses
 
-Function `lmest()` allows us to estimate LM models for categorical responses with different model specifications and with and without covariates.
-These models rely on a homogenous Markov chain of first order with a finite number of states.
+Function `lmest()` allows us to estimate LM models for categorical responses with different model specifications, 
+both 
+with and without covariates.
+These models rely on 
+the 
+homogeneous 
+first-order  Markov chain 
+with a finite number of states.
 Maximum likelihood estimation of model parameters is performed through the EM algorithm.
-Standard errors for the parameter estimates are obtained by exact computation of the information matrix or through reliable numerical approximations of this matrix, by using option `out_se=TRUE` or by using the suitable function 
+Standard errors for the parameter estimates are obtained by exact computation of the information matrix or through reliable numerical approximations of this matrix.  
+This can be done by using option `out_se=TRUE` or by using the suitable function 
 `se()`.
 
 
@@ -206,7 +255,10 @@ mod <- lmest(responsesFormula = fmLatent$responsesFormula,
 ```
 
 
-The function requires a data in long format and then an "id" column and a "time" column must be specified in the argument "index". The number of latent state may be specified as a single values, or a vector of integer values as follows: 
+The function requires a data in long format, so 
+"id" column and a "time" column must be specified in the argument "index". The number of latent state may be specified as a single 
+value
+or a vector of integer values as follows: 
 
 ```{r, eval=TRUE, add=TRUE, warning=FALSE, results='hide'}
 mod <- lmest(responsesFormula = fmLatent$responsesFormula,
@@ -242,8 +294,18 @@ mod2 <- lmest(responsesFormula = fmLatent$responsesFormula,
 
 
 
-Every 10 iterations of the EM algorithm, the function displays, along with the indication of the chosen model specification and number of latent states, the type of starting values used,
-the number of iterations, the value of the log-likelihood at the end of the current iteration, the difference with respect to the log-likelihood at the end of the previous iteration, and the discrepancy between the corresponding parameter vectors.
+Every 10 iterations of the EM algorithm, 
+the function displays the following information:
+
+-  the chosen model specification 
+- number of latent states
+- the type of starting values used
+- the number of iterations 
+- the value of the log-likelihood at the end of the current iteration 
+- the difference 
+in log-likelihood 
+from the previous iteration
+- the discrepancy between the corresponding parameter vectors.
 
 
 The `summary()` method returns the estimation results:
@@ -258,23 +320,33 @@ A  plot of the conditional response probabilities referred to the categories of 
 plot(mod2, what = "CondProb")
 ```
 
-To get an insight on the results, we  observe that the second latent state corresponds to women with the lowest propensity to fertility and the highest propensity to have a job.
+To  
+gain insight the results, we  observe that the second latent state corresponds to women with the lowest propensity 
+for fertility and the highest propensity 
+for employment. 
 
-The first state corresponds to women with both low propensity to fertility and to have a job position.
+The first state corresponds to women with both low propensity 
+for 
+fertility and 
+a low likelihood of having a job.
 
 
-
-A path diagram of the estimated transition probabilities is obtained as: 
+A path diagram of the estimated transition probabilities is shown below:
  
  
 ```{r}
 plot(mod2, what="transitions")
 ```
 
-The averaged estimated transition matrix shows a quite high persistence in the same latent state: we observe a probability of around 0.06 of moving from the first to the  second state.
+The averaged estimated transition matrix 
+reveals 
+a high level of persistence 
+within
+the same latent state. 
+Specifically, 
+ the probability of transitioning from the first state to the second state is approximately 0.06.
 
-
-The estimated marginal distribution of the latent states can be represented for each time occasion in the following plot:
+The estimated marginal distribution of the latent states for each time occasion can be represented  in the following plot:
 
 \vspace{1cm}
 ```{r}
@@ -285,10 +357,13 @@ plot(mod2, what="marginal")
 
 ## Latent Markov model for continuous outcomes
 
-The LM model for continuous outcomes may be estimated by using function `lmestCont()`.
-For the data `NLSYlong` we estimate a multivariate LM model with covariates in the latent process. The selection of the number of latent states can be performed by setting option `k` in a suitable way:
+The LM model for continuous outcomes may be estimated by using function `lmestCont()`, assuming a Gaussian distribution for the response variables given the latent process. 
+For the data `NLSYlong`,  we estimate a multivariate LM model with covariates in the latent process. The selection of the number of latent states can be performed by setting option `k`
+appropriately:
 
 ```{r,results='hide', warning=FALSE}
+dt$data$id = as.numeric(dt$data$id)
+dt$data$time = as.numeric(dt$data$time)
 modc <- lmestCont(responsesFormula = anti + self  ~ NULL,
                   latentFormula = ~ gender + childage + hispanic + black + pov +
                     momwork + married|   gender + childage + hispanic + black+ pov+
@@ -301,16 +376,14 @@ modc <- lmestCont(responsesFormula = anti + self  ~ NULL,
                   tol=10^-1)
 ```
 
+We can display the estimation results with a plot of the indices based on the Akaike Information Criterion (AIC) and the Bayesian Information Criterion (BIC):
 
-
-
-We can display the estimation results with a plot of the indices based on the Akaike Information Criterion (AIC) and on the Bayesian Information Criterion (BIC): 
 
 ```{r} 
 plot(modc,what="modSel")
 ```
 
-A plot of the ellipse of the estimated overall density with weighs given by the estimated marginal distribution of the latent states is obtained as:
+A plot of the ellipse of the estimated overall density, weighted by the estimated marginal distribution of the latent states, is obtained as follows:
 
 
 ```{r} 
@@ -325,7 +398,7 @@ plot(modc,what="density",components=c(1,2))
 
 The latent states are ordered according to increasing values of antisocial behavior.
 
-The path diagram of the estimated transition probabilities is obtained as:
+The path diagram of the estimated transition probabilities is obtained as follows:
 
 
 ```{r} 
@@ -333,8 +406,7 @@ plot(modc,what="transitions")
 ```
 
 
-
-Other results and asymptotic tests can be obtained by using the estimated standard errors 
+Other results and asymptotic tests can be obtained using the estimated standard errors
 
 
 ```{r}
@@ -348,7 +420,7 @@ colnames(TabBe) <- c("estBe",  "s.e.Be","t-test")
 round(TabBe,3) 
 ```
 
-The argument `Be`, returned by the function, contains the estimated regression parameters affecting the distribution of the initial probabilities: gender log-odds (second row of `Be`) is  negative and significant, indicating that females tend to be allocated in the first latent state at the beginning of the survey.
+The argument `Be`, returned by the function, contains the estimated regression parameters affecting the distribution of the initial probabilities. The gender log-odds (second row of `Be`) is  negative and significant, indicating that females tend to be allocated to the first latent state at the beginning of the survey.
 
 
 ```{r}
@@ -358,14 +430,20 @@ round(TabGa1,3)
 ```
 
   
-Output `Ga` contains the estimated parameters affecting the distribution of the transition probabilities.  They measure the influence of each covariate on the transition between  states.
+Output `Ga` contains the estimated parameters affecting the distribution of the transition probabilities.  
+These parameters
+measure
+the influence of each covariate on the transition between  states.
 
 
 ## Mixed Latent Markov model
 
-Function `lmestMixed()` allows us to estimate mixed LM models for categorical responses to take into account additional sources of (time-fixed) dependence in the data.
+Function `lmestMixed()` allows us to estimate mixed LM models for categorical responses, 
+taking 
+into account additional sources of (time-fixed) dependence in the data.
 For the data `data_criminal_sim` we are interested to evaluate the patterns of criminal behavior among individuals.
-At this aim, we estimate a model with $k_1$ = 2 latent classes and $k_2$ = 2 latent states, restricting the analysis to females.
+To this end, 
+we estimate a model with $k_1$ = 2 latent classes and $k_2$ = 2 latent states, restricting the analysis to females.
 
 
 ```{r,results='hide'}
@@ -386,13 +464,27 @@ summary(modm)
 round(modm$Psi[2, , ], 3)
 ```
 
-We can identify the first latent state as that of females with null or very low tendency to commit crimes, whereas the second latent state corresponds to criminals having mainly the following types of activity: theft, burglary, and other offences.
-According to the estimated transition matrix, females classified in the first cluster present a higher probability (of around 0.5) to move from the second to the first latent state than those assigned to the second cluster (of around 0.4), revealing a more pronounced tendency to commit less crimes over time.
+We can identify the first latent state as 
+representing 
+females with null or very low tendency to commit crimes, whereas the second latent state corresponds to criminals 
+primarily engaged in 
+theft, burglary, and other offences
+According to the estimated transition matrix, females classified in the first cluster present a higher probability (around 0.5) 
+of moving
+from the second to the first latent state 
+compared to 
+those 
+in
+the second cluster (of around 0.4).  
+This indicates 
+a more pronounced tendency 
+for individuals in the first cluster 
+to commit less crimes over time.
 
 
 ## Search for the global maximum of the log-likelihood
 
-Function `lmestSearch()` allows us to deal with both model selection and multimodality of the likelihood function. Different initializations are employed to search for the global maximum of the log-likelihood function.
+Function `lmestSearch()` addresses both model selection and the multimodality of the likelihood function. It employs different initializations to search for the global maximum of the log-likelihood function.
 
 Two main criteria are provided to select the number of latent states: AIC and BIC.
 For example,  for the `RLMSlong` dataset we can estimate the basic LM model for increasing values of the latent states $k$ ranging from  1 to 4:
@@ -405,7 +497,7 @@ out <- lmestSearch(responsesFormula =  fmBasic$responsesFormula,
 ```
 
 
-We can display the results of the model selection with:
+We can display the results of the model selection using:
 
 
 ```{r}
@@ -413,9 +505,11 @@ summary(out)
 ```
 
 
-The minimum BIC index corresponds to the model with $k$=4 latent states and the model has 31 free parameters. 
+The minimum BIC index corresponds to the model with $k$=4 latent states, and the model has 31 free parameters. 
 
-The estimation results for the selected number of states may be displayed as follows:
+The estimation results for the selected number of states can be displayed as follows:
+
+
 
 
 ```{r}
@@ -431,10 +525,11 @@ plot(mod4, what="CondProb")
 
 ## Local and global decoding
 
-Function `lmestDecoding()` allows us to predict the sequence of latent states for the sample units on the basis of the output of the main estimation functions, and so to perform a "dynamic pattern recognition".
+Function `lmestDecoding()` allows us to predict the sequence of latent states for the sample units on the basis of the output of the main estimation functions, thus enabling
+"dynamic pattern recognition".
 
 For the basic LM model estimated
-by using  data `PSIDlong`  the local (`Ul`) and global (`Ug`) decoding (Viterbi algorithm) are given by: 
+by using  data `PSIDlong`  the local (`Ul`) and global (`Ug`) decoding (using the Viterbi algorithm) are given by: 
 
 ```{r} 
 dec <- lmestDecoding(mod)
@@ -446,7 +541,10 @@ head(dec$Ug)
 
 ## Bootstrapping 
 
-Function `bootstrap()` allows us to obtain standard errors by parametric bootstrap. A reasonable number of bootstrap samples is $B=200$ and just for illustrative purposes we show how to obtain $B=2$ samples from the output `modc` of the model with covariates for the  `NLSYlong` data estimated with  function `lmestCont()`  as follows:
+Function `bootstrap()` allows us to obtain standard errors through parametric bootstrap. A reasonable number of bootstrap samples is $B=200$.  
+For illustrative purposes, we show how to obtain $B=2$ samples from the output `modc` of the model with covariates for the  `NLSYlong` dataset, estimated 
+using the
+function `lmestCont()`  as follows:
 
 ```{r, include=TRUE, results='hide'}
 mboot <- bootstrap(modc, n = 581, B = 2, seed = 172)
@@ -461,16 +559,17 @@ mboot$seMu
 
 ## Draw samples 
 
-Function `drawLMbasic()` allows us to draw samples from the estimated basic LM model. 
+Function `draw()`
+allows us to draw samples from the estimated basic LM model. 
 For example, considering the basic LM model illustrated  with the `RLMSlong` dataset,  we can obtain a sample of responses of size $n$ = 100  as follows: 
 
 
 ```{r}
-draw3 <- drawLMbasic(est = mod4, format = "matrices", seed = 4321, n = 100)
+draw3 <- draw(est = mod4, format = "matrices", seed = 4321, n = 100)
 head(draw3$Y)
 ```
 
 
-Every line of $Y$ contains the sample responses of each unit for the seven time occasions.
+Each line of $Y$ contains the sample responses of each unit for the seven time occasions.
 
 The package also provides functions to draw samples from  other LM models.

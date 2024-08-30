@@ -4,7 +4,7 @@
 
 \title{Draw samples from LM model for continuous outcomes with covariaates in the latent model}
 
-\description{Function that draws samples from the LM model for continuous outcomes with individual covariates with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMlatentcont}} \bold{function}.}
+\description{Function that draws samples from the LM model for continuous outcomes with individual covariates with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{draw.LMlatentcont}} \bold{function}.}
 
 \usage{
 draw_lm_cov_latent_cont(X1, X2, param = "multilogit", Mu, Si, Be, Ga, fort = TRUE)

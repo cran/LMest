@@ -129,11 +129,11 @@ lmestMc <- function(responsesFormula = NULL,
       stop("missing data in the covariates affecting the transition probabilities are not allowed")
     }
   }
-
-    out <- switch(model,
-                  "LMbasic" = mcbasic(S = Y[,,1], yv = freq, modBasic = modBasic, tol = tol, maxit = maxit, out_se = out_se),
-                  "LMlatent" = mccov(S = Y[,,1],X1 = Xinitial, X2 = Xtrans, start = start,yv = freq,
-                                                      tol = tol, maxit = maxit, out_se = out_se, output = output, fort = fort))
+  
+  out <- switch(model,
+                "LMbasic" = mcbasic(S = Y[,,1], yv = freq, modBasic = modBasic, tol = tol, maxit = maxit, out_se = out_se),
+                "LMlatent" = mccov(S = Y[,,1],X1 = Xinitial, X2 = Xtrans, start = start,yv = freq,
+                                   tol = tol, maxit = maxit, out_se = out_se, output = output, fort = fort))
 
   class <- class(out)
   out <- do.call(c, list(out,
@@ -146,5 +146,6 @@ lmestMc <- function(responsesFormula = NULL,
   attributes(out)$time = tv
   class(out) <- class
   return(out)
+
 }
 

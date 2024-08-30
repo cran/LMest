@@ -22,6 +22,9 @@ summary.LMmanifest<-function(object,...){
 	if(is.null(object$sebe)==FALSE){
 		cat("\n Standard errors for the regression parameters:\n")
 		print(round(object$sebe,digits=4))
+		pvalueBe <- 2*pnorm(abs(object$be/object$sebe),lower.tail=FALSE)
+		cat("\n p-values for the regression parameters:\n")
+		print(round(pvalueBe,3))
 	}
 	if(is.null(object$selrho)==FALSE){
 		cat("\n Standard errors for the logit type transformation of rho:\n")

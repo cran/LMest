@@ -1,21 +1,20 @@
-prob_multilogit <-
-function(Xdis,be,label,fort=TRUE,der=FALSE){
+prob_multilogit <- function(Xdis,be,label,fort=TRUE,der=FALSE){
 
 # der = T if the derivative is required
-	 k = dim(Xdis)[1]
+  k = dim(Xdis)[1]
      ndis = max(label)
      n = length(label)
      ncov = length(be)
      Pdis = matrix(0,ndis,k); P = matrix(0,n,k)
-     if(fort==F){
-         for(i in 1:ndis){
-         	if(ncov==1) pdis = exp(Xdis[,,i]*be) 
-            else pdis = exp(Xdis[,,i]%*%be) 
-            pdis = pdis/sum(pdis)
-            Pdis[i,] = pdis
-     		mul = sum(label==i)
-     		P[label==i,] = rep(1,mul)%o%pdis
-          }
+     if(fort==FALSE){
+       for(i in 1:ndis){
+         if(ncov==1) pdis = exp(Xdis[,,i]*be) 
+         else pdis = exp(Xdis[,,i]%*%be) 
+         pdis = pdis/sum(pdis)
+         Pdis[i,] = pdis
+         mul = sum(label==i)
+         P[label==i,] = rep(1,mul)%o%pdis
+       }
      }else{
 	     out = .Fortran("prob_multilogif",Xdis=Xdis,be=be,label=as.integer(label),Pdis=Pdis,P=P,k=as.integer(k),ndis=as.integer(ndis),
 	     ns=as.integer(n),ncov=as.integer(ncov))

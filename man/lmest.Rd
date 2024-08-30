@@ -26,7 +26,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
     \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion Criterion}
   \item{modBasic}{model on the transition probabilities (0 for time-heterogeneity, 1 for time-homogeneity, from 2 to (TT-1) partial time-homogeneity of a certain order)}
-  \item{modManifest}{model for manifest distribution (\code{"LM"} = Latent Markov with stationary transition, \code{"FM"} = finite mixture model) where a mixture of AR(1) processes is  estimated with common variance and specific correlation coefficients. }
+  \item{modManifest}{ model for manifest distribution when covariates are included in the measurement model (\code{"LM"} = Latent Markov with stationary transition, \code{"FM"} = finite mixture model where a mixture of AR(1) processes is  estimated with common variance and specific correlation coefficients). }
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
   \item{weights}{an optional vector of weights for the available responses}
   \item{tol}{tolerance level for convergence}
@@ -64,7 +64,9 @@ Covariates are allowed to affect manifest distribution (measurement model) or  t
 
 
 
-The function also allows us to deal with missing responses, including drop-out and non-monotonic missingness, under the missing-at-random assumption. Missing values for the covariates are not allowed. The LM model with individual covariates in the measurement model is estimated only for complete univariate responses.
+The function also allows us to deal with missing responses, including drop-out and non-monotonic missingness, under the missing-at-random assumption. Missing values for the covariates are not allowed. 
+
+The LM model with individual covariates in the measurement model is estimated only for complete univariate responses. In such a case, two possible formulations are allowed:  modManifest="LM" is used to estimate the model illustrated in Bartolucci et al. (2017), where the latent process is of first order with initial probabilities equal to those of the stationary distribution of the chain; modManifest="FM" is used to estimate a model relying on the assumption that the distribution of the latent process is a mixture of AR(1) processes with common variance and specific correlation coefficients. This model is illustrated in Bartolucci et al. (2014).
 
 For continuous outcomes see the function \code{\link{lmestCont}}.
 
@@ -85,11 +87,12 @@ Returns an object of class \code{'LMbasic'} for the model without covariates (se
 
 
 \references{
-%Bartolucci, F., Bacci, S. and Pennoni, F. (2014). Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288.
-Bartolucci F., Pandolfi S., Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
+Bartolucci, F., Bacci, S., and Pennoni, F. (2014). Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288.
+
+Bartolucci F., Pandolfi S., and Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.
 
-Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
+Bartolucci, F., Farcomeni, A., and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
 
 %Bartolucci, F., Pennoni, F. (2007). A class of latent Markov models for Capture-Recapture data allowing for Time, Heterogeneity and Behavior effects, \emph{Biometrics}, \bold{63}, 568-578.
 }
@@ -198,7 +201,7 @@ out5 <- lmest(responsesFormula = srhs ~ NULL,
 out5
 summary(out5)
 
-### LM model with the above covariates in the measurement model
+### LM model with the above covariates in the measurement model (stationary model)
 
 out6 <- lmest(responsesFormula = srhs ~ -1 +
               I(gender - 1) +
@@ -216,6 +219,23 @@ out6 <- lmest(responsesFormula = srhs ~ -1 +
               seed = 123)
 out6
 summary(out6)
+
+#### LM model with covariates in the measurement model (mixture latent auto-regressive model)
+
+out7 <- lmest(responsesFormula = srhs ~ -1 +
+              I(gender - 1) +
+              I( 0 + (race == 2) + (race == 3)) +
+              I(0 + (education == 4)) +
+              I(0 + (education == 5)) + I(age - 50) +
+              I((age-50)^2/100),
+              index = c("id","t"),
+              data = SRHS,
+              k = 2,
+              modManifest = "FM", q = 61,
+              out_se = TRUE,
+              tol = 1e-8)
+out7
+summary(out7)
 }
 }
 

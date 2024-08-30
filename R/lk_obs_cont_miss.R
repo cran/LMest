@@ -1,8 +1,9 @@
-lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
+lk_obs_cont_miss <- function(th,yv,Bm,Cm,k,Y,R,TT,r,mod,fort){
 
 # compute corresponding parameters
   if(is.null(R)) miss = FALSE else miss = any(!R)
-  n = dim(Y)[1]
+  ns = as.integer(dim(Y)[1])
+  n = sum(yv)
   th1 = th[1:(k*r)]; th = th[-(1:(k*r))]
   Mu = matrix(th1,r,k)
   th1 = th[1:(r*(r+1)/2)]; th = th[-(1:(r*(r+1)/2))]
@@ -55,10 +56,10 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
 
 # compute log-likelihood
   if(k==1){
-    Yv = matrix(Y,n*TT,r)
+    Yv = matrix(Y,ns*TT,r)
     if(miss){
       lk = 0
-      for (i in 1:n) for(t in 1:TT){
+      for (i in 1:ns) for(t in 1:TT){
         indo = R[i,t,]
         if(sum(R[i,t,])==1){
           lk = lk + dnorm(Y[i,t,][indo],Mu[indo],sqrt(Si[indo,indo]),log=TRUE)
@@ -70,7 +71,7 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
       lk = sum(dmvnorm(Yv,Mu,as.matrix(Si),log=TRUE))
     }
   }else{
-    out = complk_cont_miss(Y,R,piv,Pi,Mu,Si,k)
+    out = complk_cont_miss(Y,R,yv,piv,Pi,Mu,Si,k)
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   }
   sc = NULL
@@ -79,7 +80,7 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
   if(k==1){
     if(miss){
       Yimp = Y; Vc = matrix(0,r,r)
-      for(i in 1:n) for(t in 1:TT){
+      for(i in 1:ns) for(t in 1:TT){
         indo = R[i,t,]
         if(sum(indo)==0){
           Yimp[i,t,] = c(Mu)
@@ -93,16 +94,16 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
     }
   }else{
 # Compute V and U
-    V = array(0,c(n,k,TT)); U = array(0,c(k,k,TT))
-    M = matrix(1,n,k)
+    V = array(0,c(ns,k,TT)); U = array(0,c(k,k,TT))
+    M = matrix(1,ns,k)
     if(n==1) V[,,TT] = L[,,TT]/sum(L[1,,TT])
-    else V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+    else V[,,TT] = yv*L[,,TT]/rowSums(L[,,TT])
     if(fort){
-      U[,,TT] = .Fortran("prodnorm",L[,,TT-1],Phi[,,TT],Pi[,,TT],n,k,D=matrix(0,k,k))$D
+      U[,,TT] = .Fortran("prodnormw",L[,,TT-1],Phi[,,TT],Pi[,,TT],ns,k,D=matrix(0,k,k),yv)$D
     }else{
-      for(i in 1:n){
+      for(i in 1:ns){
         Tmp = (L[i,,TT-1]%o%Phi[i,,TT])*Pi[,,TT]
-        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)
+        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)*yv[i]
       }
     }
     if(TT>2){
@@ -112,13 +113,13 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
         M = M/rowSums(M)
         V[,,t] = L[,,t]*M
         if(n==1) V[,,t] = V[,,t]/sum(V[1,,t])
-        else V[,,t] = V[,,t]/rowSums(V[,,t])
+        else V[,,t] = V[,,t]/rowSums(V[,,t])*yv
         if(fort){
-          U[,,t] = .Fortran("prodnorm",L[,,t-1],Phi[,,t]*M,Pi[,,t],n,k,D=matrix(0,k,k))$D
+          U[,,t] = .Fortran("prodnormw",L[,,t-1],Phi[,,t]*M,Pi[,,t],ns,k,D=matrix(0,k,k),yv)$D
         }else{
-          for(i in 1:n){
+          for(i in 1:ns){
             Tmp = (L[i,,t-1]%o%(Phi[i,,t]*M[i,]))*Pi[,,t]
-            U[,,t] = U[,,t]+Tmp/sum(Tmp)
+            U[,,t] = U[,,t]+Tmp/sum(Tmp)*yv[i] ##SP: yv[i]
           }
         }
       }
@@ -128,7 +129,7 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
     M = M/rowSums(M)
     V[,,1] = L[,,1]*M
     if(n==1) V[,,1] = V[,,1]/sum(V[1,,1])
-    else V[,,1] = V[,,1]/rowSums(V[,,1])
+    else V[,,1] = V[,,1]/rowSums(V[,,1])*yv
     # print(c(3,proc.time()-t0))
     # If required store parameters
   }
@@ -139,27 +140,28 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
       Yimp = Y
       Vc = 0
     }
-    Yvimp = matrix(Yimp,n*TT,r)
-    nt= n*TT
+    Yvimp = matrix(Yimp,ns*TT,r)
+    yvv = rep(yv,TT)
+    nt = ns*TT
     iSi = solve(Si)
-    sc = iSi%*%(colSums(Yvimp)-c(n*TT*Mu))
-    Mu = as.matrix(colMeans(Yvimp,na.rm=TRUE))
+    sc = iSi%*%(colSums(yvv*Yvimp)-c(n*TT*Mu))
+    Mu = as.matrix(colSums(yvv*Yvimp,na.rm=TRUE))/(n*TT)
     Tmp = Yvimp-rep(1,nt)%o%c(Mu)
-    tmp = t(Tmp)%*%Tmp+Vc
+    tmp = t(Tmp)%*%(yvv*Tmp)+Vc
     tmp = iSi%*%tmp%*%iSi
     tmp = tmp-(n*TT)*iSi
     diag(tmp) = diag(tmp)/2
     sc = c(sc,tmp[upper.tri(tmp,TRUE)])
   }else{
     iSi = solve(Si)
-    Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
+    Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
     if(miss){
       Sitmp = matrix(0,r,r)
       Var = array(0,c(n,TT,r,r))
       tmp=0
       for(u in 1:k){
         Y1 = Y
-        for(i in 1:n) for(t in 1:TT){
+        for(i in 1:ns) for(t in 1:TT){
           nr = sum(R[i,t,])
           if(nr==0){
             Y1[i,t,] = Mu[,u]
@@ -171,11 +173,11 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
             Var[i,t,,][indm,indm] = Si[indm, indm]-Tmp%*%Si[indo,indm]
           }
         }
-        Yv1 = matrix(Y1,n*TT)
-        Var1 = array(Var,c(n*TT,r,r))
+        Yv1 = matrix(Y1,ns*TT)
+        Var1 = array(Var,c(ns*TT,r,r))
 # score for Mu and Si	
         sc = c(sc,iSi%*%(t(Yv1)%*%Vv[,u]-sum(Vv[,u])*Mu[,u]))
-        Tmp = Yv1-rep(1,n*TT)%*%t(Mu[,u])
+        Tmp = Yv1-rep(1,ns*TT)%*%t(Mu[,u])
         tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)+apply(Vv[,u]*Var1,c(2,3),sum)
       }
       tmp = iSi%*%tmp%*%iSi
@@ -184,13 +186,13 @@ lk_obs_cont_miss <- function(th,Bm,Cm,k,Y,R,TT,r,mod,fort){
       sc = c(sc,tmp[upper.tri(tmp,TRUE)])
     }else{
 # score for Mu
-      Yv = matrix(Y,n*TT,r)
-      Vv = matrix(aperm(V,c(1,3,2)),n*TT,k)
+      Yv = matrix(Y,ns*TT,r)
+      Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
       for(u in 1:k) sc = c(sc,iSi%*%(t(Yv)%*%Vv[,u]-sum(Vv[,u])*Mu[,u]))
 # score for Si
       tmp=0
       for(u in 1:k){
-        Tmp = Yv-rep(1,n*TT)%*%t(Mu[,u])
+        Tmp = Yv-rep(1,ns*TT)%*%t(Mu[,u])
         tmp = tmp+t(Tmp)%*%(Vv[,u]*Tmp)
       }
       tmp = iSi%*%tmp%*%iSi

@@ -4,7 +4,7 @@ sq <- function(J,t=NULL){
   if(J == 0) return()
   if(!is.null(t)){           # t is present
     if(t == J) M = matrix(1,1,J) else{         # all elements equal to 1
-      if(t>1){       # se sono sia 1 che 0
+      if(t>1){       # either 1 or 0
         for(i in 1:(J-t+1)){
           S = sq(J-i,t-1)
           r = nrow(S)

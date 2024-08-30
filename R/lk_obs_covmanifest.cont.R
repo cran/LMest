@@ -1,9 +1,10 @@
-lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
+lk_obs_covmanifest.cont <- function(th,yv,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
 
 # compute corresponding parameters
   if(is.null(R)) miss = FALSE else miss = any(!R)
-  n = dim(Y)[1]
-  nt = n*TT
+  ns = as.integer(dim(Y)[1])
+  n = sum(yv)
+  nt = ns*TT
   th1 = th[1:((ncov+k)*r)]; th = th[-(1:((ncov+k)*r))]
   Be = matrix(th1,ncov+k,r)
   if(k==1){
@@ -66,8 +67,8 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
 
 # compute log-likelihood
   if(k==1){
-    Yv = matrix(aperm(Y,c(2,1,3)),n*TT,r)
-    if(miss) Rv = matrix(aperm(R,c(2,1,3)),n*TT,r)
+    Yv = matrix(aperm(Y,c(2,1,3)),ns*TT,r)
+    if(miss) Rv = matrix(aperm(R,c(2,1,3)),ns*TT,r)
     nt = nrow(Yv)
     if(miss){
       lk = 0
@@ -80,12 +81,13 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
         }
       }
     }else{
+      yvv = rep(yv,each=TT)
       lk = 0
-      if(r==1) for(i in 1:nt) lk = lk+dnorm(Yv[i,],Mu[i,],sqrt(Si),log=TRUE)
-      else for(i in 1:nt) lk = lk+dmvnorm(Yv[i,],Mu[i,],Si,log=TRUE)
+      if(r==1) for(i in 1:nt) lk = lk+dnorm(Yv[i,],Mu[i,],sqrt(Si),log=TRUE)*yvv[i]
+      else for(i in 1:nt) lk = lk+dmvnorm(Yv[i,],Mu[i,],Si,log=TRUE)*yvv[i]
     }
   }else{
-    out = complk_covmanifest.cont(Y,R,piv,Pi,Mu,Si,k)
+    out = complk_covmanifest.cont(Y,R,yv,piv,Pi,Mu,Si,k)
     lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   }
   sc = NULL
@@ -105,20 +107,20 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
           Vc[!indo,!indo] = Vc[!indo,!indo]+Si[!indo,!indo]-Si[!indo,indo]%*%iSi%*%Si[indo,!indo]
         }
       }
-      Yimp = aperm(array(Yvimp,c(TT,n,r)),c(2,1,3))
+      Yimp = aperm(array(Yvimp,c(TT,ns,r)),c(2,1,3))
     }
   }else{
 # Compute V and U
-    V = array(0,c(n,k,TT)); U = array(0,c(k,k,TT))
-    M = matrix(1,n,k)
+    V = array(0,c(ns,k,TT)); U = array(0,c(k,k,TT))
+    M = matrix(1,ns,k)
     if(n==1) V[,,TT] = L[,,TT]/sum(L[1,,TT])
-    else V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+    else V[,,TT] = yv*L[,,TT]/rowSums(L[,,TT])
     if(fort){
-      U[,,TT] = .Fortran("prodnorm",L[,,TT-1],Phi[,,TT],Pi[,,TT],n,k,D=matrix(0,k,k))$D
+      U[,,TT] = .Fortran("prodnormw",L[,,TT-1],Phi[,,TT],Pi[,,TT],ns,k,D=matrix(0,k,k),yv)$D
     }else{
-      for(i in 1:n){
+      for(i in 1:ns){
         Tmp = (L[i,,TT-1]%o%Phi[i,,TT])*Pi[,,TT]
-        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)
+        U[,,TT] = U[,,TT]+Tmp/sum(Tmp)*yv[i]
       }
     }
     if(TT>2){
@@ -128,13 +130,13 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
         M = M/rowSums(M)
         V[,,t] = L[,,t]*M
         if(n==1) V[,,t] = V[,,t]/sum(V[1,,t])
-        else V[,,t] = V[,,t]/rowSums(V[,,t])
+        else V[,,t] = yv*V[,,t]/rowSums(V[,,t])
         if(fort){
-          U[,,t] = .Fortran("prodnorm",L[,,t-1],Phi[,,t]*M,Pi[,,t],n,k,D=matrix(0,k,k))$D
+          U[,,t] = .Fortran("prodnormw",L[,,t-1],Phi[,,t]*M,Pi[,,t],ns,k,D=matrix(0,k,k),yv)$D
         }else{
-          for(i in 1:n){
+          for(i in 1:ns){
             Tmp = (L[i,,t-1]%o%(Phi[i,,t]*M[i,]))*Pi[,,t]
-            U[,,t] = U[,,t]+Tmp/sum(Tmp)
+            U[,,t] = U[,,t]+Tmp/sum(Tmp)*yv[i]
           }
         }
       }
@@ -144,7 +146,7 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
     M = M/rowSums(M)
     V[,,1] = L[,,1]*M
     if(n==1) V[,,1] = V[,,1]/sum(V[1,,1])
-    else V[,,1] = V[,,1]/rowSums(V[,,1])
+    else V[,,1] = yv*V[,,1]/rowSums(V[,,1])
     # print(c(3,proc.time()-t0))
     # If required store parameters
   }
@@ -155,25 +157,26 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
       Yimp = Y
       Vc = 0
     }
-    Yvimp = matrix(aperm(Yimp,c(2,1,3)),n*TT,r)
+    Yvimp = matrix(aperm(Yimp,c(2,1,3)),ns*TT,r)
     nt = n*TT
     iSi = solve(Si)
     sc = iSi%*%t(Yvimp-Mu)%*%X
+    yvv = rep(yv,each=TT)
     Tmp = Yvimp-Mu
-    tmp = t(Tmp)%*%Tmp+Vc
+    tmp = t(Tmp)%*%(yvv*Tmp)+Vc
     tmp = iSi%*%tmp%*%iSi
     tmp = tmp-(n*TT)*iSi
     diag(tmp) = diag(tmp)/2
     sc = c(sc,tmp[upper.tri(tmp,TRUE)])
   }else{
     iSi = solve(Si)
-    Vv = matrix(aperm(V,c(3,1,2)),nt,k)
+    Vv = matrix(aperm(V,c(3,1,2)),ns*TT,k)
     if(miss){
       Sitmp = matrix(0,r,r)
       Y1 = array(Y,c(n,TT,r,k))
       Var = array(0,c(n,TT,r,r))
       j = 0
-      for(i in 1:n) for(t in 1:TT){
+      for(i in 1:ns) for(t in 1:TT){
         j = j+1
         nr = sum(R[i,t,])
         if(nr==0){
@@ -189,8 +192,8 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
 # score for Mu and Si
       sc = rep(0,r*(ncov+k))
       tmp = matrix(0,r,r)
-      Y1v = array(aperm(Y1,c(2,1,3,4)),c(nt,r,k))
-      Var1 = array(Var,c(n*TT,r,r))
+      Y1v = array(aperm(Y1,c(2,1,3,4)),c(ns*TT,r,k))
+      Var1 = array(Var,c(ns*TT,r,r))
       for(u in 1:k){
         uv = rep(0,k); uv[u] = 1
         Xu = cbind(rep(1,nt)%o%uv,X[,-1])
@@ -204,8 +207,8 @@ lk_obs_covmanifest.cont <- function(th,Bm,Cm,k,Y,R,X,TT,r,ncov,mod,fort){
       sc = c(sc,tmp[upper.tri(tmp,TRUE)])
     }else{
 # score for Be
-      Yv = matrix(aperm(Y,c(2,1,3)),nt,r)
-      Vv = matrix(aperm(V,c(3,1,2)),nt,k)
+      Yv = matrix(aperm(Y,c(2,1,3)),ns*TT,r)
+      Vv = matrix(aperm(V,c(3,1,2)),ns*TT,k)
       sc = rep(0,r*(ncov+k))
       tmp = matrix(0,r,r)
       for(u in 1:k){

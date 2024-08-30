@@ -1,10 +1,11 @@
-bootstrap <- function(est,...) {
+bootstrap <- function(est,...){
   UseMethod("bootstrap")
 }
 
+bootstrap.LMbasic <- function(est, B = 100, seed = NULL, ...){
 
-bootstrap.LMbasic <- function(est, n = 1000, B = 100, seed = NULL, ...)
-{
+  if(any(est$yv!=1)) warning("* weights are ignored within bootstrap *")
+
   piv = est$piv
   Pi = est$Pi
   Psi = est$Psi
@@ -13,24 +14,26 @@ bootstrap.LMbasic <- function(est, n = 1000, B = 100, seed = NULL, ...)
   mod <- est$modBasic
   #start = 0
   #tol = est$tol
+  
 
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
+  if(!is.null(seed)) set.seed(seed)
   k = est$k
   c = est$n
   TT = est$TT
-  # Reparametrize
+  n = est$n
+  ns = est$ns
+  
+# Reparametrize
   mPsi = mpiv = mPi = 0
   m2Psi = m2piv = m2Pi = 0
   #    mth = 0; m2th = 0;
   for(b in 1:B){
-    out = drawLMbasic(est = est,n = n, format = "matrices")
+    out = draw(est = est, n = ns, format = "matrices")
     Sb = out$S
     yvb = out$yv
     ns = dim(Sb)[1]
-    out =  lmbasic(S = Sb,yv = yvb,k = k,modBasic = mod, ...)
+    out =  lmbasic(S = Sb, yv = yvb, k = k, modBasic = mod, start = 2, piv = piv,
+                   Pi=Pi, Psi=Psi, ...)
     mPsi = mPsi+out$Psi/B
     mpiv = mpiv+out$piv/B
     mPi = mPi+out$Pi/B
@@ -44,33 +47,36 @@ bootstrap.LMbasic <- function(est, n = 1000, B = 100, seed = NULL, ...)
   out = list(mPsi=mPsi,mpiv=mpiv,mPi=mPi,sePsi=sePsi,sepiv=sepiv,sePi=sePi)
 }
 
-bootstrap.LMbasiccont <- function(est, n = 1000, B=100, seed = NULL, ...)
-{
+bootstrap.LMbasiccont <- function(est, B=100, seed = NULL, ...){
+
+# Preliminaries
+  if(any(est$yv!=1)) warning("* weights are ignored within bootstrap *")
   piv = est$piv
   Pi = est$Pi
   Mu = est$Mu
   Si = est$Si
 
   mod <- est$modBasic
-
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
+  if(!is.null(seed)) set.seed(seed)
   # mod = object$mod
   # start = object$start
 
   # Preliminaries
   k = est$k
-  # Reparametrize
+  n = est$n
+  ns = est$ns
+  
+# Reparametrize
   mMu = mSi = mpiv = mPi = 0
   m2Mu = m2Si=  m2piv = m2Pi = 0
   #    mth = 0; m2th = 0;
   for(b in 1:B){
-    cat("boostrap sample n. ",b,"\n")
-    out = drawLMbasiccont(est = est, n = n, format = "matrices")
+    cat("bootstrap sample n. ",b,"\n")
+    out = draw(est = est, format = "matrices")
     Yb = out$Y
-    out =  lmbasic.cont(Y = Yb,k = k,modBasic = mod, ...)
+    yvb = out$yv
+    out =  lmbasic.cont(Y = Yb, yv = yvb, k = k, modBasic = mod, start = 2, piv = piv, Pi = Pi,
+                        Mu = Mu, Si = Si, ...)
     mMu = mMu + out$Mu/B
     mSi = mSi + out$Si/B
     mpiv = mpiv+out$piv/B
@@ -80,18 +86,16 @@ bootstrap.LMbasiccont <- function(est, n = 1000, B=100, seed = NULL, ...)
   }
   seMu = sqrt(m2Mu - mMu^2)
   seSi = sqrt(m2Si - mSi^2)
-  sepiv = sqrt(m2piv-mpiv^2); sePi = sqrt(m2Pi-mPi^2)
+  sepiv = sqrt(m2piv-mpiv^2)
+  sePi = sqrt(m2Pi-mPi^2)
   out = list(mMu=mMu,mSi=mSi,mpiv=mpiv,mPi=mPi,seMu=seMu,seSi=seSi,sepiv=sepiv,sePi=sePi)
 }
 
-bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...)
-{
+bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...){
+  
+  if(any(est$yv!=1)) warning("* weights are ignored within bootstrap *")
 
-
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
+  if(!is.null(seed)) set.seed(seed)
   Psi = est$Psi
   Be = est$Be
   Ga = est$Ga
@@ -117,7 +121,6 @@ bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...)
   X1 <- tmp$Xinitial
   X2 <- tmp$Xtrans
 
-
   mPsi = 0
   mBe = 0
   m2Psi = 0
@@ -138,10 +141,13 @@ bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...)
   if(length(dPsi)==1) k = 1
   else k = dPsi[2]
   for (b in 1:B) {
-    cat("boostrap sample n. ",b,"\n")
-    out = drawLMlatent(est = est,fort=TRUE, format = "matrices")
+    cat("bootstrap sample n. ",b,"\n")
+    out = draw(est = est, data = est$data, index = eval(est$call$index),
+               fort=TRUE, format = "matrices")
     Yb = out$Y
-    out =  lmcovlatent(S = Yb,X1 = X1,X2 = X2,paramLatent=param,k=k, ...)
+    yvb = out$yv
+    out =  lmcovlatent(S = Yb, X1 = X1, X2 = X2, yv=yvb, paramLatent=param, k=k, start=2,
+                       Be=Be, Ga=Ga, Psi=Psi, ...)
     mPsi = mPsi + out$Psi/B
     mBe = mBe + out$Be/B
     if(param=="multilogit"){
@@ -171,13 +177,9 @@ bootstrap.LMlatent <- function(est, B=100, seed = NULL, ...)
 
 }
 
-bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...)
-{
+bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...){
 
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
+  if(!is.null(seed)) set.seed(seed)
   Mu = est$Mu
   Be = est$Be
   Ga = est$Ga
@@ -201,7 +203,6 @@ bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...)
 
   X1 <- tmp$Xinitial
   X2 <- tmp$Xtrans
-
   # preliminaries
   mMu = mSi = mBe = 0
   m2Mu = m2Si = m2Be = 0
@@ -211,10 +212,10 @@ bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...)
   }else if(param=="difflogit"){
     mGa = vector("list",2)
     m2Ga = vector("list",2)
-    mGa[[1]] = matrix(0,dim(Ga[[1]]))
-    mGa[[2]] = matrix(0,dim(Ga[[2]]))
-    m2Ga[[1]] = matrix(0,dim(Ga[[1]]))
-    m2Ga[[2]] = matrix(0,dim(Ga[[2]]))
+    mGa[[1]] = array(0,dim(Ga[[1]]))
+    mGa[[2]] = array(0,dim(Ga[[2]]))
+    m2Ga[[1]] = array(0,dim(Ga[[1]]))
+    m2Ga[[2]] = array(0,dim(Ga[[2]]))
   }
 
   if(is.vector(Mu)){
@@ -226,10 +227,12 @@ bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...)
   }
 
   for (b in 1:B) {
-    cat("boostrap sample n. ",b,"\n")
-    out = drawLMlatentcont(est = est, format = "matrices")
+    cat("bootstrap sample n. ",b,"\n")
+    out = draw(est = est, data = est$data, index = eval(est$call$index), format = "matrices")
     Yb = out$Y
-    out =  lmcovlatent.cont(Yb,X1,X2,paramLatent=param,k=k)
+    yvb = out$yv
+    out =  lmcovlatent.cont(Yb, X1, X2, yvb, paramLatent=param, k=k, start=2, 
+                            Mu=Mu, Si=Si, Be=Be, Ga=Ga)
     mMu = mMu + out$Mu/B
     mSi = mSi + out$Si/B
     mBe = mBe + out$Be/B

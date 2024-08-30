@@ -1,5 +1,4 @@
-draw_lm_basic_cont <-
-function(piv,Pi,Mu,Si,n){
+draw_lm_basic_cont <- function(piv,Pi,Mu,Si,n){
 
 #        [Y,yv] = draw_lm_basic(piv,Pi,Mu,Si,n)
 #

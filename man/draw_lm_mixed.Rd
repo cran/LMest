@@ -4,7 +4,7 @@
 
 \title{Draws samples from the mixed LM model}
 
-\description{Function that draws samples from the mixed LM model with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMmixed}} \bold{function}.}
+\description{Function that draws samples from the mixed LM model with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{draw.LMmixed}} \bold{function}.}
 
 \usage{
 draw_lm_mixed(la, Piv, Pi, Psi, n, TT)

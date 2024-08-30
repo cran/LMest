@@ -888,6 +888,8 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
   #Xmanifest <- tmp$Xmanifest
   X2 <- tmp$Xtrans
   Y <- tmp$Y
+  
+
   #X <- tmp$Xmanifest
   if(min(Y,na.rm=T)>0){
     for(i in 1:dim(Y)[3])
@@ -934,7 +936,20 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
     n = dim(Y)[1]; TT = dim(Y)[2]; r = dim(Y)[3]
   }
 
-
+  if(is.null(X1)){
+    X1 = matrix(1,n,1)
+    colnames(X1) = "(Intercept)"
+  }
+  if(is.null(X2)){
+    X2 = array(1,c(n,TT-1,1))
+    dimnames(X2) = list(NULL,NULL,"(Intercept)")
+  }
+  
+  if(param=="difflogit"){
+    cat("\n* With difflogit is not possible to avoid the intercept for the transition probabilities*\n\n")
+    X2 = X2[,,-1,drop=FALSE]
+  }
+  
   k = ncol(est$Be)+1
   Psi = est$Psi
   if(is.vector(X1)) X1 = matrix(X1,n,1)
@@ -945,22 +960,23 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
   }else{
     GBe = diag(k); GBe = GBe[,-1]
   }
-  XXdis = array(0,c(k,(k-1)*(nc1+1),n))
+  XXdis = array(0,c(k,(k-1)*(nc1),n))
   for(i in 1:n){
-    xdis = c(1,X1[i,])
+    if(nc1==0) xdis = 1 else xdis = X1[i,] #SP: xdis = c(1,X1[i,])
     XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
   }
   be = as.vector(est$Be)
+
   out = prob_multilogit(XXdis,be,Xlab,fort)
   Piv = out$P
-  if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
+  #if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
   nc2 = dim(X2)[3] # number of covariates on the transition probabilities
   Z = NULL
   for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
   if(nc2==1) Z = as.matrix(X2)
   Zlab = 1:(n*(TT-1)); Zndis = n*(TT-1)
   if(param=="multilogit"){
-    ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
+    ZZdis = array(0,c(k,(k-1)*(nc2),Zndis,k))
     for(h in 1:k){
       if(k==2){
         if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
@@ -968,7 +984,7 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
         GGa = diag(k); GGa = GGa[,-h]
       }
       for(i in 1:Zndis){
-        zdis = c(1,Z[i,])
+        if(nc2==0) zdis = 1 else zdis = Z[i,] #SP: zdis = c(1,Z[i,])
         ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
       }
     }
@@ -993,7 +1009,7 @@ lmestDecoding.LMlatent <- function(est, sequence = NULL, fort = TRUE, ...)
     }
   }
   if(param=="multilogit"){
-    Ga = matrix(est$Ga,(nc2+1)*(k-1),k)
+    Ga = matrix(est$Ga,(nc2)*(k-1),k)
     PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,n,TT))
     for(h in 1:k){
       out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
@@ -1168,7 +1184,7 @@ lmestDecoding.LMbasiccont <- function(est, sequence = NULL, fort = TRUE, ...)
   }
   piv = est$piv; Pi = est$Pi; Mu = est$Mu; Si = est$Si
   k = length(est$piv)
-  out = complk_cont_miss(Y,!miss,piv,Pi,Mu,Si,k, fort = TRUE)
+  out = complk_cont_miss(Y,!miss,est$yv,piv,Pi,Mu,Si,k, fort = TRUE)
   Phi = out$Phi; L = out$L; pv = out$pv
   V = array(0,c(n,k,TT))
   M = matrix(1,n,k)

@@ -7,7 +7,7 @@ lmmixed <- function(S,yv=rep(1,nrow(S)),
   # k1 = number of latent classes
   # k2 = number of latent states
   # start = 0 for deterministic initialization, 1 for stochastic initialization
-  # tol = tollerance level to stop
+  # tol = tolerance level to stop
 
   # preliminaries
   k2 = as.integer(k2)

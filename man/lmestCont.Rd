@@ -3,7 +3,7 @@
 \title{Estimate Latent Markov models for continuous responses}
 
 \description{
-Main function for estimating Latent Markov (LM) models for continuous responses.}
+Main function for estimating Latent Markov (LM) models for continuous outcomes under the assumption of (multivariate) Gaussian distribution of the response variables given the latent process.}
 \usage{
 lmestCont(responsesFormula = NULL, latentFormula = NULL,
           data, index, k = 1:4, start = 0,
@@ -29,7 +29,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
       \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion Criterion}
   \item{modBasic}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
-    \item{weights}{an optional vector of weights for the available responses}
+  \item{weights}{vector of weights}
   \item{tol}{tolerance level for convergence}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors (By default is set to FALSE)}
@@ -67,7 +67,7 @@ Covariates are allowed on the initial and transition probabilities (latent model
 }
 
 
-The function also allows us to deal with missing responses using the \code{mix} package for imputing the missing values. Missing values for the covariates are not allowed.
+The function also allows us to deal with missing responses using the \code{mix} package (Schafer, 2024) for imputing the missing values. Missing values for the covariates are not allowed.
 
 For categorical outcomes see the function \code{\link{lmest}.}
 }

@@ -7,11 +7,11 @@ plot.LMlatent<-function(x, what = c("modSel", "CondProb", "transitions","margina
   nc <- d[1]
   if(length(d)==2) r <- d[2]
   else  r <- d[3]
-
+  ns <- dim(object$Piv)[1]
   if(k>1){
-    PMarg <- array(0,c(n,k,TT))
+    PMarg <- array(0,c(ns,k,TT))
     PMarg[,,1] <- as.matrix(object$Piv)
-    for(i in 1:n) for(t in 2:TT) PMarg[i,,t]= t(object$PI[,,i,t])%*%PMarg[i,,t-1]
+    for(i in 1:ns) for(t in 2:TT) PMarg[i,,t]= t(object$PI[,,i,t])%*%PMarg[i,,t-1]
     Pmarg <-apply(PMarg,c(2,3),mean)
   }
   if(interactive() & length(what) > 1){
@@ -49,7 +49,7 @@ plot.LMlatent<-function(x, what = c("modSel", "CondProb", "transitions","margina
           }else{
             par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
             for (u in 1:k) {
-              title = paste("Class ",u,": Averaged initial probabilites = ",round(mean(object$Piv[,u]),3),sep="")
+              title = paste("State ",u,": Averaged initial probabilities = ",round(mean(object$Piv[,u]),3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
               pi.class[1,] <- object$Psi[,u,]
               ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -71,7 +71,7 @@ plot.LMlatent<-function(x, what = c("modSel", "CondProb", "transitions","margina
           }else{
             par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
             for (u in 1:k) {
-              title = paste("Class ",u,": Averaged initial probabilites = ",round(mean(object$Piv[,u]),3),sep="")
+              title = paste("State ",u,": Averaged initial probabilities = ",round(mean(object$Piv[,u]),3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
               for (j in 1:r) pi.class[j,] <- object$Psi[,u,j]
               dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))
@@ -142,7 +142,7 @@ plot.LMlatent<-function(x, what = c("modSel", "CondProb", "transitions","margina
         }else{
           par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
           for (u in 1:k) {
-            title = paste("Class ",u,": Averaged initial probabilites = ",round(mean(object$Piv[,u]),3),sep="")
+            title = paste("State ",u,": Averaged initial probabilities = ",round(mean(object$Piv[,u]),3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             pi.class[1,] <- object$Psi[,u,]
             ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -164,7 +164,7 @@ plot.LMlatent<-function(x, what = c("modSel", "CondProb", "transitions","margina
         }else{
           par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
           for (u in 1:k) {
-            title = paste("Class ",u,": Averaged initial probabilites = ",round(mean(object$Piv[,u]),3),sep="")
+            title = paste("State ",u,": Averaged initial probabilities = ",round(mean(object$Piv[,u]),3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             for (j in 1:r) pi.class[j,] <- object$Psi[,u,j]
             dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))

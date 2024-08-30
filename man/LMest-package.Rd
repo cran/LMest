@@ -7,7 +7,7 @@
 \description{The package \code{LMest} is a framework for specifying and fitting Latent (or Hidden) Markov (LM) models for the analysis of longitudinal continuous and categorical data. Covariates are also included in the model specification through suitable parameterizations.}
 
 \details{
-Different LM models are estimated through specific functions requiring a data frame in long format. Responses are mainly categorical, the functions referred to continous responses are specified with \code{Cont}.
+Different LM models are estimated through specific functions requiring a data frame in long format. Responses are mainly categorical, the functions referred to continous responses are specified with \code{Cont}. When responses are continuos, the (multivariate) Gaussian distribution, conditional to the latent process, is assumed. 
 The functions are the following:
 \describe{
 \item{\code{\link{lmest}}}{Function to estimate LM models for categorical responses generating the following classes:

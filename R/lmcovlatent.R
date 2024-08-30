@@ -26,7 +26,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
                       out_se=out_se,miss=miss,R=R)
     lkv_glob = out$lk
     for(it0 in 1:(k*ntry)){
-      cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
+      cat("\n* Random initialization (",it0,"/",k*ntry,") *\n",sep="")
       outr = try(lmcovlatent(S,X1,X2,yv,k,start=1,tol,maxit,paramLatent,fort=fort,output=output,
                              out_se=out_se,miss=miss,R=R))
       if(!inherits(outr,"try-error")){
@@ -39,6 +39,10 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }
 
 #---- Preliminaries ----
+  if(paramLatent=="difflogit"){
+    cat("\n* With difflogit is not possible to avoid the intercept for the transition probabilities*\n\n")
+    X2 = X2[,,-1,drop=FALSE]
+  }
   check_der = FALSE # to check score and info
   param <- paramLatent
   if(fort!=TRUE) fort = FALSE
@@ -46,13 +50,19 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   ns = sS[1]
   TT = sS[2]
   n = sum(yv)
+  if(is.null(X1)){
+    X1 = matrix(1,ns,1)
+    colnames(X1) = "(Intercept)"
+  }
+  if(is.null(X2)){
+    X2 = array(1,c(ns,TT-1,1))
+    dimnames(X2) = list(NULL,NULL,"(Intercept)")
+  }
   if(length(sS)==2) r = 1
   else r = sS[3]
   if(ns!=length(yv)) stop("dimensions mismatch between S and yv")
-
   Sv = matrix(S,ns*TT,r)
   if(miss) Rv = matrix(R,ns*TT,r)
-
   if(r==1){
     if(is.matrix(S)) S = array(S,c(dim(S),1))
     b = max(S); mb = b; sb = b
@@ -73,7 +83,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   th = NULL; sc = NULL
   J = NULL
 
-  # Covariate structure and related matrices: initial probabilities
+# Covariate structure and related matrices: initial probabilities
   if(k == 2) GBe = as.matrix(c(0,1)) else{
     GBe = diag(k); GBe = GBe[,-1]
   }
@@ -83,28 +93,28 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     nameBe = NULL
   }else{
     if(is.vector(X1)) X1 = matrix(X1,ns,1)
-    nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+    nc1 = dim(X1)[2] # dimension of X1
     if(ns!= dim(X1)[1]) stop("dimension mismatch between S and X1")
-
     nameBe = colnames(X1)
-
     out = aggr_data(X1,fort=fort)
     Xdis = out$data_dis
     if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
     Xlab = out$label
   }
   Xndis = max(Xlab)
-  XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
+  XXdis = array(0,c(k,(k-1)*nc1,Xndis))
   for(i in 1:Xndis){
-    if(nc1==0) xdis = 1 else xdis = c(1,Xdis[i,])
+    if(nc1==0){
+      xdis = 1}
+    else{
+      if(is.matrix(Xdis)) xdis = Xdis[i,] else xdis = Xdis
+    }  
     XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
   }
-
-
-  # for the transition probabilities
+# for the transition probabilities
   if(is.null(X2) | any(dimnames(X2)[2] == "(Intercept)")){
     if(param=="difflogit"){
-      warning("with X2=NULL parametrization difflogit not considered")
+      warning("With X2=NULL parametrization difflogit not considered")
       param="multilogit"
     }
     nc2 = 0
@@ -114,9 +124,8 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }else{
     # if(TT==2) X2 = array(X2,c(ns,1,dim(X2)[2]))
     # if(is.matrix(X2)) X2 = array(X2,c(ns,TT-1,1))
-    nc2 = dim(X2)[3] # number of covariates on the transition probabilities
+    nc2 = dim(X2)[3] # dimension of X2
     if(ns!= dim(X2)[1]) stop("dimension mismatch between S and X2")
-
     nameGa = colnames(aperm(X2,c(1,3,2)))
     Z = NULL
     for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
@@ -125,7 +134,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
   }
   if(param=="multilogit"){
-    ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
+    ZZdis = array(0,c(k,(k-1)*(nc2),Zndis,k))
     for(h in 1:k){
       if(k==2){
         if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
@@ -133,7 +142,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
         GGa = diag(k); GGa = GGa[,-h]
       }
       for(i in 1:Zndis){
-        if(nc2==0) zdis = 1 else zdis = c(1,Zdis[i,])
+        if(nc2==0) zdis = 1 else zdis = Zdis[i,]
         ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
       }
     }
@@ -188,7 +197,8 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     return(out)
   }
   time = proc.time()
-  # Starting values: deterministic initialization
+
+# Starting values: deterministic initialization
   if(start == 0){
     if(fixPsi==FALSE){
       P = matrix(NA,mb+1,r)
@@ -215,22 +225,23 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
         }
       }
     }
-    # parameters on initial probabilities
-    be = array(0,(nc1+1)*(k-1))
+
+# parameters on initial probabilities
+    be = rep(0,nc1*(k-1))
     out = prob_multilogit(XXdis,be,Xlab,fort)
     Piv = out$P; Pivdis = out$Pdis
-    # parameters on transition probabilities
+
+# parameters on transition probabilities
     if(param=="multilogit"){
-      Ga = matrix(0,(nc2+1)*(k-1),k)
-      Ga[1+(0:(k-2))*(nc2+1),] = -log(10)
+      Ga = matrix(0,nc2*(k-1),k)
+      Ga[1+(0:(k-2))*nc2,] = -log(10)
       PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
       for(h in 1:k){
         tmp = ZZdis[,,,h]
-        if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+        if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
         out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
         PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
       }
-
     }else if(param=="difflogit"){
       Ga = matrix(0,k*(k-1)+(k-1)*nc2)
       Ga[1:((h-1)*k)] = -log(10)
@@ -251,18 +262,18 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       }
     }
     # parameters on initial probabilities
-    be = c(rnorm(1),rep(0,nc1))
-    if(k>2) for(h in 2:(k-1)) be = c(be,rnorm(1),rep(0,nc1))
+    be = c(rnorm(1),rep(0,nc1-1))
+    if(k>2) for(h in 2:(k-1)) be = c(be,rnorm(1),rep(0,nc1-1))
     out = prob_multilogit(XXdis,be,Xlab,fort)
     Piv = out$P; Pivdis = out$Pdis
     # parameters on transition probabilities
     if(param=="multilogit"){
-      Ga = matrix(0,(nc2+1)*(k-1),k)
-      Ga[1+(0:(k-2))*(nc2+1),] = -abs(rnorm((k-1)))
+      Ga = matrix(0,(nc2)*(k-1),k)
+      Ga[1+(0:(k-2))*(nc2),] = -abs(rnorm((k-1)))
       PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
       for(h in 1:k){
         tmp = ZZdis[,,,h]
-        if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+        if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
         out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
         PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
       }
@@ -274,8 +285,12 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       PI = aperm(PI,c(2,1,3,4))
     }
   }
-  # initialization as input
+
+# initialization as input
   if(start==2){
+    if(is.null(Be)) stop("initial value of the parameters on the initial probabilities (Be) must be given in input")
+    if(is.null(Ga)) stop("initial value of parameters on the transition probabilities (Ga) must be given in input")
+    if(is.null(Psi)) stop("initial value of the conditional response probabilities (Psi) must be given in input")
     # parameters on initial probabilities
     be = as.vector(Be)
     out = prob_multilogit(XXdis,be,Xlab,fort)
@@ -283,10 +298,12 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     # parameters on transition probabilities
     if(param=="multilogit"){
       if(is.list(Ga)) stop("invalid mode (list) for Ga")
-      Ga = matrix(Ga,(nc2+1)*(k-1),k)
+      Ga = matrix(Ga,max(1,nc2)*(k-1),k)
       PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
       for(h in 1:k){
-        out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+        tmp = ZZdis[,,,h]
+        if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
+        out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
         PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
       }
     }else if(param=="difflogit"){
@@ -336,8 +353,6 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
           if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
           else Y1[jb+1,,j] = colSums(Vv[ind,])
         }
-
-
       }
       for(j in 1:r) for(c in 1:k){
         tmp = Y1[1:(b[j]+1),c,j]
@@ -346,15 +361,15 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
         Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
       }
     }
-    # Update piv
+# Update piv
     out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis,fort=fort)
     be = out$be; Pivdis = out$Pdi; Piv = out$P
-    # Update Pi
+# Update Pi
     if(param=="multilogit"){
       for(h in 1:k){
         UU = NULL
         for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
-        tmp = ZZdis[,,,h]
+        tmp = array(ZZdis[,,,h],dim(ZZdis)[1:3])
         if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
         tmp2 = PIdis[,,h]
         if(Zndis==1) tmp2 = matrix(tmp2,1,k)
@@ -394,29 +409,28 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       count = count+b[j]
       th = c(th,log(temp[-1]/temp[1]))
     }
-    dlPiv = array(0,c(ns,k,(1+nc1)*(k-1)))
+    dlPiv = array(0,c(ns,k,nc1*(k-1)))
     for(j in 1:Xndis){
       temp = pmax(Pivdis[j,],10^-50)
       Temp = (diag(k)-rep(1,k)%o%temp)%*%XXdis[,,j]
       for(i in which(Xlab==j)) dlPiv[i,,] = Temp
     }
     th = c(th,be)
-
     count = 0
     if(param=="multilogit"){
-      dlPI = array(0,c(k,k,ns*TT,(1+nc2)*(k-1)*k))
+      dlPI = array(0,c(k,k,ns*TT,nc2*(k-1)*k))
       temp0 = rep(1,k); Temp0 = diag(k)
       for(h in 1:k){
-        ind = count+(1:((1+nc2)*(k-1)))
+        ind = count+(1:(nc2*(k-1)))
         for(j in 1:Zndis){
           temp = pmax(PIdis[j,,h],10^-50)
           Temp = (Temp0-temp0%o%temp)%*%ZZdis[,,j,h]
           for(i in which(Zlab==j)) dlPI[h,,ns+i,ind] = Temp
         }
-        count = count+((1+nc2)*(k-1))
+        count = count+(nc2*(k-1))
         th = c(th,Ga[,h])
       }
-      dlPI = array(dlPI,c(k,k,ns,TT,(1+nc2)*(k-1)*k))
+      dlPI = array(dlPI,c(k,k,ns,TT,nc2*(k-1)*k))
     }else if(param=="difflogit"){
       dlPI = array(0,c(k,k*ns*TT,(k+nc2)*(k-1)))
       temp0 = rep(1,k); Temp0 = diag(k)
@@ -430,7 +444,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       dlPI = aperm(dlPI,c(2,1,3,4,5))
     }
 
-    # Compute log-likelihood
+# Compute log-likelihood
     lk2 = lk
     out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
     sc = out$dlk; dlL = out$dlL; dlPhi = out$dlPhi; dlL2 = out$dlL2; dlpv = out$dlpv
@@ -441,8 +455,8 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     out = prob_post_cov(S,yv,Psi,Piv,PI,Phi,L,pv,der=TRUE,fort=fort,dlPhi=dlPhi,dlPiv,
                         dlPI=dlPI,dlL=dlL,dlL2=dlL2,dlpv=dlpv)
     U = out$U; V = out$V; dlU = out$dlU; dlV = out$dlV
-    # ---- M-step ----
-    # score and info Psi
+# ---- M-step ----
+# score and info Psi
     sc = NULL
     Y1 = array(NA,c(mb+1,k,r))
     for(j in 1:r) Y1[1:(b[j]+1),,j] = 0
@@ -457,29 +471,27 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
         if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
         else Y1[jb+1,,j] = colSums(Vv[ind,])
       }
-
     }
     for(c in 1:k) for(j in 1:r){
       sc = c(sc,t(Am[[j]])%*%(Y1[1:(b[j]+1),c,j]-sum(Y1[1:(b[j]+1),c,j])*Psi[1:(b[j]+1),c,j]))
       tmp = Y1[1:(b[j]+1),c,j]
       tmp = pmax(tmp/sum(tmp),10^-10)
       Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
-
       temp = pmax(Psi[1:(b[j]+1),c,j],10^-50)
       Op = diag(temp)-temp%o%temp
       Temp  = sum(Y1[1:(b[j]+1),c,j])*t(Am[[j]])%*%Op%*%Am[[j]]
       if(j==1 & c==1) Fi = Temp else Fi = blkdiag(Fi,Temp)
     }
-    # score and info piv
+# score and info piv
     out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis,fort=fort,ex=TRUE)
     sc = c(sc,out$sc); Fi = blkdiag(Fi,out$Fi)
-    # score and info Pi
+# score and info Pi
     if(param=="multilogit"){
       for(h in 1:k){
         UU = NULL
         for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
         tmp = ZZdis[,,,h]
-        if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+        if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
         tmp2 = PIdis[,,h]
         if(Zndis==1) tmp2 = matrix(tmp2,1,k)
         out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort,ex=TRUE)
@@ -492,7 +504,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       sc = c(sc,out$sc); Fi = blkdiag(Fi,out$Fi)
     }
     Fi = as.matrix(Fi)
-    # compute correction matrix for the information
+# compute correction matrix for the information
     nal = dim(dlPhi)[4]; nbe = dim(dlPiv)[3]; nga = dim(dlPI)[5]
     npar = nal+nbe+nga
     Cor = matrix(0,npar,npar)
@@ -531,10 +543,9 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
           UU = NULL
           for(t in 2:TT) UU = rbind(UU,t(dU[h,,,t,h1]))
           tmp = ZZdis[,,,h]
-          if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+          if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
           tmp2 = PIdis[,,h]
           if(Zndis==1) tmp2 = matrix(tmp2,1,k)
-
           out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort,ex=TRUE)
           ind = nal+nbe+(h-1)*rGa+(1:rGa)
           Cor[h1,ind] = out$sc
@@ -550,7 +561,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
         Cor[h1,ind] = out$sc
       }
     }
-    # check score and information
+# check score and information
     if(check_der){
       lk0 = lk
       out = lk_obs_latent(th,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort)
@@ -579,17 +590,14 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }
   # Compute number of parameters
   if(r==1) np = k*mb*r else np = k*sum(b)
-  np = np+(k-1)*(nc1+1)
-  if(param=="multilogit") np = np+(k-1)*(nc2+1)*k else if(param=="difflogit")  np = np+(k-1)*(nc2+k)
+  np = np+(k-1)*nc1
+  if(param=="multilogit") np = np+(k-1)*nc2*k else if(param=="difflogit")  np = np+(k-1)*(nc2+k)
   aic = -2*lk+np*2
   bic = -2*lk+np*log(n)
   # local decoding
   Ul = matrix(0,ns,TT)
-  for(i in 1:ns) for(t in 1:TT){
-    Ul[i,t] = which.max(V[i,,t])
-  }
+  for(i in 1:ns) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
   if(all(yv==1)) V1=V else V1 = V/yv
-
   if(out_se){
     if(r==1){
       psi = as.vector(aperm(Psi,c(1,3,2)))
@@ -611,34 +619,26 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       }
     }
   }
-  Be = matrix(be,nc1+1,k-1)
-  if (is.null(nameBe)){
-    if(nc1==0) nameBe = c("Intercept") else nameBe = c("intercept",paste("X1",1:nc1,sep=""))
-  }else{
-    nameBe = c("intercept",nameBe)
-  }
-
+  Be = matrix(be,nc1,k-1)
+  if(is.null(nameBe)) nameBe = c("(Intercept)",paste("X1",1:(nc1-1),sep=""))
   dimnames(Be) = list(nameBe,logit=2:k)
-  if(out_se) {seBe = matrix(sebe,nc1+1,k-1); dimnames(seBe) = list(nameBe,logit=2:k)}
+  if(out_se){seBe = matrix(sebe,nc1,k-1); dimnames(seBe) = list(nameBe,logit=2:k)}
   if(param=="multilogit"){
     if(is.null(nameGa)){
-      if(nc2==0) nameGa = c("Intercept") else nameGa = c("intercept", paste("X2",1:nc2,sep=""))
-    }else{
-      nameGa = c("intercept",nameGa)
+      nameGa = c("(Intercept)", paste("X2",1:(nc2-1),sep=""))
     }
     if(k>2) {
-      Ga = array(as.vector(Ga),c(nc2+1,k-1,k))
+      Ga = array(as.vector(Ga),c(nc2,k-1,k))
       dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
     }else if(k==2){
-
-      dimnames(Ga) = 	list(nameGa,logit=1:k)
+      dimnames(Ga) = list(nameGa,logit=1:k)
     }
     if(out_se){
       if(k==2){
-        seGa = matrix(sega,nc2+1,2)
+        seGa = matrix(sega,nc2,2)
         dimnames(seGa) = list(nameGa,logit=1:k)
       }else if(k>2){
-        seGa = array(as.vector(sega),c(nc2+1,k-1,k))
+        seGa = array(as.vector(sega),c(nc2,k-1,k))
         dimnames(seGa) = list(nameGa,logit=2:k,logit=1:k)
       }
     }
@@ -654,11 +654,11 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       nameGa2 = nameGa
     }
     if (k==2) {
-      dimnames(Ga[[1]]) = list(intercept=1:k,logit=k)
-      dimnames(Ga[[2]])=list(nameGa2,logit=k)
+      dimnames(Ga[[1]]) = list("(Intercept)"=1:k,logit=k)
+      dimnames(Ga[[2]]) = list(nameGa2,logit=k)
     } else if (k>2){
-      dimnames(Ga[[1]]) = list(intercept=1:k,logit=2:k)
-      dimnames(Ga[[2]])=list(nameGa2,logit=2:k)
+      dimnames(Ga[[1]]) = list("(Intercept)"=1:k,logit=2:k)
+      dimnames(Ga[[2]]) = list(nameGa2,logit=2:k)
     }
     if(out_se){
       seGa[[1]] = t(matrix(sega[1:(k*(k-1))],k-1,k))
@@ -677,7 +677,8 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   dimnames(Piv)=list(subject=1:ns,state=1:k)
   dimnames(PI)=list(state=1:k,state=1:k,subject=1:ns,time=1:TT)
   if(r==1) dimnames(Psi) = list(category=0:b,state=1:k,item=1) else dimnames(Psi)=list(category=0:mb,state=1:k,item=1:r)
-  out = list(lk=lk,Be=Be,Ga=Ga,Psi=Psi,Piv = Piv, PI = PI, np=np,k = k, aic=aic,bic=bic,lkv=lkv, n = n, TT = TT,paramLatent=param )
+  out = list(lk=lk,Be=Be,Ga=Ga,Psi=Psi,Piv = Piv, PI = PI, np=np,k = k, aic=aic,bic=bic,
+             lkv=lkv, n = n, TT = TT,paramLatent=param,ns=ns,yv=yv)
   if(out_se){
     out$sePsi = sePsi
     out$seBe = seBe
@@ -691,7 +692,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       for(i in 1:ns) for(t in 2:TT) PMarg[i,,t]= t(PI[,,i,t])%*%PMarg[i,,t-1]
       Pmarg <-apply(PMarg,c(2,3),mean)
     }else Pmarg<- NULL
-    out = c(out,list(V = V1, Ul = Ul, S = S, yv=yv, Pmarg=Pmarg))
+    out = c(out,list(V = V1, Ul = Ul, S = S, Pmarg=Pmarg))
   } 
     
   cat("------------|-------------|-------------|-------------|-------------|-------------|\n");

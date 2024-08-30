@@ -3,7 +3,7 @@
 
 \title{Draw samples from LM model with covariaates in the latent model}
 
-\description{Function that draws samples from the LM model with individual covariates with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{drawLMlatent}} \bold{function}.}
+\description{Function that draws samples from the LM model with individual covariates with specific parameters.  \cr \cr \bold{The function is no longer maintained. Please look at} \code{\link{draw.LMlatent}} \bold{function}.}
 
 \usage{
 draw_lm_cov_latent(X1, X2, param = "multilogit", Psi, Be, Ga, fort = TRUE)

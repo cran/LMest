@@ -32,9 +32,13 @@ export("matrices2long")
 
 export("lmestFormula")
 
-export("drawLMbasic", "drawLMlatent", "drawLMlatentcont", "drawLMbasiccont", "drawLMmixed")
-
 # S3methods
+S3method("draw", "LMbasic")
+S3method("draw", "LMbasiccont")
+S3method("draw", "LMlatent")
+S3method("draw", "LMlatentcont")
+S3method("draw", "LMmixed")
+
 S3method("print", "LMbasic")
 S3method("print", "LMlatent")
 S3method("print", "LMmanifest")
@@ -65,7 +69,7 @@ S3method("plot", "LMbasic")
 S3method("plot", "LMlatent")
 
 
-export("bootstrap", "se","lmestDecoding")
+export("bootstrap", "se","lmestDecoding","draw")
 
 
 S3method("bootstrap", "LMbasic")

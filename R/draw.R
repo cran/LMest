@@ -1,33 +1,28 @@
-drawLMbasic <- function(piv,Pi,Psi,
-                        n, est = NULL,
-                        format = c("long","matrices"),
-                        seed = NULL){
+draw <- function(est,n,TT,...) {
+  UseMethod("draw")
+}
+
+draw.LMbasic <- function(est, n = NULL, TT = NULL, format = c("long","matrices"), 
+                         seed = NULL, ...){
 
 # Draw a sample of size n from a Basic Latent Markov model with parameter piv, Pi and Psi
-  format <- match.arg(format, choices = eval(formals(drawLMbasic)$format))
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-  if(!is.null(est))
-  {
-    if (!inherits(est, "LMbasic"))
-    {
-      stop("est must be an object of class 'lmbasic'")
-    }
-    piv <- est$piv
-    Pi <- est$Pi
-    Psi <- est$Psi
-  }
+  format <- match.arg(format, choices = eval(formals(draw.LMbasic)$format))
+  if(!is.null(seed)) set.seed(seed)
+  piv <- est$piv
+  Pi <- est$Pi
+  Psi <- est$Psi
 
-  # Preliminaries
+# Preliminaries
   k = length(piv)
   dd = dim(Psi)
   c = dim(Psi)[1]
-  TT = dim(Pi)[3]
+
+  if(is.null(n)) n = ifelse(is.null(est$ns), est$n, est$ns)
+  if(is.null(TT)) TT = est$TT #TT = dim(Pi)[3]
   if(length(dd)>2) r = dd[3]
   else r = 1
-  # For each subject
+
+# For each subject
   Y = matrix(0,n,TT*r)
   cat("------------|\n")
   cat(" sample unit|\n")
@@ -48,128 +43,87 @@ drawLMbasic <- function(piv,Pi,Psi,
       }
     }
   }
+  if(i/1000>floor(i/1000)) cat(sprintf("%11g",i),"\n",sep=" | ")
   cat("------------|\n")
-  if(format == "matrices")
-  {
-    out = aggr_data(Y)
-    S = out$data_dis
-    yv = out$freq
+  if(format == "matrices"){
+    # out = aggr_data(Y)
+    # S = out$data_dis
+    # yv = out$freq
+    S = Y
+    yv = rep(1,n)
     S = array(t(S), c(r, TT, length(yv)))
     S = aperm(S)
     if (r == 1){S = S[, , 1]}
   }
-  if(format == "long")
-  {
-    S = array(t(Y), c(r, TT, n))
+  if(format == "long"){
+    S = array(t(Y), c(r,TT,n))
     S = aperm(S)
     if (r == 1){S = S[, , 1]}
     id <- 1:n
     #Y <- reshape(data = as.data.frame(Y), varying = list(1:TT),ids = id, direction = "long")
     Y <- matrices2long(Y = S)
-    out <-  aggr_data_long(data = Y[,-c(1,2)], id = Y$id,time = Y$time)
-    S = out$Y
+    # out <-  aggr_data_long(data = Y[,-c(1,2)], id = Y$id,time = Y$time)
+    # S = out$Y
+    S = Y
     Y = as.data.frame(Y)
-    S = as.data.frame(S)
-    yv = out$freq
+    # S = as.data.frame(S)
+    # yv = out$freq
+    yv = rep(1,n)
   }
 
   # S = array(t(S),c(r,TT,length(yv)))
   # S = aperm(S)
   #if(r==1) S = S[,,1]
-
-
-
-  out = list(Y = Y,
-             S = S,
-             yv = yv,
-             piv = piv, Pi = Pi,Psi = Psi,
-             n = n, est = est)
+  out = list(Y = Y, S = S, yv = yv, piv = piv, Pi = Pi,Psi = Psi,
+             n = n, TT=TT, est = est)
 }
 
-drawLMlatent <- function(Psi, Be, Ga,
-                         latentFormula, data, index,
-                         paramLatent = c("multilogit", "difflogit"),
-                         est = NULL, format = c("long", "matrices"),
-                         fort = TRUE,
-                         seed = NULL)
-{
-  # Preliminaries
-  format <- match.arg(format, choices = eval(formals(drawLMlatentcont)$format))
-  param <- match.arg(paramLatent, choices = eval(formals(drawLMlatentcont)$paramLatent))
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-  if(!is.null(est))
-  {
-    if (!inherits(est, "LMlatent"))
-    {
-      stop("est must be an object of class 'LMlatent'")
-    }
-    Psi = est$Psi
-    Be = est$Be
-    Ga = est$Ga
-    latentFormula = attributes(est)$latentFormula
-    id <- attributes(est)$id
-    tv <- attributes(est)$time
-    data <- est$data
-    param <- est$paramLatent
+draw.LMlatent <- function(est, n=NULL, TT=NULL, data, index, format = c("long", "matrices"),
+                         fort = TRUE, seed = NULL, ...){
 
-  }else{
+# Preliminaries
+  format <- match.arg(format, choices = eval(formals(draw.LMlatentcont)$format))
+  if(!is.null(seed)) set.seed(seed)
+  Psi = est$Psi
+  Be = est$Be
+  Ga = est$Ga
+  latentFormula = attributes(est)$latentFormula
+  id.el <- names(data) == index[1]
+  tv.el <- names(data) == index[2]
+  id.which <- which(id.el == TRUE)
+  tv.which <- which(tv.el == TRUE)
+  if(!any(id.el)) stop("the id column does not exist")
+  if(!any(tv.el)) stop("the time column does not exist")
+  id <- data[,id.which]
+  tv <- data[,tv.which]
 
-
-    id.el <- names(data) == index[1]
-    tv.el <- names(data) == index[2]
-
-
-    id.which <- which(id.el == TRUE)
-    tv.which <- which(tv.el == TRUE)
-
-
-    if(!any(id.el))
-    {
-      stop("the id column does not exist")
-    }
-
-    if(!any(tv.el))
-    {
-      stop("the time column does not exist")
-    }
-
-    id <- data[,id.which]
-    tv <- data[,tv.which]
-  }
-
-  temp <-  getLatent(data = data,latent = latentFormula,
-                            responses = as.formula(paste(names(data)[1],"NULL", sep = "~")))
+  param <- est$paramLatent
+  temp <-  getLatent(data = data, latent = latentFormula,
+                     responses = as.formula(paste(names(data)[1],"NULL", sep = "~")))
   Xinitial <- temp$Xinitial
   Xtrans <- temp$Xtrans
   tmp <-  long2matrices.internal(Y = Xtrans, id = id, time = tv,
-                                        yv = NULL, Xinitial = Xinitial, Xtrans = Xtrans)
+                                 yv = NULL, Xinitial = Xinitial, Xtrans = Xtrans)
   X1 <- tmp$Xinitial
   X2 <- tmp$Xtrans
-
-  if(!is.null(X1))
-  {
-    if(any(is.na(X1)))
-    {
-      stop("missing data in the covariates affecting the initial probabilities are not allowed")
-    }
+  if(param=="difflogit"){
+    cat("\n* With difflogit is not possible to avoid the intercept for the transition probabilities*\n\n")
+    X2 = X2[,,-1,drop=FALSE]
   }
 
-
-  if(!is.null(X2))
-  {
-    if(any(is.na(X2)))
-    {
-      stop("missing data in the covariates affecting the transition probabilities are not allowed")
-    }
+  if(!is.null(X1)){
+    if(any(is.na(X1))) stop("missing data in the covariates affecting the initial probabilities are not allowed")
+  }
+  if(!is.null(X2)){
+    if(any(is.na(X2))) stop("missing data in the covariates affecting the transition probabilities are not allowed")
   }
 
-
-  # Preliminaries
-  n = nrow(X2)
-  TT = dim(X2)[2]+1
+# Preliminaries
+  # if(is.null(n)) n = est$n #n = nrow(X2)
+  # if(is.null(TT)) TT = est$TT #TT = dim(X2)[2]+1
+  if(is.null(n)) n = length(unique(data[,which(names(data)==index[1])])) #n = nrow(X2)
+  if(is.null(TT)) TT = max(data[,which(names(data)==index[2])]) #TT = dim(X2)[2]+1
+  
   dPsi = dim(Psi)
   if(length(dPsi)==2) r = 1
   else r = dPsi[3]
@@ -182,32 +136,48 @@ drawLMlatent <- function(Psi, Be, Ga,
     b = rep(0,r)
     for(j in 1:r) b[j] = sum(!is.na(Psi[,1,j]))-1
   }
-  # Covariate structure and related matrices: initial probabilities
-  if(is.vector(X1)) X1 = matrix(X1,n,1)
-  nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+
+# Covariate structure and related matrices: initial probabilities
+  if(is.null(X1)){
+    nc1 = 0
+    Xlab = rep(1,n)
+  }else{
+    if(is.vector(X1)) X1 = matrix(X1,n,1)
+    nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+    out = MultiLCIRT::aggr_data(X1)
+    Xdis = out$data_dis
+    if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
+    Xlab = out$label
+  }
+  
   if(k == 2) GBe = as.matrix(c(0,1)) else{
     GBe = diag(k); GBe = GBe[,-1]
   }
-  out = MultiLCIRT::aggr_data(X1)
-  Xdis = out$data_dis
-  if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
-  Xlab = out$label
+  
   Xndis = max(Xlab)
-  XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
+  XXdis = array(0,c(k,(k-1)*nc1,Xndis))
   for(i in 1:Xndis){
-    xdis = c(1,Xdis[i,])
+    if(nc1==0) xdis = 1 else xdis = Xdis[i,]
     XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
   }
 
-  # for the transition probabilities
-  if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
-  nc2 = dim(X2)[3] # number of covariates on the transition probabilities
-  Z = NULL
-  for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
-  if(nc2==1) Z = as.vector(X2)
-  out = MultiLCIRT::aggr_data(Z); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+# for the transition probabilities
+  if(is.null(X2)){
+    nc2 = 0
+    Zlab = rep(1,n*(TT-1))
+    Zndis = max(Zlab)
+  }else{
+    if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
+    nc2 = dim(X2)[3] # number of covariates on the transition probabilities
+    Z = NULL
+    for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
+    if(nc2==1) Z = as.vector(X2)
+    out = aggr_data(Z); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+    if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
+  }
+
   if(param=="multilogit"){
-    ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
+    ZZdis = array(0,c(k,(k-1)*nc2,Zndis,k))
     for(h in 1:k){
       if(k==2){
         if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
@@ -215,7 +185,7 @@ drawLMlatent <- function(Psi, Be, Ga,
         GGa = diag(k); GGa = GGa[,-h]
       }
       for(i in 1:Zndis){
-        zdis = c(1,Zdis[i,])
+        if(nc2==0) zdis = 1 else zdis = Zdis[i,]
         ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
       }
     }
@@ -239,7 +209,7 @@ drawLMlatent <- function(Psi, Be, Ga,
     }
   }
 
-  # When there is just 1 latent class
+# When there is just 1 latent class
   Y = array(0,c(n,TT,r))
   if(k == 1){
     U = array(1,n,TT)
@@ -251,20 +221,21 @@ drawLMlatent <- function(Psi, Be, Ga,
       }
     }
   }else{
-    # parameters on initial probabilities
+# parameters on initial probabilities
     U = matrix(0,n,TT)
     be = as.vector(Be)
     out =  prob_multilogit(XXdis,be,Xlab,fort)
     Piv = out$P
     for(i in 1:n) U[i,1] = which(rmultinom(1,1,Piv[i,])==1)
-
-    # parameters on transition probabilities
+# parameters on transition probabilities
     if(param=="multilogit"){
       if(is.list(Ga)) stop("invalid mode (list) for Ga")
-      Ga = matrix(Ga,(nc2+1)*(k-1),k)
+      Ga = matrix(Ga,max(nc2,1)*(k-1),k)
       PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,n,TT))
       for(h in 1:k){
-        out =  prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+        tmp = ZZdis[,,,h]
+        if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
+        out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
         PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,n,TT-1))
       }
     }else if(param=="difflogit"){
@@ -282,26 +253,23 @@ drawLMlatent <- function(Psi, Be, Ga,
       Y[i,t,j] = which(rmultinom(1,1,Psi[1:(b[j]+1),U[i,t],j])==1)-1
     }
   }
-  # output
-  if(r==1) Y = matrix(Y,n,TT)
 
-  if(format == "long")
-  {
+# output
+  if(r==1) Y = matrix(Y,n,TT)
+  if(format == "long"){
     #id <- 1:n
     #Y <- reshape(data = as.data.frame(Y), varying = list(1:TT),ids = id, direction = "long")
     #out <-  aggr_data_long(data = Y[,-c(1,3)], id = Y$id,time = Y$time)
     Y <- matrices2long(Y = Y)
   }
-  out = list(U = U,Y = Y, Psi = Psi, Be = Be, Ga = Ga, latentFormula = latentFormula, data = data, est = est)
+  yv = rep(1,n)
+  out = list(U = U, Y = Y, Psi = Psi, Be = Be, Ga = Ga, latentFormula = latentFormula,
+             data = data, n=n, TT=TT, est = est, yv=yv)
 
 }
 
-drawLMlatentcont <- function(Mu, Si, Be, Ga,
-                             latentFormula, data, index,
-                             paramLatent = c("multilogit", "difflogit"),
-                             est = NULL, format = c("long", "matrices"),
-                             fort = TRUE,
-                             seed = NULL){
+draw.LMlatentcont <- function(est, n=NULL, TT=NULL, data, index, format = c("long", "matrices"),
+                              fort = TRUE, seed = NULL, ...){
 
   # Draw a sample from LM model with covariates
   # param = type of parametrization for the transition probabilities:
@@ -311,82 +279,51 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
   # X1    = design matrix for the initial probabilities (n by n.cov.)
   # X2    = design matrix for the initial probabilities (n by TT-1 by n.cov.)
 
-  # Preliminaries
-  format <- match.arg(format, choices = eval(formals(drawLMlatentcont)$format))
-  param <- match.arg(paramLatent, choices = eval(formals(drawLMlatentcont)$paramLatent))
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-  if(!is.null(est))
-  {
-    if (!inherits(est, "LMlatentcont"))
-    {
-      stop("est must be an object of class 'LMlatentcont'")
-    }
-    Mu <- est$Mu
-    Si <- est$Si
-    Be <- est$Be
-    Ga <- est$Ga
-    latentFormula = attributes(est)$latentFormula
-    id <- attributes(est)$id
-    tv <- attributes(est)$time
-    data <- est$data
-    param <- est$paramLatent
-
-  }else{
-
-
-    id.el <- names(data) == index[1]
-    tv.el <- names(data) == index[2]
-
-
-    id.which <- which(id.el == TRUE)
-    tv.which <- which(tv.el == TRUE)
-
-
-    if(!any(id.el))
-    {
-      stop("the id column does not exist")
-    }
-
-    if(!any(tv.el))
-    {
-      stop("the time column does not exist")
-    }
-
-    id <- data[,id.which]
-    tv <- data[,tv.which]
-  }
-
+# Preliminaries
+  format <- match.arg(format, choices = eval(formals(draw.LMlatentcont)$format))
+  if(!is.null(seed)) set.seed(seed)
+  Mu <- est$Mu
+  Si <- est$Si
+  Be <- est$Be
+  Ga <- est$Ga
+  latentFormula = attributes(est)$latentFormula
+  id.el <- names(data) == index[1]
+  tv.el <- names(data) == index[2]
+  id.which <- which(id.el == TRUE)
+  tv.which <- which(tv.el == TRUE)
+  if(!any(id.el)) stop("the id column does not exist")
+  if(!any(tv.el)) stop("the time column does not exist")
+  id <- data[,id.which]
+  tv <- data[,tv.which]
+  param <- est$paramLatent
   temp <-  getLatent(data = data,latent = latentFormula,
-                            responses = as.formula(paste(names(data)[1],"NULL", sep = "~")))
+                     responses = as.formula(paste(names(data)[1],"NULL", sep = "~")))
   Xinitial <- temp$Xinitial
   Xtrans <- temp$Xtrans
   tmp <-  long2matrices.internal(Y = Xtrans, id = id, time = tv,
                                         yv = NULL, Xinitial = Xinitial, Xtrans = Xtrans)
   X1 <- tmp$Xinitial
   X2 <- tmp$Xtrans
-
-  if(!is.null(X1))
-  {
-    if(any(is.na(X1)))
-    {
-      stop("missing data in the covariates affecting the initial probabilities are not allowed")
-    }
+  if(param=="difflogit"){
+    cat("\n* With difflogit is not possible to avoid the intercept for the transition probabilities*\n\n")
+    X2 = X2[,,-1,drop=FALSE]
   }
 
-
-  if(!is.null(X2))
-  {
-    if(any(is.na(X2)))
-    {
-      stop("missing data in the covariates affecting the transition probabilities are not allowed")
-    }
+  if(!is.null(X1)){
+    if(any(is.na(X1))) stop("missing data in the covariates affecting the initial probabilities are not allowed")
   }
 
-  n = nrow(X2)
-  TT = dim(X2)[2]+1
+  if(!is.null(X2)){
+    if(any(is.na(X2))) stop("missing data in the covariates affecting the transition probabilities are not allowed")
+  }
+  # if(is.null(n)){
+  #   if(is.null(est$ns)) n = est$n else n = est$ns #SP #n = nrow(X2)
+  # }
+  # if(is.null(TT)) TT = est$TT #SP #TT = dim(X2)[2]+1
+
+  if(is.null(n)) n = length(unique(data[,which(names(data)==index[1])])) #n = nrow(X2)
+  if(is.null(TT)) TT = max(data[,which(names(data)==index[2])]) #TT = dim(X2)[2]+1
+  
   if(is.vector(Mu)){
     r = 1
     k = length(Mu)
@@ -397,34 +334,49 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
     k = ncol(Mu)
   }
 
-  # Covariate structure and related matrices: initial probabilities
-  if(is.vector(X1)) X1 = matrix(X1,n,1)
-  nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+# Covariate structure and related matrices: initial probabilities
+  if(is.null(X1)){
+    nc1=0
+    Xlab = rep(1,n)
+  }else{  
+    if(is.vector(X1)) X1 = matrix(X1,n,1)
+    nc1 = dim(X1)[2] # number of covariates on the initial probabilities
+    out =  aggr_data(X1)
+    Xdis = out$data_dis
+    if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
+    Xlab = out$label
+  }
+  
   if(k == 2){
     GBe = as.matrix(c(0,1))
   }else{
     GBe = diag(k); GBe = GBe[,-1]
   }
-  out =  aggr_data(X1)
-  Xdis = out$data_dis
-  if(nc1==1) Xdis = matrix(Xdis,length(Xdis),1)
-  Xlab = out$label
+  
   Xndis = max(Xlab)
-  XXdis = array(0,c(k,(k-1)*(nc1+1),Xndis))
+  XXdis = array(0,c(k,(k-1)*nc1,Xndis))
   for(i in 1:Xndis){
-    xdis = c(1,Xdis[i,])
+    if(nc1==0) xdis = 1 else xdis = Xdis[i,]
     XXdis[,,i] = GBe%*%(diag(k-1)%x%t(xdis))
   }
 
   # for the transition probabilities
-  if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
-  nc2 = dim(X2)[3] # number of covariates on the transition probabilities
-  Z = NULL
-  for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
-  if(nc2==1) Z = as.vector(X2)
-  out =  aggr_data(Z); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+  if(is.null(X2)){
+    nc2 = 0
+    Zlab = rep(1,n*(TT-1))
+    Zndis = max(Zlab)
+  }else{
+    if(is.matrix(X2)) X2 = array(X2,c(n,TT-1,1))
+    nc2 = dim(X2)[3] # number of covariates on the transition probabilities
+    Z = NULL
+    for(t in 1:(TT-1)) Z = rbind(Z,X2[,t,])
+    if(nc2==1) Z = as.vector(X2)   
+    out =  aggr_data(Z); Zdis = out$data_dis; Zlab = out$label; Zndis = max(Zlab)
+    if(nc2==1) Zdis=matrix(Zdis,length(Zdis),1)
+  }  
+
   if(param=="multilogit"){
-    ZZdis = array(0,c(k,(k-1)*(nc2+1),Zndis,k))
+    ZZdis = array(0,c(k,(k-1)*nc2,Zndis,k))
     for(h in 1:k){
       if(k==2){
         if(h == 1) GGa = as.matrix(c(0,1)) else GGa = as.matrix(c(1,0))
@@ -432,7 +384,7 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
         GGa = diag(k); GGa = GGa[,-h]
       }
       for(i in 1:Zndis){
-        zdis = c(1,Zdis[i,])
+        if(nc2==0) zdis = 1 else zdis = Zdis[i,]
         ZZdis[,,i,h] = GGa%*%(diag(k-1)%x%t(zdis))
       }
     }
@@ -456,23 +408,25 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
     }
   }
 
-  # Draw data
+# Draw data
   Y = array(0,c(n,TT,r))
   U = matrix(0,n,TT)
 
-  # first time occasion
+# first time occasion
   be = as.vector(Be)
   out =  prob_multilogit(XXdis,be,Xlab,fort)
   Piv = out$P
   for(i in 1:n) U[i,1] = which(rmultinom(1,1,Piv[i,])==1)
 
-  # following time occasions
+# following time occasions
   if(param=="multilogit"){
     if(is.list(Ga)) stop("invalid mode (list) for Ga")
-    Ga = matrix(Ga,(nc2+1)*(k-1),k)
+    Ga = matrix(Ga,max(nc2,1)*(k-1),k)
     PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,n,TT))
     for(h in 1:k){
-      out =  prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+      tmp = ZZdis[,,,h]
+      if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
+      out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
       PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,n,TT-1))
     }
   }else if(param=="difflogit"){
@@ -492,7 +446,6 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
 
   # output
   if(r==1) Y = matrix(Y,n,TT)
-
   if(format == "long")
   {
     #id <- 1:n
@@ -505,41 +458,25 @@ drawLMlatentcont <- function(Mu, Si, Be, Ga,
   # S = aperm(S)
   #if(r==1) S = S[,,1]
 
+  yv = rep(1,n)
+  out = list(Y=Y, U=U, Mu=Mu, Si=Si, Be=Be, Ga=Ga, latentFormula=latentFormula, data=data, 
+             n=n, TT=TT, est=est, yv=yv)
 
-
-  out = list(Y = Y,
-             U = U,
-             Mu = Mu, Si = Si, Be = Be, Ga = Ga,
-             latentFormula = latentFormula, data = data, est = est)
 }
 
-drawLMbasiccont <- function(piv,Pi,Mu,Si,n,
-                            est = NULL,format = c("long","matrices"),
-                            seed = NULL){
+draw.LMbasiccont <- function(est,n=NULL,TT=NULL,  format = c("long","matrices"), seed = NULL, ...){
 
   #        [Y,yv] = draw_lm_basic(piv,Pi,Mu,Si,n)
   #
   # Draw a sample of size n from a Basic Latent Markov model for continuous data with parameter piv, Pi, Mu and Si
 
   # Preliminaries
-  format <- match.arg(format, choices = eval(formals(drawLMbasiccont)$format))
-
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-  if(!is.null(est))
-  {
-    if (!inherits(est, "LMbasiccont"))
-    {
-      stop("est must be an object of class 'lmbasic'")
-    }
-    piv <- est$piv
-    Pi <- est$Pi
-    Mu <- est$Mu
-    Si <- est$Si
-  }
-
+  format <- match.arg(format, choices = eval(formals(draw.LMbasiccont)$format))
+  if(!is.null(seed)) set.seed(seed)
+  piv <- est$piv
+  Pi <- est$Pi
+  Mu <- est$Mu
+  Si <- est$Si
 
   if(is.vector(Mu)){
     r = 1
@@ -549,65 +486,63 @@ drawLMbasiccont <- function(piv,Pi,Mu,Si,n,
     r = nrow(Mu)
     k = ncol(Mu)
   }
-  TT = dim(Pi)[3]
+  if(is.null(n)) n = ifelse(is.null(est$ns), est$n, est$ns)
+  
+  if(is.null(TT)) TT = est$TT #TT = dim(Pi)[3]
   if(r==1) Si = matrix(Si,r,r)
-  # For each subject
+  
+# For each subject
   Y = array(0,c(n,TT,r))
   cat("------------|\n")
   cat(" sample unit|\n")
   cat("------------|\n")
   for(i in 1:n){
     if(i/1000==floor(i/1000)) cat(sprintf("%11g",i),"\n",sep=" | ")
-    u = k+1-sum(runif(1)<cumsum(piv))
-    Y[i,1,] = rmvnorm(1,Mu[,u],Si)
-
+    if(k==1){
+      u = 1
+      Y[i,1,] = rmvnorm(1,Mu[,u],Si)
+    }else{
+      u = k+1-sum(runif(1)<cumsum(piv))
+      Y[i,1,] = rmvnorm(1,Mu[,u],Si)
+    }
     for(t in 2:TT){
-      u = k+1-sum(runif(1)<cumsum(Pi[u,,t]))
-      Y[i,t,] = rmvnorm(1,Mu[,u],Si)
+      if(k==1){
+        u = 1
+        Y[i,t,] = rmvnorm(1,Mu[,u],Si)
+      }else{
+        u = k+1-sum(runif(1)<cumsum(Pi[u,,t]))
+        Y[i,t,] = rmvnorm(1,Mu[,u],Si)
+      }
     }
   }
-  if(format == "long")
-  {
+  if(i/1000>floor(i/1000)) cat(sprintf("%11g",i),"\n",sep=" | ")
+  if(format == "long"){
     # id <- 1:n
     # Y <- reshape(data = as.data.frame(Y), varying = list(1:TT),ids = id, direction = "long")
     # Y <- as.data.frame(Y)
     Y <- matrices2long(Y = Y)
   }
-
-
+  yv = rep(1,n)
   cat("------------|\n")
-  out = list(Y = Y, piv = piv, Pi = Pi, Mu = Mu, Si = Si, n = n,
-             est = est)
+  out = list(Y = Y, piv = piv, Pi = Pi, Mu = Mu, Si = Si, n = n, TT = TT,
+             est = est, yv = yv)
   return(out)
+
 }
 
-drawLMmixed <- function(la, Piv, Pi, Psi, n, TT,
-                        est = NULL, format = c("long", "matrices"),
-                        seed = NULL){
+draw.LMmixed <- function(est,n=NULL,TT=NULL,format = c("long", "matrices"), seed = NULL, ...){
 
   #        [Y,S,yv] = draw_lm_mixed(la,Piv,Pi,Psi,n,TT)
   #
   # Draw a sample of size n from a mixed Latent Markov model with specific parameters
-  format <- match.arg(format, choices = eval(formals(drawLMbasic)$format))
+  format <- match.arg(format, choices = eval(formals(draw.LMbasic)$format))
 
   # Preliminaries
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-  if(!is.null(est))
-  {
-    if (!inherits(est, "LMmixed"))
-    {
-      stop("est must be an object of class 'LMmixed'")
-    }
-    Piv <- est$Piv
-    Pi <- est$Pi
-    Psi <- est$Psi
-    la <- est$la
-    TT <- est$TT
-      }
-
+  if(!is.null(seed)) set.seed(seed)
+  Piv <- est$Piv
+  Pi <- est$Pi
+  Psi <- est$Psi
+  la <- est$la
 
   k1 = length(la)
   k2 = nrow(Piv)
@@ -615,6 +550,8 @@ drawLMmixed <- function(la, Piv, Pi, Psi, n, TT,
   l = dim(Psi)[1]
   if(length(dd)>2) r = dd[3] else r = 1
   Psi = array(Psi,c(l,k2,r))
+  if(is.null(n)) n=est$n
+  if(is.null(TT)) TT=est$TT
   # # For each subject
   Y = matrix(0,n,TT*r)
   cat("------------|\n")
@@ -637,9 +574,9 @@ drawLMmixed <- function(la, Piv, Pi, Psi, n, TT,
       }
     }
   }
+  if(i/100>floor(i/100)) cat(sprintf("%11g",i),"\n",sep=" | ")
   cat("------------|\n")
-  if(format == "matrices")
-  {
+  if(format == "matrices"){
     out = aggr_data(Y)
     S = out$data_dis
     yv = out$freq
@@ -647,8 +584,7 @@ drawLMmixed <- function(la, Piv, Pi, Psi, n, TT,
     S = aperm(S)
     if (r == 1){S = S[, , 1]}
   }
-  if(format == "long")
-  {
+  if(format == "long"){
     S = array(t(Y), c(r, TT, n))
     S = aperm(S)
     if (r == 1){S = S[, , 1]}
@@ -666,10 +602,7 @@ drawLMmixed <- function(la, Piv, Pi, Psi, n, TT,
   # S = aperm(S)
   #if(r==1) S = S[,,1]
 
-
-
-  out = list(Y = Y,
-             S = S,
-             yv = yv, la = la, Piv = Piv, Pi = Pi, Psi = Psi, n = n, TT = TT,
+  out = list(Y = Y, S = S, yv = yv, la = la, Piv = Piv, Pi = Pi, Psi = Psi, n = n, TT = TT,
              est = est)
+
 }

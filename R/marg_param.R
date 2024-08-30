@@ -10,7 +10,7 @@ marg_param <- function(lev,type){
 # type: vector with elements 'l', 'g', 'c', 'r' indicating the type of logit
 #
 # OUTPUT:
-# C:    matrix of constrats (the first sum(lev)-length(r) elements are
+# C:    matrix of contrats (the first sum(lev)-length(r) elements are
 #       referred to univariate logits)
 # M:    marginalization matrix with elements 0 and 1
 # G:    corresponding design matrix for the corresponding log-linear model

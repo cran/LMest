@@ -14,13 +14,16 @@ print.LMbasic <-function(x, ...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_basic function is no longer maintained. Please look at lmest function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, 
+                       TT=x$TT, row.names=" "))
+    }
   }
 
 }
@@ -42,14 +45,16 @@ print.LMbasiccont <-function(x, ...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
-  }
+    if(!is.null(x$lk)){
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
+ }
 }
 
 print.LMmanifestcont <-function(x, ...){
@@ -62,12 +67,15 @@ print.LMmanifestcont <-function(x, ...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
+    warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 }
 
@@ -80,13 +88,16 @@ print.LMbasiccontMISS <-function(x, ...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+ 
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_basic_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 }
 
@@ -106,13 +117,15 @@ print.LMlatent <-function(x,...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_cov_latent function is no longer maintained. Please look at lmest function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 
 }
@@ -126,20 +139,22 @@ print.LMlatent <-function(x,...){
 
 print.LMlatentcont <-function(x,...){
   cat("\nBasic Latent Markov model for continuous outcomes with covariates in the latent model\n")
-  if(!is.null(x$call))
-  {
+  if(!is.null(x$call)){
     cat("Call:\n")
     print(x$call)
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_cov_latent_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){ 
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, 
+                       TT=x$TT, row.names=" "))
+    }
   }
 }
 
@@ -152,13 +167,15 @@ print.LMlatentcontMISS <-function(x,...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_cov_latent_cont function is no longer maintained. Please look at lmestCont function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){ 
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 }
 # print.LMmanifest <-function(x,...){
@@ -183,7 +200,10 @@ print.LMmanifest <-function(x,...){
     warning("est_lm_cov_manifest function is no longer maintained. Please look at lmest function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){ 
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k = x$k, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 }
 
@@ -203,13 +223,15 @@ print.LMmixed <-function(x, ...){
   }
   cat("\nAvailable objects:\n")
   print(names(x))
-  cat("\nConvergence info:\n")
-  if(is.null(x$TT))
-  {
+  if(is.null(x$TT)){
+    cat("\nConvergence info:\n")
     warning("est_lm_mixed function is no longer maintained. Please look at lmestMixed function",call. = FALSE)
     print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
   }else{
-    print(data.frame(LogLik=x$lk,np=x$np, k1 = x$k1, k2 = x$k2, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    if(!is.null(x$lk)){ 
+      cat("\nConvergence info:\n")
+      print(data.frame(LogLik=x$lk,np=x$np, k1 = x$k1, k2 = x$k2, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
+    }
   }
 }
 
@@ -298,5 +320,3 @@ print.MCcov <-function(x,...){
     print(data.frame(LogLik=x$lk,np=x$np, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
   }
 }
-
-

@@ -1,4 +1,4 @@
-complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
+complk_cont_miss <- function(Y,R,yv,piv,Pi,Mu,Si,k,fort=TRUE){
 
 # ---- Preliminaries ----
   if(!fort){
@@ -6,7 +6,8 @@ complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
     dmvnorm1 <-function(y,mu,Si) f = exp(-c((y-mu)%*%solve(Si)%*%(y-mu))/2)/sqrt(det(2*pi*Si))
   }
   sY = dim(Y)
-  n = as.integer(sY[1])
+  n = sum(yv)
+  ns = as.integer(sY[1])
   TT = as.integer(sY[2])
   if(length(sY)==2) r = 1 else r = sY[3]
   r = as.integer(r)
@@ -18,14 +19,14 @@ complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
 
 # ---- Compute conditional probabilities ----
   # t0 = proc.time()
-  Phi = array(1,c(n,k,TT)); L = array(0,c(n,k,TT))
+  Phi = array(1,c(ns,k,TT)); L = array(0,c(ns,k,TT))
   if(miss){
     if(fort){
       RR = array(as.integer(1*R),c(n,TT,r))
-      out = .Fortran("normmiss",Y,RR,n,TT,r,k,Mu,Si,Phi=Phi)
+      out = .Fortran("normmiss",Y,RR,ns,TT,r,k,Mu,Si,Phi=Phi)
       Phi = out$Phi
     }else{
-      for(i in 1:n) for(t in 1:TT){
+      for(i in 1:ns) for(t in 1:TT){
         if(all(!R[i,t,])){
           Phi[i,,t] = 1
         }else{
@@ -40,7 +41,7 @@ complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
       if(r==1){
         Phi[,u,t] = pmax(dnorm(Y[,t,],Mu[,u],sqrt(Si)),0.1^300)
       }else{
-        Phi[,u,t] =  pmax(dmvnorm(matrix(Y[,t,],n,r),Mu[,u],Si),0.1^300)
+        Phi[,u,t] =  pmax(dmvnorm(matrix(Y[,t,],ns,r),Mu[,u],Si),0.1^300)
       }
     }
   }
@@ -50,14 +51,14 @@ complk_cont_miss <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
   L[,,1] = Phi[,,1]%*%diag(piv)
   if(n==1) Lt = sum(L[,,1])
   else Lt = rowSums(L[,,1])
-  lk = sum(log(Lt))
+  lk = sum(yv*log(Lt))
   L[,,1] = L[,,1]/Lt
   # print(c(2,2,proc.time()-t0))
   for(t in 2:TT){
     L[,,t] = Phi[,,t]*(L[,,t-1]%*%Pi[,,t])
     if(n==1) Lt = sum(L[1,,t])
     else Lt = rowSums(L[,,t])
-    lk = lk+sum(log(Lt))
+    lk = lk+sum(yv*log(Lt))
     L[,,t] = L[,,t]/Lt
   }
   # print(c(2,3,proc.time()-t0))

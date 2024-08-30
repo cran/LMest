@@ -16,7 +16,7 @@
   \item{aic}{value of the Akaike Information Criterion for model selection}
   \item{bic}{value of the Bayesian Information Criterion for model selection}
   \item{lkv}{log-likelihood trace at every step}
-  \item{n}{number of observations in the data}
+  \item{n}{sample size (sum of the weights when weights are provided)}
   \item{TT}{number of time occasions}
   \item{modBasic}{model on the transition probabilities: default 0 for time-heterogeneous transition matrices, 1 for time-homogeneous transition matrices, 2 for partial time homogeneity based on two transition matrices one from 2 to (TT-1) and the other for TT.}
   \item{sepiv}{standard errors for the initial probabilities}
@@ -28,10 +28,12 @@
     \item{V}{array containing the estimated posterior probabilities of the latent states for each response configuration and time occasion}
  	\item{Ul}{matrix containing the predicted sequence of latent states by the local decoding method}
  	\item{S}{array containing the available response configurations}
- 	  \item{yv}{vector of frequencies of the available configurations}
- 	\item{Pmarg}{matrix containing the marginal distribution of the latent states} 
+ 	\item{yv}{vector of frequencies of the available configurations}
+ 	\item{Pmarg}{matrix containing the marginal distribution of the latent states}
+ 	\item{ns}{number of distinct response configurations}
   \item{call}{command used to call the function}
   \item{data}{data.frame given in input}
+  
 }
 
 

@@ -14,7 +14,8 @@ lk_comp_latent <- function(S,R,yv,Piv,PI,Psi,k,fort=TRUE,der=FALSE,dlPsi=NULL,dl
 	Phi = array(1,c(ns,k,TT)); L = array(0,c(ns,k,TT))
 	if(fort){
 		Psi[is.na(Psi)]=0
-            o = .Fortran("for_mult",as.integer(TT),as.integer(r),as.integer(k),as.integer(ns),as.integer(l),as.integer(S),Psi,Piv,PI,Phi=Phi,LL=array(0,c(ns,k,TT)))
+            o = .Fortran("for_mult",as.integer(TT),as.integer(r),as.integer(k),as.integer(ns),as.integer(l),
+                         as.integer(S),Psi,Piv,PI,Phi=Phi,LL=array(0,c(ns,k,TT)))
             Phi = o$Phi; L = o$LL
 	}else{
 		if(miss) for(j in 1:r) Phi[,,1] = Phi[,,1]*(Psi[S[,1,j]+1,,j]*R[,1,j]+(1-R[,1,j]))

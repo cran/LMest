@@ -2,14 +2,14 @@ prob_post_cov <-
 function(S,yv,Psi,Piv,PI,Phi,L,pv,der=FALSE,fort=TRUE,
                           dlPhi=NULL,dlPiv=NULL,dlPI=NULL,dlL=NULL,dlL2=NULL,dlpv=NULL){
 	
-# prelimiaries
+# preliminaries
    	sS = dim(S)
   	ns = sS[1]
   	TT = sS[2]
   	if(length(sS)==2) r = 1	else r = sS[3]
     mb = max(S)
     k = ncol(Piv)
-# use backward recursion for potesterior probabilities	
+# use backward recursion for posterior probabilities	
     if(fort){
     	Psi[is.na(Psi)]=0
       o = .Fortran("back",as.integer(TT),as.integer(r),as.integer(k),as.integer(ns),as.integer(mb+1),as.integer(S),Psi,Piv,PI,Phi,L,U=array(0,c(k,k,ns,TT)),V=array(0,c(ns,k,TT)))
@@ -40,7 +40,7 @@ function(S,yv,Psi,Piv,PI,Phi,L,pv,der=FALSE,fort=TRUE,
     	for(i in 1:ns) M[i,] = PI[,,i,2]%*%MP[i,]
     	V1[,,1] = L[,,1]*M*Pv; V[,,1] = Yv*V1[,,1]
     }   
-# compute derivarives
+# compute derivatives
 # if the derivative is required
   	if(der){
   		nal = dim(dlPhi)[4]; nbe = dim(dlPiv)[3]; nga = dim(dlPI)[5]

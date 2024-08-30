@@ -6,7 +6,7 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
                       maxit = 5000, out_se = FALSE, output = FALSE,
                       parInit = list(piv = NULL, Pi = NULL, Mu = NULL, Si = NULL,
                                      Be = NULL, Ga = NULL),
-                     fort = TRUE, seed = NULL, ntry = 0, miss.imp = FALSE){
+                      fort = TRUE, seed = NULL, ntry = 0, miss.imp = FALSE){
 
   data <- as.data.frame(data)
   if(!is.data.frame(data)) stop("A data.frame must be provided")
@@ -24,10 +24,7 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
   k <- sort(unique(k))
   nkv <- length(k)
 
-  if(length(index) !=2)
-  {
-    stop("id and time must be provided")
-  }
+  if(length(index) !=2) stop("id and time must be provided")
   id.which <- which(names(data) == index[1])
   tv.which <- which(names(data) == index[2])
 
@@ -36,7 +33,6 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
 
   modSel <- match.arg(modSel, choices = eval(formals(lmestCont)$modSel))
   paramLatent <- match.arg(paramLatent, choices = eval(formals(lmestCont)$paramLatent))
-
   id <- data[,id.which]
   tv <- data[,tv.which]
 
@@ -69,8 +65,10 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
     Xinitial <- temp$Xinitial
     Xtrans <- temp$Xtrans
   }
-  tmp <- long2matrices.internal(Y = Y, id = id, time = tv,Xinitial = Xinitial, 
-                                Xmanifest = Xmanifest, Xtrans = Xtrans, cont = TRUE)
+  Xinitial0 = Xinitial; Xtrans0 = Xtrans
+  if(is.null(weights)) weights = rep(1,length(unique(id)))
+  tmp <- long2matrices.internal(Y = Y, id = id, time = tv, yv = weights, 
+                                Xinitial = Xinitial, Xmanifest = Xmanifest, Xtrans = Xtrans, cont = TRUE)
   model <- tmp$model
   Xinitial <- tmp$Xinitial
   Xtrans <- tmp$Xtrans
@@ -81,6 +79,10 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
     freq = weights
     if(nrow(Y)!=length(weights)) stop("dimensions mismatch between data and weights")
   }
+  if(any(is.na(Xinitial) & !any(is.na(Xinitial0))))
+    for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
+  if(any(is.na(Xtrans) & !any(is.na(Xtrans0)))) 
+    for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
 
   out = vector("list",nkv)
   if(!is.null(Xinitial)){
@@ -104,16 +106,21 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
   }
   npv = lkv = aicv = bicv = rep(NA,nkv)
 #  model <- paste(model, covariance, sep = "")
+  if(any(is.na(tmp$Xmanifest))){
+    Xmanifest = matrix(aperm(tmp$Xmanifest,c(2,1,3)),dim(tmp$Xmanifest)[1]*dim(tmp$Xmanifest)[2],dim(tmp$Xmanifest)[3])
+    for(j in 1:ncol(Xmanifest)) Xmanifest[is.na(Xmanifest[,j]),j] = mean(Xmanifest[,j],na.rm=TRUE)
+  }
   for(kv in 1:nkv){
     out[[kv]] <- switch(model,
-                        "LMbasiccont" = (lmbasic.cont(Y = Y,k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,out_se = out_se,
+                        "LMbasiccont" = (lmbasic.cont(Y = Y, yv = freq, k = k[kv], start = start,modBasic = modBasic,
+                                                      tol = tol, maxit = maxit, out_se = out_se,
                                                            piv = parInit$piv,Pi = parInit$Pi,Mu = parInit$Mu,Si = parInit$Si, output=output, fort = fort,
                                                            ntry=ntry)),
-                        "LMlatentcont" = (lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans,k = k[kv],
+                        "LMlatentcont" = (lmcovlatent.cont(Y = Y,X1 = Xinitial,X2 = Xtrans, yv=freq, k = k[kv],
                                                            start = start,tol = tol,maxit = maxit,paramLatent = paramLatent,
                                                            Mu = parInit$Mu, Si = parInit$Si,Be = parInit$Be,Ga = parInit$Ga,output = output, out_se = out_se,
                                                            fort = fort,ntry=ntry)),
-                        "LMmanifestcont" = (lmcovmanifest.cont(Y = Y,X=Xmanifest,k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,
+                        "LMmanifestcont" = (lmcovmanifest.cont(Y = Y,X=Xmanifest, yv=freq, k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,
                                                                out_se = out_se,piv = parInit$piv,Pi = parInit$Pi,Mu = parInit$Mu,Si = parInit$Si, output=output,
                                                                fort = fort,ntry=ntry)))
     npv[kv] = out[[kv]]$np

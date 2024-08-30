@@ -550,7 +550,8 @@ lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,modManifest=c("LM","F
     else sebe = se1[(ne+k+1):length(se1)]
   }
 
-  out = list(mu=mu,al=al,be=be,si=si,rho=rho,la=la,PI=PI,lk=lk,np=np,k = k, aic=aic,bic=bic, n = ns, TT = TT, modManifest = mod )
+  out = list(mu=mu,al=al,be=be,si=si,rho=rho,la=la,PI=PI,lk=lk,np=np,k = k, aic=aic,bic=bic,
+             n = n, TT = TT,modManifest = mod,ns=ns,yv=yv)
   if(out_se){
     out$selrho=selrho
     out$sebe = sebe

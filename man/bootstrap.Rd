@@ -11,14 +11,13 @@ Function that performs bootstrap parametric resampling to compute standard error
 }
 \usage{
 bootstrap(est, ...)
-\method{bootstrap}{LMbasic}(est, n = 1000, B = 100, seed = NULL, ...)
-\method{bootstrap}{LMbasiccont}(est, n = 1000, B=100, seed = NULL, ...)
+\method{bootstrap}{LMbasic}(est,  B = 100, seed = NULL, ...)
+\method{bootstrap}{LMbasiccont}(est, B=100, seed = NULL, ...)
 \method{bootstrap}{LMlatent}(est, B = 100, seed = NULL, ...)
 \method{bootstrap}{LMlatentcont}(est, B = 100, seed = NULL, ...)
 }
 \arguments{
   \item{est}{an object obtained from a call to \code{\link{lmest}} and \code{\link{lmestCont}}}
-  \item{n}{sample size}
   \item{B}{number of bootstrap samples}
   \item{seed}{an integer value with the random number generator state}
   \item{\dots}{further arguments}

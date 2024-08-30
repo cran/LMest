@@ -1,4 +1,4 @@
-complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
+complk_covmanifest.cont <- function(Y,R,yv,piv,Pi,Mu,Si,k,fort=TRUE){
 
 # ---- Preliminaries ----
   if(!fort){
@@ -6,8 +6,9 @@ complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
     dmvnorm1 <-function(y,mu,Si) f = exp(-c((y-mu)%*%solve(Si)%*%(y-mu))/2)/sqrt(det(2*pi*Si))
   }
   sY = dim(Y)
-  n = as.integer(sY[1])
+  ns = as.integer(sY[1])
   TT = as.integer(sY[2])
+  n = sum(yv)
   if(length(sY)==2) r = 1 else r = sY[3]
   r = as.integer(r)
   if(r==1){
@@ -18,15 +19,15 @@ complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
 
 # ---- Compute conditional probabilities ----
   # t0 = proc.time()
-  Phi = array(1,c(n,k,TT)); L = array(0,c(n,k,TT))
+  Phi = array(1,c(ns,k,TT)); L = array(0,c(ns,k,TT))
   if(miss){
     if(fort){
-      RR = array(as.integer(1*R),c(n,TT,r))
-      out = .Fortran("normmiss2",Y,RR,n,TT,r,k,Mu,Si,Phi=Phi)
+      RR = array(as.integer(1*R),c(ns,TT,r))
+      out = .Fortran("normmiss2",Y,RR,ns,TT,r,k,Mu,Si,Phi=Phi)
       Phi = out$Phi
     }else{
       j = 0
-      for(i in 1:n) for(t in 1:TT){
+      for(i in 1:ns) for(t in 1:TT){
         j = j+1
         if(all(!R[i,t,])){
           Phi[i,,t] = 1
@@ -39,7 +40,7 @@ complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
     }
   }else{
     j = 0
-    for(i in 1:n) for(t in 1:TT){
+    for(i in 1:ns) for(t in 1:TT){
       j = j+1
       if(r==1){
         for(u in 1:k) Phi[i,u,t] = pmax(dnorm(Y[i,t,],Mu[j,,u],sqrt(Si)),0.1^300)
@@ -54,20 +55,20 @@ complk_covmanifest.cont <- function(Y,R,piv,Pi,Mu,Si,k,fort=TRUE){
   L[,,1] = Phi[,,1]%*%diag(piv)
   if(n==1) Lt = sum(L[,,1])
   else Lt = rowSums(L[,,1])
-  lk = sum(log(Lt))
+  lk = sum(yv*log(Lt))
   L[,,1] = L[,,1]/Lt
   # print(c(2,2,proc.time()-t0))
   for(t in 2:TT){
     L[,,t] = Phi[,,t]*(L[,,t-1]%*%Pi[,,t])
     if(n==1) Lt = sum(L[1,,t])
     else Lt = rowSums(L[,,t])
-    lk = lk+sum(log(Lt))
+    lk = lk+sum(yv*log(Lt))
     L[,,t] = L[,,t]/Lt
   }
   # print(c(2,3,proc.time()-t0))
   if(n==1) pv = sum(L[1,,TT])
-  else pv = rowSums(L[,,TT])   
-  
+  else pv = rowSums(L[,,TT])
+
   #lk = sum(log(pv))
   out = list(lk=lk,Phi=Phi,L=L,pv=pv)
 

@@ -41,6 +41,9 @@ summary.LMmanifestcont <- function(object,...){
   if(is.null(object$seBe)==FALSE){
     cat("\n Standard errors for the regression parameters:\n")
     print(round(object$seBe,4))
+    pvalueBe <- 2*pnorm(abs(object$Be/object$seBe),lower.tail=FALSE)
+    cat("\n p-values for Be:\n")
+    print(round(pvalueBe,3))
   }
 
   cat("\n Si - Variance-covariance matrix:\n")

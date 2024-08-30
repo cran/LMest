@@ -93,7 +93,7 @@ long2matrices.internal <- function(Y, id, time, yv = NULL, Xinitial = NULL, Xman
       colnames(XXinitial) = colnames(Xinitial)
       tmp = 0
       for(t in timeid){
-        tmp=tmp+1
+        tmp = tmp+1
         indTemp <- ind[tmp]
         if(!length(indTemp)==0){
           if(!is.null(Xtrans)) XXtrans[i,t,] = Xtrans[indTemp,]
@@ -161,17 +161,18 @@ getLatent <- function(data, latent, responses){
   Xtrans <- NULL
   if(length(Formula(latent))[2] == 1 && all(as.character(latent[[2]]) != "|")){
     if(!is.null(latent[[2]])){
-#      Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-      Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
-#      Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-      Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+     # Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      # Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1,drop=FALSE]
+      Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      # Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      # Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1,drop=FALSE]
+      Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
       Xinitial <- data.matrix(Xinitial)
       Xtrans <- data.matrix(Xtrans)
       attributes(Xinitial)$onlyintercept = FALSE
       attributes(Xtrans)$onlyintercept = FALSE
     }
   }else{
-    
   # if(length(Formula(latent))[2] == 1 && !is.null(latent[[2]]))
   # {
   #   Xinitial <- model.part(formula, data = model.frame(formula, data = data), rhs = 1)
@@ -179,8 +180,10 @@ getLatent <- function(data, latent, responses){
   # }
 
     if(length(Formula(latent))[2] == 2){
-      Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-      Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 2)
+      # Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      # Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 2)
+      Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
+      Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 2)
       Xinitial <- data.matrix(Xinitial)
       Xtrans <- data.matrix(Xtrans)
       attributes(Xinitial)$onlyintercept = FALSE
@@ -189,7 +192,8 @@ getLatent <- function(data, latent, responses){
       if(!is.null(latent[[2]][[2]])){
         #Xinitial <- model.matrix(formula(formula, rhs = 1),data)
 #        Xinitial <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-        Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+        # Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1,drop=FALSE]
+        Xinitial <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
         Xinitial <- data.matrix(Xinitial)
         attributes(Xinitial)$onlyintercept = FALSE
         #Xtrans <- NULL
@@ -198,7 +202,8 @@ getLatent <- function(data, latent, responses){
         #Xinitial <- NULL
         #Xtrans <- model.matrix(formula(formula, rhs = 1),data)
         # Xtrans <- model.part(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
-        Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1]
+        # Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)[,-1,drop=FALSE]
+        Xtrans <- model.matrix(formula, data = model.frame(formula, data = data,na.action = NULL), rhs = 1)
         Xtrans <- data.matrix(Xtrans)
         attributes(Xtrans)$onlyintercept = FALSE
       }

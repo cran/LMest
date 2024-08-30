@@ -51,7 +51,7 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
           }else{
             par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
             for (u in 1:k) {
-              title = paste("Class ",u,": Initial probabilites = ",round(object$piv[u],3),sep="")
+              title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
               pi.class[1,] <- object$Psi[,u,]
               ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -73,7 +73,7 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
           }else{
             par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
             for (u in 1:k) {
-              title = paste("Class ",u,": Initial probabilites = ",round(object$piv[u],3),sep="")
+              title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
               for (j in 1:r) pi.class[j,] <- object$Psi[,u,j]
               dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))
@@ -144,7 +144,7 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         }else{
           par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
           for (u in 1:k) {
-            title = paste("Class ",u,": Initial probabilites = ",round(object$piv[u],3),sep="")
+            title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             pi.class[1,] <- object$Psi[,u,]
             ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -166,7 +166,7 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         }else{
           par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
           for (u in 1:k) {
-            title = paste("Class ",u,": Initial probabilites = ",round(object$piv[u],3),sep="")
+            title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             for (j in 1:r) pi.class[j,] <- object$Psi[,u,j]
             dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))

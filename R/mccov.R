@@ -3,7 +3,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
                   start=0,tol=10^-8,maxit=1000,
                   out_se=FALSE,output=FALSE,fort=TRUE){
 
-  # Preliminaries
+# Preliminaries
   check_der = FALSE  # to check derivatives
   n = sum(yv)
   sS = dim(S)
@@ -11,7 +11,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
   TT = sS[2]
   b = max(S)
 
-  # Covariate structure and related matrices: initial probabilities
+# Covariate structure and related matrices: initial probabilities
   if((b+1) == 2) GBe = as.matrix(c(0,1)) else{
     GBe = diag(b+1); GBe = GBe[,-1]
   }
@@ -171,7 +171,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
     dimnames(Piv)=list(subject=1:ns,category=0:b)
     dimnames(PI)=list(category=0:b,category=0:b,subject=1:ns,time=1:TT)
   }
-  out = list(lk=lk,Be=Be,Ga=Ga,np=np,aic=aic,bic=bic, n = n, TT = TT)
+  out = list(lk=lk,Be=Be,Ga=Ga,np=np,aic=aic,bic=bic,n=n,TT=TT,ns=ns,yv=yv)
   if(out_se){
     out$seBe = seBe
     out$seGa = seGa
@@ -185,5 +185,3 @@ mccov <- function(S,X1=NULL,X2=NULL,
   return(out)
 
 }
-
-

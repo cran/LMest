@@ -1,5 +1,5 @@
-est_multilogit <-
-function(Y,Xdis,label=1:n,be=NULL,Pdis=NULL,dis=FALSE,fort=TRUE,ex=FALSE,tol=10^-8){
+est_multilogit <- function(Y,Xdis,label=1:n,be=NULL,Pdis=NULL,dis=FALSE,
+                           fort=TRUE,ex=FALSE,tol=10^-8){
 
 # fit multinomial logit model for reponses included in Y
 # covariates in matrix X (two formats are allows for X: with binary responses it is n x ncov, with more response categories it is ncat x ncov x ndis)
@@ -46,7 +46,7 @@ function(Y,Xdis,label=1:n,be=NULL,Pdis=NULL,dis=FALSE,fort=TRUE,ex=FALSE,tol=10^
   if(dis) print(c(0,lk))
 # iterate until convergence
   it = 0; lko = lk
-  while(((lk-lko)/abs(lko)>tol & it<100) | it==0){
+  while(((lk-lko)/max(abs(lko),1)>tol & it<100) | it==0){
     it = it+1; lko = lk
     if(fort==F){
       sc = 0; Fi = 0
