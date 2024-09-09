@@ -17,7 +17,7 @@
    \item{\code{id}}{subject id.}
     \item{\code{time}}{occasion of observation.}
    \item{\code{emp}}{0 if unemployed, 1 if employed.}
-   \item{\code{area}}{0  if graduated in the South area, 1 if  graduated in the North area.}
+   \item{\code{area}}{1  if graduated in the South area, 2 if  graduated in the North area.}
    \item{\code{grade}}{1 if grade at graduation is low, 2 if it is medium, 3 if it is high.}
    \item{\code{edu}}{1 if parents hold a university degree, 0 if not.}
   }

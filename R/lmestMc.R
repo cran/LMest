@@ -2,29 +2,16 @@ lmestMc <- function(responsesFormula = NULL,
                     data, index, start = 0,
                     modBasic = 0, weights = NULL,
                     tol = 10^-8, maxit = 1000,
-                    out_se = FALSE, output = FALSE, fort = TRUE, seed = NULL)
-{
+                    out_se = FALSE, output = FALSE, fort = TRUE, seed = NULL){
 
-  if(inherits(data, "lmestData"))
-  {
+  if(inherits(data, "lmestData")){
     data <- data$data
-  }else if(!is.data.frame(data))
-  {
+  }else if(!is.data.frame(data)){
     data <- as.data.frame(data)
     stop("A data.frame must be provided")
   }
-
-
-  if(!is.null(seed))
-  {
-    set.seed(seed)
-  }
-
-
-  if(length(index) !=2)
-  {
-    stop("id and time must be provided")
-  }
+  if(!is.null(seed)) set.seed(seed)
+  if(length(index) !=2) stop("id and time must be provided")
   id.which <- which(names(data) == index[1])
   tv.which <- which(names(data) == index[2])
 
@@ -129,7 +116,6 @@ lmestMc <- function(responsesFormula = NULL,
       stop("missing data in the covariates affecting the transition probabilities are not allowed")
     }
   }
-  
   out <- switch(model,
                 "LMbasic" = mcbasic(S = Y[,,1], yv = freq, modBasic = modBasic, tol = tol, maxit = maxit, out_se = out_se),
                 "LMlatent" = mccov(S = Y[,,1],X1 = Xinitial, X2 = Xtrans, start = start,yv = freq,

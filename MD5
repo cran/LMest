@@ -1,4 +1,4 @@
-ad146b39b675ecd6763f511ee9fcdec6 *DESCRIPTION
+b44c0fb1d141ec62ee31a277f1a9a1a3 *DESCRIPTION
 047c3dee0fedac3d4a21a62a9859f3ff *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 20c75dc1f3b91035d87b549019c3fe25 *R/blkdiag.R
@@ -47,7 +47,7 @@ c7facac80fe8c3d5e5c69c4da97e98b5 *R/lmcovmanifest.cont.R
 8d7c19f4f318c1a7654807603f2a64f5 *R/lmestData.R
 cf10913919747f61a9f612092925eda9 *R/lmestDecoding.R
 34a58a47f7fa462a90e7e103ca8f952c *R/lmestFormula.R
-c49fc8a666f4351ddf0363ac63380733 *R/lmestMc.R
+dd62a1a0ca4b8fd19b69a99aa3c892d0 *R/lmestMc.R
 c9f32815bb887149f3b47933a4c2fe56 *R/lmestMixed.R
 718e843c6d32d0e1bdc59d54f2472733 *R/lmestSearch.R
 df97674e4e7cc071b8660882da7cd2d4 *R/lmmixed.R
@@ -56,7 +56,7 @@ df97674e4e7cc071b8660882da7cd2d4 *R/lmmixed.R
 d994abea6a8d98366cef180155bd2d0a *R/long2wide.R
 f099ae9fb63ab8e6509890fb8817b5a6 *R/marg_param.R
 d2db443b75159db5a811412318356e8b *R/mcbasic.R
-5330c945c8e0f46367c45806cb12558c *R/mccov.R
+3cad9a221a22b0945444ca424cd18c4d *R/mccov.R
 16c36a061f58dca5cb32e663e9e657b7 *R/plot.LMbasic.R
 e33bad6bd9d72c6cdd97cf7eea591900 *R/plot.LMbasiccont.R
 aff9f18672474ae3e14c92f883f73e95 *R/plot.LMlatent.R
@@ -102,7 +102,7 @@ f3319b4c8b32d0e2ce80b694c119f230 *data/data_market_sim.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 920d05ec486946159b59ede30cbafc94 *inst/doc/vignetteLMest.R
 5e8cb96a4a04576e9b93c37dedfb3fc0 *inst/doc/vignetteLMest.Rmd
-6a2e194b20d4a7dfc6f3300a75ebfd88 *inst/doc/vignetteLMest.html
+2f2d33d9ccf0061a437b77f3b80c0f27 *inst/doc/vignetteLMest.html
 4f583e84e838237a4a978c9e21400fff *man/LMbasic-class.Rd
 7565f9fdbee41118cecfeecc144e702d *man/LMbasiccont-class.Rd
 ae4bccd771d162ac3b2d1d9a9ccc25bb *man/LMest-package.Rd
@@ -125,7 +125,7 @@ f88db56ac6bce60d2164089f79a23da5 *man/bootstrap_lm_cov_latent.Rd
 93f4967328f99f14cb0923b476f58a21 *man/data_SRHS_long.Rd
 07093928ba1678a1d107a3afe70312f8 *man/data_criminal_sim.Rd
 c76ac1b35ce4ae3d356d68866e9cae7f *man/data_drug.Rd
-f8e8ee01380489088a210f6d61c9dafa *man/data_employment_sim.Rd
+98ee768a1e537e1bfd9747154ee0833d *man/data_employment_sim.Rd
 8e887943fa85a58112722c213bfd7560 *man/data_heart_sim.Rd
 fc3b34f5785fa90d38341e178d884fbb *man/data_long_cont.Rd
 b1e0abde393edbd2fb7de72fab54d6f8 *man/data_market_sim.Rd
