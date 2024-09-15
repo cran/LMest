@@ -1,5 +1,5 @@
 lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,
-                    Psi=NULL,miss = FALSE, R = NULL,output=FALSE, ntry=0){
+                    Psi=NULL, miss=FALSE, R=NULL, output=FALSE, ntry=0){
 
 # ---- Repeat estimation if necessary ----
   if(ntry>0){
@@ -27,7 +27,6 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
   sS = dim(S)
   ns = sS[1]
   TT = sS[2]
-
   if(length(sS)==2){
     r = 1
     if(is.matrix(S)) S = array(S,c(dim(S),1))

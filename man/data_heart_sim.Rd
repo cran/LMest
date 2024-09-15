@@ -7,12 +7,12 @@
 \title{Health dataset}
 
 
-\description{Simulated dataset of a retrospective study to assess the health state progression of patients after treatment.}
+\description{Simulated longitudinal dataset coming from a medical study to assess the health state progression of patients after a certain treatment.}
 
 \usage{data(data_heart_sim)}
 
 \format{
-  A data frame with 125 observations on the following variables:
+  A data frame referred to 125 units observed at 6 time occasions on the following variables:
   \describe{
    \item{\code{id}}{subject id}
    \item{\code{time}}{occasion of observation}

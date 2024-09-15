@@ -36,7 +36,9 @@ lmcovmanifest.cont  <- function(Y,X,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000
   if(length(sY)==2){
     r = 1
     if(is.matrix(Y)) Y = array(Y,c(dim(Y),1))
-  }else r = sY[3]
+  }else{
+    r = sY[3]
+  }
   r = as.integer(r)
 
 # Check and impute for missing data

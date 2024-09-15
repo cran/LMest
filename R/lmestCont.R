@@ -10,7 +10,6 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
 
   data <- as.data.frame(data)
   if(!is.data.frame(data)) stop("A data.frame must be provided")
-
   if(start == 2){
     if(is.null(parInit)){
       stop("With start = 2, initial parameters must be provided")
@@ -72,6 +71,9 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
   model <- tmp$model
   Xinitial <- tmp$Xinitial
   Xtrans <- tmp$Xtrans
+  if(!is.null(Xmanifest))  Xmanifest = matrix(aperm(tmp$Xmanifest,c(2,1,3)),
+                                              dim(tmp$Xmanifest)[1]*dim(tmp$Xmanifest)[2],
+                                              dim(tmp$Xmanifest)[3])
   Y <- tmp$Y
   if(is.null(weights)){
     freq = tmp$freq

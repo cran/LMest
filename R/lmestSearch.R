@@ -3,10 +3,10 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
                         version = c("categorical", "continuous"),
                         weights = NULL, nrep = 2, tol1 = 10^-5,
                         tol2 = 10^-10, out_se = FALSE, miss.imp = FALSE, seed = NULL, ...){
-  # function that search for the global maximum of the log-likelihood
-  # vector of kv to try for
-  # nrep = number repetitions with random starting values
-  # version = model to be estimated ("basic" = basic LM model (est_lm_basic function); "LMlatent" = LM model with covariates in the distribution of the latent process (est_lm_cov_latent function); "LMmanifest" = LM model with covariates in the measurement model (est_lm_cov_maifest function))
+# function that search for the global maximum of the log-likelihood
+# vector of kv to try for
+# nrep = number repetitions with random starting values
+# version = model to be estimated ("basic" = basic LM model (est_lm_basic function); "LMlatent" = LM model with covariates in the distribution of the latent process (est_lm_cov_latent function); "LMmanifest" = LM model with covariates in the measurement model (est_lm_cov_maifest function))
 
   if(inherits(data, "lmestData")){
     data <- data$data
