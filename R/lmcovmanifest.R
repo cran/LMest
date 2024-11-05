@@ -55,7 +55,7 @@ lmcovmanifest <- function(S,X,yv = rep(1,nrow(S)),k,q=NULL,modManifest=c("LM","F
       outr = try(lmcovmanifest(S,X,yv,k,q,modManifest,tol,maxit,start=1,output=output,out_se=out_se))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
-        out = outr
+        if(outr$lk>out$lk) out = outr #SP out = outr
       }
     }
     out$lkv_glob = lkv_glob

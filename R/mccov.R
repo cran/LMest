@@ -139,8 +139,9 @@ mccov <- function(S,X1=NULL,X2=NULL,
     dimnames(seBe) = list(nameBe,logit=2:(b+1))
   }
   if(is.null(nameGa)) if(nc2==1) nameGa = c("(Intercept)")
+
   if((b+1)>2) {
-    Ga = array(as.vector(Ga),c(nc2+1,b,b+1))
+    Ga = array(as.vector(Ga),c(nc2,b,b+1))
     dimnames(Ga) = list(nameGa,logit=2:(b+1),logit=1:(b+1))
   }else if((b+1)==2){
     dimnames(Ga) = 	list(nameGa,logit=1:(b+1))

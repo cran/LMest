@@ -15,6 +15,7 @@ lmbasic.cont  <- function(Y,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=
                               out_se=out_se,output=output,fort=fort))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
+        if(outr$lk>out$lk) out = outr #SP
         out = outr
       }
     }

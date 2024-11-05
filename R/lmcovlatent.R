@@ -31,7 +31,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
                              out_se=out_se,miss=miss,R=R))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
-        out = outr
+        if(outr$lk>out$lk) out = outr #SP out = outr
       }
     }
     out$lkv_glob = lkv_glob

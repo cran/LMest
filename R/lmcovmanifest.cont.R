@@ -16,7 +16,7 @@ lmcovmanifest.cont  <- function(Y,X,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000
                               out_se=out_se,output=output,fort=fort))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
-        out = outr
+        if(outr$lk>out$lk) out = outr #SP out = outr
       }
     }
     out$lkv_glob = lkv_glob
