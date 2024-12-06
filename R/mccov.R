@@ -72,8 +72,8 @@ mccov <- function(S,X1=NULL,X2=NULL,
 # parameters on initial probabilities
   if(start==0) be = array(0,nc1*b)
   else if(start==1){
-    be = c(rnorm(1),rep(0,nc1))
-    if((b+1)>2) for(h in 2:b) be = c(be,rnorm(1),rep(0,nc1))
+    be = c(rnorm(1),rep(0,nc1-1))
+    if((b+1)>2) for(h in 2:b) be = c(be,rnorm(1),rep(0,nc1-1))
   }
   out = prob_multilogit(XXdis,be,Xlab,fort)
   Piv = out$P; Pivdis = out$Pdis
@@ -81,7 +81,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
 # parameters on transition probabilities
   Ga = matrix(0,nc2*b,b+1)
   if(start==0) Ga[1+(0:(b-1))*nc2,] = -log(10)
-  else if(start==1) Ga[1+(0:(b-1))*(nc2+1),] = -abs(rnorm(b))
+  else if(start==1) Ga[1+(0:(b-1))*nc2,] = -abs(rnorm(b))
   PIdis = array(0,c(Zndis,b+1,b+1)); PI = array(0,c(b+1,b+1,ns,TT))
   for(h in 1:(b+1)){
     tmp = ZZdis[,,,h]

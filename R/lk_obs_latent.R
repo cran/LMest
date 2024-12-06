@@ -31,7 +31,7 @@ function(th,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
 	}
 # parameters on initial probabilities
     ind = count + (1:((1+nc1)*(k-1)))
- 	be = th[ind]
+    be = th[ind]
    	out = prob_multilogit(XXdis,be,Xlab,fort)
    	Piv = out$P; Pivdis = out$Pdis
    	count = count+((1+nc1)*(k-1))
@@ -39,12 +39,12 @@ function(th,S,R,b,yv,Am,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
     if(param=="multilogit"){
     	ind = count+(1:((nc2+1)*(k-1)*k))
         Ga = matrix(th[ind],(nc2+1)*(k-1),k)
-		PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
-		for(h in 1:k){
-		    out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
-			PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
-		}
-		count = count+(nc2+1)*(k-1)*k
+        PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
+        for(h in 1:k){
+          out = prob_multilogit(ZZdis[,,,h],Ga[,h],Zlab,fort)
+          PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
+        }
+        count = count+(nc2+1)*(k-1)*k
 	}else if(param=="difflogit"){
 		ind = count+(1:(k*(k-1)+(k-1)*nc2))
 		Ga = matrix(th[ind],k*(k-1)+(k-1)*nc2)

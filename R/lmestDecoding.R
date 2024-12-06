@@ -1169,7 +1169,9 @@ lmestDecoding.LMbasiccont <- function(est, sequence = NULL, fort = TRUE, ...)
   ## Start Computation
 
   miss = any(is.na(Y))
+  R= NULL #SP: aggiunto questo
   if(miss){
+    R = (!is.na(Y)) ##SP: inserito questo
     Y = est$Y
   }
   if(dim(est$Mu)[1]==1){
@@ -1184,27 +1186,30 @@ lmestDecoding.LMbasiccont <- function(est, sequence = NULL, fort = TRUE, ...)
   }
   piv = est$piv; Pi = est$Pi; Mu = est$Mu; Si = est$Si
   k = length(est$piv)
-  out = complk_cont_miss(Y,!miss,est$yv,piv,Pi,Mu,Si,k, fort = TRUE)
+  #out = complk_cont_miss(Y,!miss,est$yv,piv,Pi,Mu,Si,k, fort = TRUE)
+  out = complk_cont_miss(Y,R,est$yv,piv,Pi,Mu,Si,k, fort = TRUE)
   Phi = out$Phi; L = out$L; pv = out$pv
   V = array(0,c(n,k,TT))
   M = matrix(1,n,k)
   if(n==1) V[,,TT] = L[,,TT]/sum(L[1,,TT])
-  else V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+  #else V[,,TT] = L[,,TT]/rowSums(L[,,TT])
+  else V[,,TT] = est$yv*L[,,TT]/rowSums(L[,,TT])
   if(TT>2){
     for(t in seq(TT-1,2,-1)){
       M = (Phi[,,t+1]*M)%*%t(Pi[,,t+1])
       M = M/sum(M)
       V[,,t] = L[,,t]*M
       if(n==1) V[,,t] = V[,,t]/sum(V[1,,t])
-      else V[,,t] = V[,,t]/rowSums(V[,,t])
+      else V[,,t] = est$yv*V[,,t]/rowSums(V[,,t])
     }
   }
   M = (Phi[,,2]*M)%*%t(Pi[,,2])
   M = M/sum(M)
   V[,,1] = L[,,1]*M
   if(n==1) V[,,1] = V[,,1]/sum(V[1,,1])
-  else V[,,1] = V[,,1]/rowSums(V[,,1])
-
+  #else V[,,1] = V[,,1]/rowSums(V[,,1])
+  else V[,,1] = est$yv*V[,,1]/rowSums(V[,,1])
+  
   # local deconding
   Ul = matrix(0,n,TT)
   for(i in 1:n) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])

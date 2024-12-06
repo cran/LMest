@@ -8,9 +8,11 @@ lk_obs_latent_cont <- function(th,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
   n = sum(yv)
   if(length(sY)==2) r = 1 else r = sY[3]
   k = dim(XXdis)[1]
-  nc1 = dim(XXdis)[2]/(k-1)-1
+#  nc1 = dim(XXdis)[2]/(k-1)-1
+  nc1 = dim(XXdis)[2]/(k-1)
   if(param=="multilogit"){
-    nc2 = dim(ZZdis)[2]/(k-1)-1
+#    nc2 = dim(ZZdis)[2]/(k-1)-1
+    nc2 = dim(ZZdis)[2]/(k-1)
   }else if(param=="difflogit"){
     nc2 = (dim(ZZdis)[2]-(k*(k-1)))/(k-1)
   }
@@ -27,24 +29,30 @@ lk_obs_latent_cont <- function(th,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
   if(r>1) Si = Si+t(Si-diag(diag(Si)))
 
 # parameters on initial probabilities
-  ind = (1:((1+nc1)*(k-1)))
+#  ind = (1:((1+nc1)*(k-1)))
+  ind = 1:(nc1*(k-1))
   be = th[ind];
   out = prob_multilogit(XXdis,be,Xlab,fort)
   Piv = out$P; Pivdis = out$Pdis
-  count = ((1+nc1)*(k-1))
+  # count = ((1+nc1)*(k-1))
+  count = nc1*(k-1)
 
 # parameters on transition probabilities
   if(param=="multilogit"){
-    ind = count+(1:((nc2+1)*(k-1)*k))
-    Ga = matrix(th[ind],(nc2+1)*(k-1),k)
+#    ind = count+(1:((nc2+1)*(k-1)*k))
+    ind = count+(1:(nc2*(k-1)*k))
+    # Ga = matrix(th[ind],(nc2+1)*(k-1),k)
+    Ga = matrix(th[ind],nc2*(k-1),k)
     PIdis = array(0,c(Zndis,k,k)); PI = array(0,c(k,k,ns,TT))
     for(h in 1:k){
       tmp = ZZdis[,,,h]
       if(nc2<=1) tmp = array(tmp,c(k,(k-1),Zndis))
       out = prob_multilogit(tmp,Ga[,h],Zlab,fort)
       PIdis[,,h] = out$Pdis; PI[h,,,2:TT] = array(as.vector(t(out$P)),c(1,k,ns,TT-1))
+      if(is.na(sum(PI))) browser() ########## ERRRORE con fort=TRUE a volte si ha NaN
     }
-    count = count+(nc2+1)*(k-1)*k
+    # count = count+(nc2+1)*(k-1)*k
+    count = count+nc2*(k-1)*k
   }else if(param=="difflogit"){
     ind = count+(1:(k*(k-1)+(k-1)*nc2))
     Ga = matrix(th[ind],k*(k-1)+(k-1)*nc2)
@@ -114,7 +122,6 @@ lk_obs_latent_cont <- function(th,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
     diag(tmp) = diag(tmp)/2
     sc = c(sc,tmp[upper.tri(tmp,TRUE)])
   }
-
 # Update piv and Pi
   out = est_multilogit(V[,,1],XXdis,Xlab,be,Pivdis,fort=fort,ex=TRUE)
   sc = c(sc,out$sc)
@@ -125,7 +132,7 @@ lk_obs_latent_cont <- function(th,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=TRUE){
       UU = NULL
       for(t in 2:TT) UU = rbind(UU,t(U[h,,,t]))
       tmp = ZZdis[,,,h]
-      if(nc2==0) tmp = array(tmp,c(k,(k-1),Zndis))
+      if(nc2==1) tmp = array(tmp,c(k,(k-1),Zndis))
       tmp2 = PIdis[,,h]
       if(Zndis==1) tmp2 = matrix(tmp2,1,k)
       out = est_multilogit(UU,tmp,Zlab,Ga[,h],tmp2,fort=fort,ex=TRUE)

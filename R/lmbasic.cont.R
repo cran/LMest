@@ -92,7 +92,7 @@ lmbasic.cont  <- function(Y,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=
       cat("      k     |     step    |     lk      |    lk-lko   | discrepancy |\n")
       cat("------------|-------------|-------------|-------------|-------------|\n")
       cat(sprintf("%11g",c(k,0,lk)),"\n",sep=" | ")
-      while(((lk-lko)/abs(lko)>tol | it==0) & it<1000){
+      while(((lk-lko)/abs(lko)>tol | it==0) & it<maxit){
         it = it+1
         Yimp = Y; Vc = matrix(0,r,r)
         for(i in 1:ns) for(t in 1:TT){

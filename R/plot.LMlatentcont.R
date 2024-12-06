@@ -19,7 +19,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
     choice <- menu(what, graphics = FALSE, title = title)
     while(choice != 0)
     { if(what[choice] == "modSel"){
-      par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+     # par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+      par(mfrow=c(1,1))
       if(is.null(object$Aic)){
         object$Aic <- object$aic
         names(object$Aic) <- paste("k",k,sep = "=")
@@ -34,7 +35,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
       legend("topright",legend=c("BIC","AIC"),col=c(2,4),lty=1,bty="n")
     }
       if(what[choice] == "density"){
-        par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        par(mfrow=c(1,1))
         temp <- getResponses(data = object$data,formula =attributes(object)$responsesFormula)
         if(r==1){
           minY <- c(min(out$Mu)-2.5*sqrt(out$Si))
@@ -69,7 +71,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
         if(k==1){
           stop("Transition probabilities not available when k=1")
         }
-        par(mar=c(2,1,5,1),mfrow=c(1,1))
+        #par(mar=c(2,1,5,1),mfrow=c(1,1))
+        par(mfrow=c(1,1))
         PM<-apply(object$PI[,,,2:TT],c(1,2),mean)
         PM <- round(diag(1/rowSums(PM))%*%PM,2)
         plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
@@ -81,7 +84,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
         if(k==1){
           stop("Marginal distribution of the latent states not available when k=1")
         }
-        par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        par(mfrow=c(1,1))
         plot(1:TT,Pmarg[1,],ylim=c(0,1),xaxt="n",xlab="Time",ylab="Estimated averaged marginal distribution",type="l",lwd=1)
         for(u in 2:k) lines(Pmarg[u,],col=u,lwd=1)
         leg = paste("state",1:k)
@@ -95,7 +99,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
   }
   else
   { if(any(what == "modSel")){
-    par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    par(mfrow=c(1,1))
     if(is.null(object$Aic)){
       object$Aic <- object$aic
       names(object$Aic) <- paste("k",k,sep = "=")
@@ -112,7 +117,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
     if(any(what == "density")){
       temp <- getResponses(data = object$data,formula =attributes(object)$responsesFormula)
       if(is.null(components)){
-        par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        par(mfrow=c(1,1))
         if(r==1){
           minY <- c(min(out$Mu)-2.5*sqrt(out$Si))
           maxY <- c(max(out$Mu)+2.5*sqrt(out$Si))
@@ -143,11 +149,13 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
         }
       }else{
         nk <- length(components)
-        if(nk==1) par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        if(nk==1) #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+          par(mfrow=c(1,1))
         else{
           nr = round(nk/2)
           if((nk/2-nr)==0.5) nr = nr+1
-          par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(nr,2))
+          #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(nr,2))
+          par(mfrow=c(nr,2))
         }
         if(r==1){
           for(u in components){
@@ -190,7 +198,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
       if(k==1){
         stop("Transition probabilities not available when k=1")
       }
-      par(mar=c(2,1,5,1),mfrow=c(1,1))
+      #par(mar=c(2,1,5,1),mfrow=c(1,1))
+      par(mfrow=c(1,1))
       PM<-apply(object$PI[,,,2:TT],c(1,2),mean)
       PM = round(diag(1/rowSums(PM))%*%PM,2)
       plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
@@ -202,7 +211,8 @@ plot.LMlatentcont<-function(x,what = c("modSel", "density", "transitions","margi
       if(k==1){
         stop("Marginal distribution of the latent states not available when k=1")
       }
-      par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+      #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+      par(mfrow=c(1,1))
       plot(1:TT,Pmarg[1,],ylim=c(0,1),xaxt="n",xlab="Time",ylab="Estimated averaged marginal distribution",type="l",lwd=1)
       for(u in 2:k) lines(Pmarg[u,],col=u,lwd=1)
       leg = paste("state",1:k)

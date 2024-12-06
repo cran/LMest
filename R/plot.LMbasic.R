@@ -21,7 +21,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
     choice <- menu(what, graphics = FALSE, title = title)
     while(choice != 0)
     { if(what[choice] == "modSel"){
-      par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+     # par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+      par(mfrow=c(1,1))
       if(is.null(object$Aic)){
         object$Aic <- object$aic
         names(object$Aic) <- paste("k",k,sep = "=")
@@ -41,7 +42,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         title = "Conditional response probabilities"
         if(r==1){
           if(k==1){
-            par(mfrow=c(1,1),mar=c(4,4,2,0)+0.1)
+            #par(mfrow=c(1,1),mar=c(4,4,2,0)+0.1)
+            par(mfrow=c(1,1))
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             pi.class[1,] <- object$Psi
             ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -49,7 +51,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
             dimnames(tt)[[1]]=0:(nc-1)
             plot(tt, type = "h", col = "blue", lwd = 10,col.axis="blue",bty="n",main=title,ylab="Prob.Cond.",xlab="Item categories",ylim=c(0,1))
           }else{
-            par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
+            #par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
+            par(mfrow=c(k,1))
             for (u in 1:k) {
               title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
@@ -62,7 +65,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
           }
         }else{
           if(k==1){
-            par(mfrow=c(1,1),mar=c(5,4,4,2)+0.1)
+            #par(mfrow=c(1,1),mar=c(5,4,4,2)+0.1)
+            par(mfrow=c(1,1))
             pi.class <- matrix(NA,nrow=r,ncol=nc)
             for (j in 1:r) pi.class[j,] <- object$Psi[,j]
             dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))
@@ -71,7 +75,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
                                  xlab="Items",zlab="Cond. prob.",main=title,lab=c(r-1,nc-1),zlim=c(0,1)
                                  ,mar=c(3,3,2,3), highlight.3d=FALSE,col.grid="lightblue",col.axis="lightblue",cex.main=1.5,angle=75,box=FALSE,color=4)
           }else{
-            par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
+            #par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
+            par(mfrow=c(k,1))
             for (u in 1:k) {
               title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
               pi.class <- matrix(NA,nrow=r,ncol=nc)
@@ -89,7 +94,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         if(k==1){
           stop("Transition probabilities not available when k=1")
         }
-        par(mar=c(2,1,5,1),mfrow=c(1,1))
+        #par(mar=c(2,1,5,1),mfrow=c(1,1))
+        par(mfrow=c(1,1))
         PM <- round(apply(object$Pi[,,2:TT],c(1,2),mean),2)
         plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
                 box.lwd = 1,self.cex = 0.8,
@@ -100,7 +106,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         if(k==1){
           stop("Marginal distribution of the latent states not available when k=1")
         }
-        par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+        par(mfrow=c(1,1))
         plot(1:TT,Pmarg[1,],ylim=c(0,1),xaxt="n",xlab="Time",ylab="Estimated marginal distribution",type="l",lwd=1)
         for(u in 2:k) lines(Pmarg[u,],col=u,lwd=1)
         leg = paste("state",1:k)
@@ -114,7 +121,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
   }
   else
   { if(any(what == "modSel")){
-    par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    par(mfrow=c(1,1))
     if(is.null(object$Aic)){
       object$Aic <- object$aic
       names(object$Aic) <- paste("k",k,sep = "=")
@@ -134,7 +142,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
       title = "Conditional response probabilities"
       if(r==1){
         if(k==1){
-          par(mfrow=c(1,1),mar=c(4,4,2,0)+0.1)
+          #par(mfrow=c(1,1),mar=c(4,4,2,0)+0.1)
+          par(mfrow=c(1,1))
           pi.class <- matrix(NA,nrow=r,ncol=nc)
           pi.class[1,] <- object$Psi
           ds.plot <- data.frame(Items=as.vector(row(pi.class)),Categories=as.vector(col(pi.class)),value=as.vector(pi.class))
@@ -142,7 +151,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
           dimnames(tt)[[1]]=0:(nc-1)
           plot(tt, type = "h", col = "blue", lwd = 10,col.axis="blue",bty="n",main=title,ylab="Prob.Cond.",xlab="Item categories",ylim=c(0,1))
         }else{
-          par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
+          #par(mfrow=c(k,1),mar=c(4,4,2,0)+0.1)
+          par(mfrow=c(k,1))
           for (u in 1:k) {
             title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
@@ -155,7 +165,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
         }
       }else{
         if(k==1){
-          par(mfrow=c(1,1),mar=c(5,4,4,2)+0.1)
+          #par(mfrow=c(1,1),mar=c(5,4,4,2)+0.1)
+          par(mfrow=c(1,1))
           pi.class <- matrix(NA,nrow=r,ncol=nc)
           for (j in 1:r) pi.class[j,] <- object$Psi[,j]
           dimnames(pi.class) <- list(item=1:r,category=0:(nc-1))
@@ -164,7 +175,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
                                xlab="Items",zlab="Cond. prob.",main=title,lab=c(r-1,nc-1),zlim=c(0,1)
                                ,mar=c(3,3,2,3), highlight.3d=FALSE,col.grid="lightblue",col.axis="lightblue",cex.main=1.5,angle=75,box=FALSE,color=4)
         }else{
-          par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
+          #par(mfrow=c(k,1),mar=c(5,4,4,2)+0.1)
+          par(mfrow=c(k,1))
           for (u in 1:k) {
             title = paste("State ",u,": Initial probabilities = ",round(object$piv[u],3),sep="")
             pi.class <- matrix(NA,nrow=r,ncol=nc)
@@ -182,7 +194,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
       if(k==1){
         stop("Transition probabilities not available when k=1")
       }
-      par(mar=c(2,1,5,1),mfrow=c(1,1))
+      #par(mar=c(2,1,5,1),mfrow=c(1,1))
+      par(mfrow=c(1,1))
       TT <- dim(object$Pi)[3]
       PM <- round(apply(object$Pi[,,2:TT],c(1,2),mean),2)
       plotmat(t(PM),relsize=0.7,box.col="lightblue",lwd = 1,
@@ -194,7 +207,8 @@ plot.LMbasic<-function(x, what = c("modSel", "CondProb", "transitions","marginal
     if(k==1){
       stop("Marginal distribution of the latent states not available when k=1")
     }
-    par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    #par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+    par(mfrow=c(1,1))
     plot(1:TT,Pmarg[1,],ylim=c(0,1),xaxt="n",xlab="Time",ylab="Estimated marginal distribution",type="l",lwd=1)
     for(u in 2:k) lines(Pmarg[u,],col=u,lwd=1)
     axis(side=1,at=1:TT)

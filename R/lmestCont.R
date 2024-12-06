@@ -46,6 +46,7 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
   }
 
   data.new <- data[,-c(id.which,tv.which), drop = FALSE]
+
   if(is.null(responsesFormula)){
     Y <- data.new
     Xmanifest <- NULL
@@ -81,11 +82,10 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
     freq = weights
     if(nrow(Y)!=length(weights)) stop("dimensions mismatch between data and weights")
   }
-  if(any(is.na(Xinitial) & !any(is.na(Xinitial0))))
+  if(any(is.na(Xinitial)) & !any(is.na(Xinitial0)))
     for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
-  if(any(is.na(Xtrans) & !any(is.na(Xtrans0)))) 
+  if(any(is.na(Xtrans)) & !any(is.na(Xtrans0)))
     for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
-
   out = vector("list",nkv)
   if(!is.null(Xinitial)){
     if(any(is.na(Xinitial)))stop("missing data in the covariates affecting the initial probabilities are not allowed")
@@ -125,6 +125,7 @@ lmestCont <- function(responsesFormula = NULL, latentFormula = NULL,
                         "LMmanifestcont" = (lmcovmanifest.cont(Y = Y,X=Xmanifest, yv=freq, k = k[kv],start = start,modBasic = modBasic,tol = tol,maxit = maxit,
                                                                out_se = out_se,piv = parInit$piv,Pi = parInit$Pi,Mu = parInit$Mu,Si = parInit$Si, output=output,
                                                                fort = fort,ntry=ntry)))
+    if(model=="LMlatentcont") out[[kv]]$responsesFormula = responsesFormula
     npv[kv] = out[[kv]]$np
     lkv[kv] = out[[kv]]$lk
     aicv[kv] = out[[kv]]$aic

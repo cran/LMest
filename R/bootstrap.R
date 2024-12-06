@@ -197,12 +197,19 @@ bootstrap.LMlatentcont <- function(est, B=100, seed = NULL, ...){
   temp <-  getLatent(data = Y[,-c(tv.which,id.which)],latent = latentFormula, responses = responsesFormula)
   Xinitial <- temp$Xinitial
   Xtrans <- temp$Xtrans
-
+  Xinitial0 = Xinitial; Xtrans0 = Xtrans
   tmp <-  long2matrices.internal(Y = Y, id = id, time = tv,
                             Xinitial = Xinitial, Xmanifest = NULL, Xtrans = Xtrans)
 
-  X1 <- tmp$Xinitial
-  X2 <- tmp$Xtrans
+  Xinitial <- tmp$Xinitial
+  Xtrans <- tmp$Xtrans
+  if(any(is.na(Xinitial)) & !any(is.na(Xinitial0)))
+    for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
+  if(any(is.na(Xtrans)) & !any(is.na(Xtrans0)))
+    for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
+
+  X1 <- Xinitial
+  X2 <- Xtrans
   # preliminaries
   mMu = mSi = mBe = 0
   m2Mu = m2Si = m2Be = 0

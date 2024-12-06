@@ -44,14 +44,24 @@ lk_comp_latent_cont <- function(Y,R,yv,Piv,PI,Mu,Si,k,fort=FALSE){
 # ---- forward recursion ----
 #	Phi = pmax(Phi,10^-30)
   L[,,1] = Phi[,,1]*Piv
+  # new
+  Lt = rowSums(L[,,1])
+  lk = sum(yv*log(Lt))
+  L[,,1] = L[,,1]/Lt
+  # end new
   for(t in 2:TT){
-    # for(u in 1:k) Phi[,u,t] = dmvnorm(matrix(Y[,t,],n,r),Mu[,u],Si)
-#		Phi = pmax(Phi,10^-30)
     for(i in 1:ns)	L[i,,t] = L[i,,t-1]%*%PI[,,i,t]
     L[,,t] = L[,,t]*Phi[,,t]
+    
+    # new
+    Lt = rowSums(L[,,t])
+    lk = lk+sum(yv*log(Lt))
+    L[,,t] = L[,,t]/Lt
+    # end new
   }
   if(n==1) pv = sum(L[,,TT]) else pv = rowSums(L[,,TT])
-  lk = sum(yv*log(pv))
+  # lk = sum(yv*log(pv))
+  # browser()
 
 # ---- output ----
   out = list(lk=lk,Phi=Phi,L=L,pv=pv)

@@ -1,6 +1,6 @@
 prob_post_cov_cont <- function(Y, yv, Mu, Si, Piv, PI, Phi, L, pv, der=FALSE,
                                dlPhi=NULL, dlPiv=NULL, dlPI=NULL, dlL=NULL, dlL2=NULL, dlpv=NULL){
-	
+
 # preliminaries
   sY = dim(Y)
   ns = sY[1]
@@ -10,34 +10,58 @@ prob_post_cov_cont <- function(Y, yv, Mu, Si, Piv, PI, Phi, L, pv, der=FALSE,
   k = ncol(Piv)
 
 # use backward recursion for posterior probabilities	
-  V = array(0,c(ns,k,TT)); U = array(0,c(k,k,ns,TT))
-  V1 = V
-  Pv = matrix(1/pv,ns,k)
-  # Yv = matrix(yv,n,k); Yvp = Yv*Pv   		
-  # last step
-  V1[,,TT] = L[,,TT]*Pv
-  # V[,,TT] = Yv*V1[,,TT]
+  V = V1 = array(0,c(ns,k,TT)); U = array(0,c(k,k,ns,TT))
+# new
+  # Pv = matrix(1/pv,ns,k)
+  # V1[,,TT] = L[,,TT]*Pv
+  V1[,,TT] = L[,,TT]
+# end new
+  
   V[,,TT] = yv*V1[,,TT]
-  # AA = Yvp*Phi[,,TT]
-  AA = Pv*Phi[,,TT]
-  for(i in 1:ns) U[,,i,TT] = outer(L[i,,TT-1],AA[i,])*yv[i]
-  M = matrix(1,ns,k)
-  # backward
+
+# new
+  # AA = Pv*Phi[,,TT]
+  # for(i in 1:ns) U[,,i,TT] = outer(L[i,,TT-1],AA[i,])*yv[i]
+  AA = Phi[,,TT]
+  for(i in 1:ns){
+    Tmp = PI[,,i,TT]*outer(L[i,,TT-1],AA[i,])
+    U[,,i,TT] = yv[i]*Tmp/sum(Tmp)
+  }
+  # M = matrix(1,ns,k)
+  M = matrix(1/k,ns,k)
+# end new
+
+# backward
   if(TT>2) for(t in seq(TT-1,2,-1)){
     MP = Phi[,,t+1]*M
     for(i in 1:ns) M[i,] = PI[,,i,t+1]%*%MP[i,]
-    AA = Pv*Phi[,,t]*M
-    # AA = Yvp*Phi[,,t]*M
-    for(i in 1:ns) U[,,i,t] = outer(L[i,,t-1],AA[i,])*yv[i]
-    V1[,,t] = L[,,t]*M*Pv
-    # V[,,t] = Yv*V1[,,t]
+    M = M/rowSums(M)
+
+# new
+    # AA = Pv*Phi[,,t]*M
+    AA = Phi[,,t]*M
+    # for(i in 1:ns) U[,,i,t] = outer(L[i,,t-1],AA[i,])*yv[i]
+    for(i in 1:ns){
+      Tmp = PI[,,i,t]*outer(L[i,,t-1],AA[i,])
+      U[,,i,t] = yv[i]*Tmp/sum(Tmp)
+    }
+    # V1[,,t] = L[,,t]*M*Pv
+    V1[,,t] = L[,,t]*M
+    V1[,,t] = V1[,,t]/rowSums(V1[,,t])
+# end new
     V[,,t] = yv*V1[,,t]
   }
-  U = U*PI
+# new
+  # U = U*PI
+# end new
   MP = Phi[,,2]*M
   for(i in 1:ns) M[i,] = PI[,,i,2]%*%MP[i,]
-  V1[,,1] = L[,,1]*M*Pv
-  # V[,,1] = Yv*V1[,,1]
+# new
+  # V1[,,1] = L[,,1]*M*Pv
+  V1[,,1] = L[,,1]*M
+  V1[,,1] = V1[,,1]/rowSums(V1[,,1])
+# end new
+
   V[,,1] = yv*V1[,,1]
   
 # compute derivatives

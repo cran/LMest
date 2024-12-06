@@ -154,6 +154,7 @@ getResponses <- function(data, formula){
 # -
 
 getLatent <- function(data, latent, responses){
+
   formula <- update(Formula(responses),Formula(latent))
   formula <- Formula(formula)
   ll <- length(formula)

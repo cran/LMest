@@ -235,7 +235,7 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,yv,k,start=0,tol=10^-8,maxit=1000
     if(is.null(Mu)) stop("initial value of the conditional means of the response variables (Mu) must be given in input")
     if(is.null(Si)) stop("initial value of the var-cov matrix common to all states (Si) must be given in input")
     
-    # parameters on initial probabilities
+# parameters on initial probabilities
     be = as.vector(Be)
     out = prob_multilogit(XXdis,be,Xlab,fort=fort)
     Piv = out$P; Pivdis = out$Pdis
@@ -384,22 +384,22 @@ lmcovlatent.cont <- function(Y,X1=NULL,X2=NULL,yv,k,start=0,tol=10^-8,maxit=1000
     th = c(th, be)
     if(param=="multilogit"){
       for(h in 1:k) th = c(th, Ga[,h])
-    }else if(param=="difflogit") th = c(th,Ga)
+    }else{
+      if(param=="difflogit") th = c(th,Ga)
+    }
     out = lk_obs_latent_cont(th,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort=fort)
     lk0 = out$lk; sc0 = out$sc
+    if(check_der) print(c(lk,lk0,lk-lk0))
     lth = length(th)
     scn = rep(0,lth); Fn = matrix(0,lth,lth)
     for(h in 1:lth){
       thh = th; thh[h] = thh[h]+10^-6
-      outh = lk_obs_latent_cont(thh,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param)
+      outh = lk_obs_latent_cont(thh,Y,R,yv,XXdis,Xlab,ZZdis,Zlab,param,fort)
       scn[h] = (outh$lk-lk0)/10^-6
       Fn[,h] = (outh$sc-sc0)/10^-6
     }
     J = -(Fn+t(Fn))/2
-    if(check_der){
-      print(c(lk,lk0))
-      print(round(cbind(scn,sc0,round(scn-sc0,4)),5))
-    }
+    if(check_der) print(round(cbind(scn,sc0,round(scn-sc0,4)),5))
     iJ = try(solve(J))
     if(inherits(iJ,"try-error")){
       ind = NULL

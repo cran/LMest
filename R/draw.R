@@ -300,10 +300,28 @@ draw.LMlatentcont <- function(est, n=NULL, TT=NULL, data, index, format = c("lon
                      responses = as.formula(paste(names(data)[1],"NULL", sep = "~")))
   Xinitial <- temp$Xinitial
   Xtrans <- temp$Xtrans
+  Xinitial0 = Xinitial; Xtrans0 = Xtrans
   tmp <-  long2matrices.internal(Y = Xtrans, id = id, time = tv,
-                                        yv = NULL, Xinitial = Xinitial, Xtrans = Xtrans)
-  X1 <- tmp$Xinitial
-  X2 <- tmp$Xtrans
+                                 yv = NULL, Xinitial = Xinitial, Xtrans = Xtrans)
+  
+  Xinitial <- tmp$Xinitial
+  Xtrans <- tmp$Xtrans
+  if(any(is.na(Xinitial)) & !any(is.na(Xinitial0)))
+    for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
+  if(any(is.na(Xtrans)) & !any(is.na(Xtrans0)))
+    for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
+
+  if(!is.null(est$responsesFormula)){
+    data.new <- data[,-c(id.which,tv.which), drop = FALSE]
+    temp1 <- getResponses(data = data.new,formula = est$responsesFormula)
+    Y <- temp1$Y
+    tmp1 <- long2matrices.internal(Y = Y, id = id, time = tv, cont = TRUE)
+    Y <- tmp1$Y
+    if(any(is.na(Y))) R = !is.na(Y)
+  }
+
+  X1 <- Xinitial
+  X2 <- Xtrans
   if(param=="difflogit"){
     cat("\n* With difflogit is not possible to avoid the intercept for the transition probabilities*\n\n")
     X2 = X2[,,-1,drop=FALSE]
@@ -443,9 +461,10 @@ draw.LMlatentcont <- function(est, n=NULL, TT=NULL, data, index, format = c("lon
 
   # draw response variables
   for(i in 1:n) for(t in 1:TT) Y[i,t,] = rmvnorm(1,Mu[,U[i,t]],Si)
+  if(exists("R")) Y[!R] = NA
 
   # output
-  if(r==1) Y = matrix(Y,n,TT)
+  if(r==1 & !exists("R")) Y = matrix(Y,n,TT)
   if(format == "long")
   {
     #id <- 1:n

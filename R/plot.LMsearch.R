@@ -1,6 +1,7 @@
 plot.LMsearch<-function(x,...){
   object <- x
-  par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+ # par(mar=c(5, 4, 4, 2) + 0.1,mfrow=c(1,1))
+  par(mfrow=c(1,1))
   ylim1 =  min(c(object$Aic,object$Bic))
   ylim2 = max(c(object$Aic,object$Bic))*1.05
   kv <-as.numeric(names(object$Bic))
