@@ -187,7 +187,6 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     pm = rep(1,ns)
     if (miss) for(t in 1:TT) for(j in 1:r)  pm = pm*(Psi[S[,t,j]+1,j]*R[,t,j]+(1-R[,t,j]))
     else for(t in 1:TT) for(j in 1:r)  pm = pm*Psi[S[,t,j]+1,j]
-
     lk = sum(yv*log(pm))
     if(r==1) np = k*mb*r else np = k*sum(b)
     aic = -2*lk+np*2
@@ -198,7 +197,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
   }
   time = proc.time()
 
-# Starting values: deterministic initialization
+#---- Starting values: deterministic initialization ----
   if(start == 0){
     if(fixPsi==FALSE){
       P = matrix(NA,mb+1,r)
@@ -397,7 +396,8 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     lkv = c(lkv,lk)
   }
   if(it/10 > floor(it/10))  cat(sprintf("%11g",c(k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
-  #### compute infomation matrix ####
+
+#---- compute infomation matrix ----
   if(out_se){
     dlPsi = array(NA,c(mb+1,k,r,k*sb))
     for(j in 1:r) dlPsi[1:(b[j]+1),,j,] = 0
@@ -443,7 +443,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       dlPI = array(dlPI,c(k,k,ns,TT,(k+nc2)*(k-1)))
       dlPI = aperm(dlPI,c(2,1,3,4,5))
     }
-
+    
 # Compute log-likelihood
     lk2 = lk
     out = lk_comp_latent(S,R,yv,Piv,PI,Psi,k,der=TRUE,fort=fort,dlPsi=dlPsi,dlPiv=dlPiv,dlPI=dlPI)
@@ -476,7 +476,7 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
       sc = c(sc,t(Am[[j]])%*%(Y1[1:(b[j]+1),c,j]-sum(Y1[1:(b[j]+1),c,j])*Psi[1:(b[j]+1),c,j]))
       tmp = Y1[1:(b[j]+1),c,j]
       tmp = pmax(tmp/sum(tmp),10^-10)
-      Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
+#      Psi[1:(b[j]+1),c,j] = tmp/sum(tmp)
       temp = pmax(Psi[1:(b[j]+1),c,j],10^-50)
       Op = diag(temp)-temp%o%temp
       Temp  = sum(Y1[1:(b[j]+1),c,j])*t(Am[[j]])%*%Op%*%Am[[j]]
@@ -589,7 +589,14 @@ lmcovlatent <- function(S,X1=NULL,X2=NULL,yv=rep(1,nrow(S)),k,start=0,tol=10^-8,
     sega = se[nal+nbe+(1:nga)]
   }
   # Compute number of parameters
-  if(r==1) np = k*mb*r else np = k*sum(b)
+  if(fixPsi){
+    np = 0
+  }else{
+    if(r==1)
+      np = k*mb*r
+    else
+      np = k*sum(b)
+  }
   np = np+(k-1)*nc1
   if(param=="multilogit") np = np+(k-1)*nc2*k else if(param=="difflogit")  np = np+(k-1)*(nc2+k)
   aic = -2*lk+np*2

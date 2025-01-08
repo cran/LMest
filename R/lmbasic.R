@@ -1,16 +1,16 @@
 lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,piv=NULL,Pi=NULL,
-                    Psi=NULL, miss=FALSE, R=NULL, output=FALSE, ntry=0){
+                    Psi=NULL,miss=FALSE, R=NULL, output=FALSE,ntry=0,fixPsi=FALSE){
 
 # ---- Repeat estimation if necessary ----
   if(ntry>0){
     cat("* Deterministic inditialization *\n")
     out = lmbasic(S,yv,k,start=0,modBasic=modBasic,tol=tol,maxit=maxit,
-                  out_se=out_se,miss=miss,R=R,output=output)
+                  out_se=out_se,miss=miss,R=R,output=output,piv=piv,Pi=Pi,Psi=Psi,fixPsi=fixPsi)
     lkv_glob = out$lk
     for(it0 in 1:(k*ntry)){
       cat("\n* Random inditialization (",it0,"/",k*ntry,") *\n",sep="")
       outr = try(lmbasic(S,yv,k,start=1,modBasic=modBasic,tol=tol,maxit=maxit,
-                         out_se=out_se,miss=miss,R=R,output=output))
+                         out_se=out_se,miss=miss,R=R,output=output,Psi=Psi,fixPsi=fixPsi))
       if(!inherits(outr,"try-error")){
         lkv_glob = c(lkv_glob,outr$lk)
         if(outr$lk>out$lk) out = outr #SP out = outr
@@ -31,7 +31,6 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     r = 1
     if(is.matrix(S)) S = array(S,c(dim(S),1))
   }else r = sS[3]
-
   Sv = matrix(S,ns*TT,r)
   if(miss) Rv = matrix(R,ns*TT,r)
   bv = apply(Sv,2,max)
@@ -60,7 +59,8 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
                       cbind(matrix(0,k-u,u-1),diag(k-u)))
     }
   }
-  # When there is just 1 latent class
+
+#---- When there is just 1 latent class ----
   if(k == 1){
     piv = 1; Pi = 1
     P = matrix(NA,b+1,r)
@@ -93,36 +93,49 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     class(out)="LMbasic"
     return(out)
   }
-  # Starting values
+
+#---- When there is more than 1 latent class ----
+# Starting values
+  if(is.null(Psi)) fixPsi = FALSE
   if(start == 0){
-    P = matrix(NA,b+1,r); E = matrix(NA,b,r)
-    for(j in 1:r) P[1:(bv[j]+1),j] = 0
-    for(t in 1:TT) for(j in 1:r) for(y in 0:b){
-      ind = which(S[,t,j]==y)
-      P[y+1,j] = P[y+1,j]+sum(yv[ind])
-      E[1:bv[j],j] = m[[j]]$Co%*%log(m[[j]]$Ma%*%P[1:(bv[j]+1),j])
+    if(is.null(Psi)){
+      P = matrix(NA,b+1,r); E = matrix(NA,b,r)
+      for(j in 1:r) P[1:(bv[j]+1),j] = 0
+      for(t in 1:TT) for(j in 1:r) for(y in 0:b){
+        ind = which(S[,t,j]==y)
+        P[y+1,j] = P[y+1,j]+sum(yv[ind])
+        E[1:bv[j],j] = m[[j]]$Co%*%log(m[[j]]$Ma%*%P[1:(bv[j]+1),j])
+      }
+      Psi = array(NA,c(b+1,k,r)); Eta = array(NA,c(b,k,r))
+      grid = seq(-k,k,2*k/(k-1))
+      for(c in 1:k) for(j in 1:r){
+        etac = E[1:bv[j],j]+grid[c]
+        Eta[1:bv[j],c,j] = etac
+        Psi[1:(bv[j]+1),c,j] = invglob(etac)
+      }
     }
-    Psi = array(NA,c(b+1,k,r)); Eta = array(NA,c(b,k,r))
-    grid = seq(-k,k,2*k/(k-1))
-    for(c in 1:k) for(j in 1:r){
-      etac = E[1:bv[j],j]+grid[c]
-      Eta[1:bv[j],c,j] = etac
-      Psi[1:(bv[j]+1),c,j] = invglob(etac)
+    if(is.null(piv)) piv = rep(1,k)/k
+    if(is.null(Pi)){
+      Pi = matrix(1,k,k)+9*diag(k); Pi = diag(1/rowSums(Pi))%*%Pi;
+      Pi = array(Pi,c(k,k,TT)); Pi[,,1] = 0
     }
-    piv = rep(1,k)/k
-    Pi = matrix(1,k,k)+9*diag(k); Pi = diag(1/rowSums(Pi))%*%Pi;
-    Pi = array(Pi,c(k,k,TT)); Pi[,,1] = 0
   }
   if(start==1){
-    Psi = array(NA,c(b+1,k,r))
-    for(j in 1:r){
-      Psi[1:(bv[j]+1),,j] = matrix(runif((bv[j]+1)*k),bv[j]+1,k)
-      for(c in 1:k) Psi[1:(bv[j]+1),c,j] = Psi[1:(bv[j]+1),c,j]/sum(Psi[1:(bv[j]+1),c,j])
+    if(is.null(Psi)){
+      Psi = array(NA,c(b+1,k,r))
+      for(j in 1:r){
+        Psi[1:(bv[j]+1),,j] = matrix(runif((bv[j]+1)*k),bv[j]+1,k)
+        for(c in 1:k) Psi[1:(bv[j]+1),c,j] = Psi[1:(bv[j]+1),c,j]/sum(Psi[1:(bv[j]+1),c,j])
+      }
     }
-    Pi = array(runif(k^2*TT),c(k,k,TT))
-    for(t in 2:TT) Pi[,,t] = diag(1/rowSums(Pi[,,t]))%*%Pi[,,t]
-    Pi[,,1] = 0
-    piv = runif(k); piv = piv/sum(piv)
+    if(is.null(piv)){
+      piv = runif(k); piv = piv/sum(piv)
+    }
+    if(is.null(Pi)){
+      Pi = array(runif(k^2*TT),c(k,k,TT))
+      for(t in 2:TT) Pi[,,t] = diag(1/rowSums(Pi[,,t]))%*%Pi[,,t]
+      Pi[,,1] = 0
+    }
   }
   if(start==2){
     if(is.null(piv)) stop("initial value of the initial probabilities (piv) must be given in input")
@@ -132,7 +145,8 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     Pi = Pi
     Psi = Psi
   }
-  # Compute log-likelihood
+
+#---- Compute initial log-likelihood ----
   out = complk(S,R,yv,piv,Pi,Psi,k)
   lk = out$lk; Phi = out$Phi; L = out$L; pv = out$pv
   lk0 = sum(yv*log(yv/n)); dev = 2*(lk0-lk)
@@ -144,13 +158,14 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
   par = c(piv,as.vector(Pi),as.vector(Psi))
   if(any(is.na(par))) par = par[-which(is.na(par))]
   paro = par
-  # Iterate until convergence
+
+#---- Iterate until convergence ----
   while((lk-lko)/abs(lk)>tol & it<maxit){
     Psi0 = Psi; piv0 = piv; Pi0 = Pi
     it = it+1
 
 # ---- E-step ----
-    # Compute V and U
+# Compute V and U
     V = array(0,c(ns,k,TT)); U = array(0,c(k,k,TT))
     Yvp = matrix(yv/pv,ns,k)
     M = matrix(1,ns,k)
@@ -166,32 +181,32 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     M = (Phi[,,2]*M)%*%t(Pi[,,2])
     V[,,1] = Yvp*L[,,1]*M
 
-    # If required store parameters
-    # ---- M-step ----
-    # Update Psi
-    Y1 = array(NA,c(b+1,k,r))
-    for(j in 1:r) Y1[1:(bv[j]+1)] = 0
-    Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
-    for(j in 1:r) for(jb in 0:bv[j]) {
-      ind = which(Sv[,j]==jb)
-      if(length(ind)==1){
-        if(miss) Y1[jb+1,,j] = Vv[ind,]*Rv[ind,j]
-        else Y1[jb+1,,j] = Vv[ind,]
+#---- M-step ----
+# Update Psi
+    if(!fixPsi){
+      Y1 = array(NA,c(b+1,k,r))
+      for(j in 1:r) Y1[1:(bv[j]+1)] = 0
+      Vv = matrix(aperm(V,c(1,3,2)),ns*TT,k)
+      for(j in 1:r) for(jb in 0:bv[j]) {
+        ind = which(Sv[,j]==jb)
+        if(length(ind)==1){
+          if(miss) Y1[jb+1,,j] = Vv[ind,]*Rv[ind,j]
+          else Y1[jb+1,,j] = Vv[ind,]
+        }
+        if(length(ind)>1){
+          if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
+          else Y1[jb+1,,j] = colSums(Vv[ind,])
+        }
       }
-      if(length(ind)>1){
-        if(miss) Y1[jb+1,,j] = colSums(Vv[ind,]*Rv[ind,j])
-        else Y1[jb+1,,j] = colSums(Vv[ind,])
+      for(j in 1:r) for(c in 1:k){
+        tmp = Y1[1:(bv[j]+1),c,j]
+        if(any(is.na(tmp))) tmp[is.na(tmp)] = 0
+        tmp = pmax(tmp/sum(tmp),10^-10)
+        Psi[1:(bv[j]+1),c,j] = tmp/sum(tmp)
       }
-
-    }
-    for(j in 1:r) for(c in 1:k){
-      tmp = Y1[1:(bv[j]+1),c,j]
-      if(any(is.na(tmp))) tmp[is.na(tmp)] = 0
-      tmp = pmax(tmp/sum(tmp),10^-10)
-      Psi[1:(bv[j]+1),c,j] = tmp/sum(tmp)
     }
 
-    # Update piv and Pi
+# Update piv and Pi
     piv = colSums(V[,,1])/n
     U = pmax(U,10^-300)
     if(mod==0) for(t in 2:TT) Pi[,,t] = diag(1/rowSums(U[,,t]))%*%U[,,t]
@@ -293,7 +308,6 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
         sc = c(sc,t(Cm[,,u])%*%(Ut[u,]-sum(Ut[u,])*Pi[u,,mod+1]))
         J = blkdiag(J,sum(Ut[u,])*t(Cm[,,u])%*%(diag(Pi[u,,mod+1])-Pi[u,,mod+1]%o%Pi[u,,mod+1])%*%Cm[,,u])
       }
-
     }
     J = as.matrix(J)
     Jd = NULL
@@ -339,7 +353,6 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
         for(i in 1:ns) for(t in (mod+1):TT) Ut = Ut+yv[i]*F2d[,,t,i,pa]
         for(u in 1:k) scj = c(scj,t(Cm[,,u])%*%(Ut[u,]-sum(Ut[u,])*Pi[u,,mod+1]))
       }
-
       Jd = cbind(Jd,scj)
     }
     J = J-Jd
@@ -410,15 +423,18 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
       browser()
     }
   }
-  # Compute number of parameters
-  np = (k-1)+k*sum(bv)
+
+#---- Compute number of parameters ----
+  np = (k-1)
+  if(!fixPsi) np = np+k*sum(bv)
   if(mod==0) np = np+(TT-1)*k*(k-1)
   if(mod==1) np = np+k*(k-1)
   if(mod>1) np = np+2*k*(k-1)
   aic = -2*lk+np*2
   bic = -2*lk+np*log(n)
   cat(sprintf("%11g",c(mod,k,start,it,lk,lk-lko,max(abs(par-paro)))),"\n",sep=" | ")
-  # adjust output
+
+#---- Adjust output ----
   Ul = matrix(0,ns,TT)
   for(i in 1:ns) for(t in 1:TT) Ul[i,t] = which.max(V[i,,t])
   if(any(yv!=1)) V = V/yv
@@ -458,7 +474,8 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
     if(k>1){
       Pmarg <- as.matrix(piv)
       for(t in 2:TT) Pmarg= cbind(Pmarg,t(Pi[,,t])%*%Pmarg[,t-1])
-    }else Pmarg=NULL
+    }else
+      Pmarg = NULL
     out = c(out,list(V=V,Ul=Ul,S=S,Pmarg=Pmarg))
   } 
     

@@ -1,4 +1,4 @@
-5bc99479cfcae28c6071f0e7e05c0140 *DESCRIPTION
+ffae468c3e58f3ff64469c63ee1c9efe *DESCRIPTION
 047c3dee0fedac3d4a21a62a9859f3ff *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 20c75dc1f3b91035d87b549019c3fe25 *R/blkdiag.R
@@ -7,7 +7,7 @@ f884088cd1906d92b94a8802bddd2dbb *R/bootstrap.R
 88de12fe63e20a86055ae42b6939df95 *R/bootstrap_lm_basic_cont.R
 23432fcc62cb2d27d3dc2eb70703caea *R/bootstrap_lm_cov_latent.R
 6ff9b6702e4424c9265de669bc861f30 *R/bootstrap_lm_cov_latent_cont.R
-6962d7e9c6a445258abbbdf64470eac7 *R/complk.R
+95a9ccb0969088c7f735335b59038482 *R/complk.R
 c22a6091e3864f0d1d67906be1189cbd *R/complk_cont.R
 e66b84017ebba4a5708e9d064b8bc7c6 *R/complk_cont_miss.R
 af64bec690d1bcfb8d71f93c893b9ef4 *R/complk_covmanifest.cont.R
@@ -36,13 +36,13 @@ f7110b2e79d7de3016447243f9f76d7a *R/lk_obs_latent.R
 79c31a6d7aff32b935e1f1ffd9501778 *R/lk_obs_manifest.R
 d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 c53cd84605a2a82fdc9b2a1013072e75 *R/lk_sta.R
-226f1b4f4743c12e869599727d9c609c *R/lmbasic.R
+5b8739bae65f59f9e973cedfe14ed16f *R/lmbasic.R
 5fbf9fdfd89d82e553541dc456b63b1a *R/lmbasic.cont.R
-5feb25653043522885002cc2ed880a35 *R/lmcovlatent.R
+21f1e409dd28874f3d8b8c82fbaf6575 *R/lmcovlatent.R
 029a05b94d5f6c44c1c1c320f20a3b85 *R/lmcovlatent.cont.R
 d9d8eda7ba34a802c2760cd4d1d1c211 *R/lmcovmanifest.R
 543c751a198dc624f35f0c8efd75efe0 *R/lmcovmanifest.cont.R
-973fd9eca2f74ba33920863946581a25 *R/lmest.R
+dbd07620d4eec2db872cf0100012cabc *R/lmest.R
 4c64badb92f597a59bbb6b49dea5b1d5 *R/lmestCont.R
 8d7c19f4f318c1a7654807603f2a64f5 *R/lmestData.R
 310263550b7eef3e9f86da6556ef914f *R/lmestDecoding.R
@@ -102,7 +102,7 @@ f3319b4c8b32d0e2ce80b694c119f230 *data/data_market_sim.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 920d05ec486946159b59ede30cbafc94 *inst/doc/vignetteLMest.R
 5e8cb96a4a04576e9b93c37dedfb3fc0 *inst/doc/vignetteLMest.Rmd
-e1dfd3a16a335982070c6e5d798ef95b *inst/doc/vignetteLMest.html
+5da1cf1bfc223bd5e4ff81235e2f5f9b *inst/doc/vignetteLMest.html
 4f583e84e838237a4a978c9e21400fff *man/LMbasic-class.Rd
 7565f9fdbee41118cecfeecc144e702d *man/LMbasiccont-class.Rd
 ae4bccd771d162ac3b2d1d9a9ccc25bb *man/LMest-package.Rd

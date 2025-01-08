@@ -57,7 +57,6 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
     #warning("time column must be numeric. Coerced in numeric.", call. = FALSE)
     tv <- as.numeric(factor(tv))
   }
-
   data.new <- data[,-c(id.which,tv.which), drop = FALSE]
   ## of frequencies of the available configurations
   if(is.null(responsesFormula)){
@@ -76,7 +75,6 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
     Y_names <- colnames(Y)
     Xmanifest_names <- colnames(Xmanifest)
   }
-
   if(!is.null(latentFormula)){
     temp <- getLatent(data = data.new,latent = latentFormula, responses = responsesFormula)
     Xinitial <- temp$Xinitial
@@ -124,39 +122,32 @@ lmest <- function(responsesFormula = NULL, latentFormula = NULL,
   }
 
   dimnames(Y)[[3]] <- Y_names
-  
   if(any(is.na(Xinitial) & !any(is.na(Xinitial0))))
     for(j in 1:ncol(Xinitial)) if(any(is.na(Xinitial[,j]))) Xinitial[is.na(Xinitial[,j]),j] = mean(Xinitial[,j],na.rm=TRUE)
   if(any(is.na(Xtrans) & !any(is.na(Xtrans0)))) 
     for(h in 1:dim(Xtrans)[3]) for(j in 1:ncol(Xtrans)) if(any(is.na(Xtrans[,j,h]))) Xtrans[is.na(Xtrans[,j,h]),j,h] = mean(Xtrans[,j,h],na.rm=TRUE)
-  
-  if(!is.null(Xmanifest)){
+  if(!is.null(Xmanifest))
     if(any(is.na(Xmanifest))) stop("missing data in the covariates affecting the measurement model are not allowed")
-  }
   if(!is.null(Xinitial)){
     dimnames(Xinitial)[[2]] <- Xinitial_names
-    if(any(is.na(Xinitial))){
+    if(any(is.na(Xinitial)))
       stop("missing data in the covariates affecting the initial probabilities are not allowed")
-    }
   }
-
   if(!is.null(Xtrans)){
     dimnames(Xtrans)[[3]] <- Xtrans_names
-    if(any(is.na(Xtrans))){
+    if(any(is.na(Xtrans)))
       stop("missing data in the covariates affecting the transition probabilities are not allowed")
-    }
   }
-
   aicv = rep(NA,nkv)
   bicv = rep(NA,nkv)
   lkv = rep(NA,nkv)
-
   for(kv in 1:nkv){
     out[[kv]] <- switch(model,
                        "LMbasic" = lmbasic(S = Y,yv = freq,k = k[kv],start = start,
                                            modBasic = modBasic,tol = tol,maxit = maxit,
                                            out_se = out_se,piv = parInit$piv,Pi = parInit$Pi,
-                                           Psi = parInit$Psi,miss = miss, R = R,output=output,ntry = ntry),
+                                           Psi = parInit$Psi,miss = miss, R = R,output=output,ntry = ntry,
+                                           fixPsi = parInit$fixPsi),
                        "LMlatent" = lmcovlatent(S = Y,X1 = Xinitial,X2 = Xtrans,yv = freq,
                                                 start = start,k = k[kv],tol = tol,maxit = maxit,
                                                 paramLatent = paramLatent,output = output,
