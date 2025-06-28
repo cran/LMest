@@ -5,7 +5,7 @@
 \usage{
 lmestMc(responsesFormula = NULL,
         data, index, start = 0,
-        modBasic = 0, weights = NULL,
+        modBasic = NULL, weights = NULL,
         tol = 10^-8, maxit = 1000,
         out_se = FALSE, output = FALSE, fort = TRUE, seed = NULL)
 }
@@ -25,11 +25,11 @@ lmestMc(responsesFormula = NULL,
 }
 
 \details{
-The function \code{lmestMc} estimates the basic MC model and the MC model with covariates for categorical responses. The function requires data in long format and two additional column indicating the unit identifier and the time occasions.
+The function \code{lmestMc} estimates the basic MC model and the univariate MC model with covariates for categorical responses. The function requires data in long format and two additional column indicating the unit identifier and the time occasions.
 
 \code{responsesFormula} is used to specify the basic MC models and the model with covariates:
 \itemize{
-\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr the MC model without covariates and two responses (\code{y1} and \code{y2}) is specified;
+\item{\code{responsesFormula = y1 ~ NULL}} \cr the MC model without covariates and one response (\code{y1}) is specified;
 \item{\code{responsesFormula = NULL}} \cr all the columns in the data except the \code{"id"} and \code{"time"} columns are used to estimate MC without covariates;
 \item{\code{responsesFormula = y1 ~ x1 + x2 | x3 + x4}} \cr the MC model with one response (\code{y1}),  two covariates affecting the initial probabilities (\code{x1} and \code{x2}) and other two different covariates affecting the transition probabilities (\code{x3} and \code{x4}) is specified;
 %\item{\code{responsesFormula = x1 ~ 1 | x4 + x5}} specifies the MC model where the covariates affects only the transition probabilities and an intercept is considered for the intial probabilities

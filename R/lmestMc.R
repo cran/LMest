@@ -1,6 +1,6 @@
 lmestMc <- function(responsesFormula = NULL,
                     data, index, start = 0,
-                    modBasic = 0, weights = NULL,
+                    modBasic = NULL, weights = NULL,
                     tol = 10^-8, maxit = 1000,
                     out_se = FALSE, output = FALSE, fort = TRUE, seed = NULL){
 
@@ -32,7 +32,7 @@ lmestMc <- function(responsesFormula = NULL,
   }
   
   if(!is.null(responsesFormula)) if(length(responsesFormula)==3){
-    if(is.null(responsesFormula[[3]]))
+    if(is.null(responsesFormula[[3]]) & is.null(modBasic))
       responsesFormula[[3]]=1
     else{
       if(length(responsesFormula[[3]])>1){
@@ -95,7 +95,7 @@ lmestMc <- function(responsesFormula = NULL,
   if(!is.null(Xtrans))
     if(any(is.na(Xtrans)))
       stop("missing data in the covariates affecting the transition probabilities are not allowed")
-
+  # if(is.null(modBasic)) modBasic = 0
   out <- switch(model,
                 "LMbasic" = mcbasic(S = Y[,,1], yv = freq, modBasic = modBasic, tol = tol, maxit = maxit, out_se = out_se),
                 "LMlatent" = mccov(S = Y[,,1],X1 = Xinitial, X2 = Xtrans, start = start,yv = freq,
