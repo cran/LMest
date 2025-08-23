@@ -33,7 +33,8 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{out_se}{to compute the information matrix and standard errors}
   \item{q}{number of support points for the AR(1) process (if modManifest ="FM")}
-   \item{output}{to return additional output: \code{V}, \code{Ul}, \code{S}, \code{yv}, \code{Pmarg} for the basic LM model and for the LM with covariates on the latent model (\code{\link{LMbasic-class}} and \code{\link{LMlatent-class}}) and \code{V}, \code{PRED1}, \code{S}, \code{yv}, \code{Pmarg} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}})}
+   \item{output}{to return additional output: Posterior probabilities \code{V}, 
+   decoded states \code{Ul}, response configurations \code{S}, vector of frequencies \code{yv}, marginal probabilities \code{Pmarg} for the basic LM model and for the LM with covariates on the latent model (\code{\link{LMbasic-class}} and \code{\link{LMlatent-class}}) and \code{V}, \code{PRED1}, \code{S}, \code{yv}, \code{Pmarg} for the LM model with covariates in the measurement model (\code{\link{LMmanifest-class}})}
   \item{parInit}{list of initial model parameters when \code{"start = 2"}. For the list of parameters look at \code{\link{LMbasic-class}}, \code{\link{LMlatent-class}} and \code{\link{LMmanifest-class}}}
   \item{fort}{to use fortran routines when possible}
   \item{seed}{an integer value with the random number generator state}

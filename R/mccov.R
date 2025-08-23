@@ -45,7 +45,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
     nameGa = NULL
     Zndis = max(Zlab)
   }else{
-    if(TT==2) X2 = array(X2,c(ns,1,dim(X2)[2]))
+    if(TT==2 & !is.array(X2)) X2 = array(X2,c(ns,1,dim(X2)[2]))
     if(is.matrix(X2)) X2 = array(X2,c(ns,TT-1,1))
     nc2 = dim(X2)[3] # number of covariates on the transition probabilities
     if(ns!= dim(X2)[1]) stop("dimension mismatch between S and X2")
@@ -140,9 +140,9 @@ mccov <- function(S,X1=NULL,X2=NULL,
   }
   if(is.null(nameGa)) if(nc2==1) nameGa = c("(Intercept)")
 
-  if((b+1)>2) {
+  if((b+1)>2){
     Ga = array(as.vector(Ga),c(nc2,b,b+1))
-    dimnames(Ga) = list(nameGa,logit=2:(b+1),logit=1:(b+1))
+    dimnames(Ga) = list(nameGa,"column (without the row)"=1:b,"row (of the transition matrix)"=1:(b+1))
   }else if((b+1)==2){
     dimnames(Ga) = 	list(nameGa,logit=1:(b+1))
   }
@@ -152,7 +152,7 @@ mccov <- function(S,X1=NULL,X2=NULL,
       dimnames(seGa) = list(nameGa,logit=1:(b+1))
     }else if((b+1)>2){
       seGa = array(as.vector(sega),c(nc2,b,b+1))
-      dimnames(seGa) = list(nameGa,logit=2:(b+1),logit=1:(b+1))
+      dimnames(seGa) = list(nameGa,"column (without the row)"=1:b,"row (of the transition matrix)"=1:(b+1))
     }
   }
   # adjust output

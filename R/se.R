@@ -784,7 +784,8 @@ se.LMlatent <- function(est,...){
     }
     if(k>2) {
       Ga = array(as.vector(Ga),c(nc2,k-1,k))
-      dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
+      dimnames(Ga) = list(nameGa,"column (without the row)"=1:(k-1),
+                          "row (of the transition matrix)"=1:k)
     }else if(k==2){
 
       dimnames(Ga) = 	list(nameGa,logit=1:k)
@@ -795,7 +796,8 @@ se.LMlatent <- function(est,...){
         dimnames(seGa) = list(nameGa,logit=1:k)
       }else if(k>2){
         seGa = array(as.vector(sega),c(nc2,k-1,k))
-        dimnames(seGa) = list(nameGa,logit=2:k,logit=1:k)
+        dimnames(seGa) = list(nameGa,"column (without the row)"=1:(k-1),
+                              "row (of the transition matrix)"=1:k)
       }
     }
   }else if(param=="difflogit"){
@@ -1240,7 +1242,8 @@ se.LMlatentcont <- function(est,...){
     }
     if(k>2) {
       Ga = array(as.vector(Ga),c(nc2,k-1,k))
-      dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
+      dimnames(Ga) = list(nameGa,"column (without the row)"=1:(k-1),
+                          "row (of the transition matrix)"=1:k)
     }else if(k==2){
 
       dimnames(Ga) = 	list(nameGa,logit=1:k)
@@ -1251,7 +1254,8 @@ se.LMlatentcont <- function(est,...){
         dimnames(seGa) = list(nameGa,logit=1:k)
       }else if(k>2){
         seGa = array(as.vector(sega),c(nc2,k-1,k))
-        dimnames(seGa) = list(nameGa,logit=2:k,logit=1:k)
+        dimnames(seGa) = list(nameGa,"column (without the row)"=1:(k-1),
+                              "row (of the transition matrix)"=1:k)
       }
     }
   }else if(param=="difflogit"){

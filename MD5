@@ -1,4 +1,4 @@
-ba57f672971966b5267cf5ec2ce2fa46 *DESCRIPTION
+3cf6b3466574cded306681f42f4c37a0 *DESCRIPTION
 047c3dee0fedac3d4a21a62a9859f3ff *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 20c75dc1f3b91035d87b549019c3fe25 *R/blkdiag.R
@@ -19,7 +19,7 @@ dc27d74d3130f4689e8d000462aaafbd *R/draw_lm_cov_latent.R
 6d624b5f040b856fe0bd3d3b8aefeb8a *R/draw_lm_cov_latent_cont.R
 96f6708a67744c592bf39ca678f3c6a5 *R/draw_lm_mixed.R
 26bcb6a8030525ba867dfc20499d883a *R/est_multilogit.R
-19328a3f802d2f9c312204ae2dd66a24 *R/est_old.R
+c8177bf15c86a80f9bfb54d459c53bc7 *R/est_old.R
 784081e31d1fcd3bceeb8c26f46f2398 *R/expit.R
 7f49e740b2dff9c5cec2f01900db78ed *R/expit1.R
 e29792ba009e6832c4d8b76b9c13b800 *R/functions.R
@@ -38,8 +38,8 @@ d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 c53cd84605a2a82fdc9b2a1013072e75 *R/lk_sta.R
 5b8739bae65f59f9e973cedfe14ed16f *R/lmbasic.R
 5fbf9fdfd89d82e553541dc456b63b1a *R/lmbasic.cont.R
-21f1e409dd28874f3d8b8c82fbaf6575 *R/lmcovlatent.R
-029a05b94d5f6c44c1c1c320f20a3b85 *R/lmcovlatent.cont.R
+b1b5b10fc152c90deb1f60705e7f0c97 *R/lmcovlatent.R
+d47faa2b298624a921052196599ea00b *R/lmcovlatent.cont.R
 d9d8eda7ba34a802c2760cd4d1d1c211 *R/lmcovmanifest.R
 543c751a198dc624f35f0c8efd75efe0 *R/lmcovmanifest.cont.R
 dbd07620d4eec2db872cf0100012cabc *R/lmest.R
@@ -56,7 +56,7 @@ df97674e4e7cc071b8660882da7cd2d4 *R/lmmixed.R
 d994abea6a8d98366cef180155bd2d0a *R/long2wide.R
 f099ae9fb63ab8e6509890fb8817b5a6 *R/marg_param.R
 d2db443b75159db5a811412318356e8b *R/mcbasic.R
-c130d103f1d78d3ad9570b93d4601571 *R/mccov.R
+654635d011dcfc61f650ea701ee7b7e3 *R/mccov.R
 e78d372389646881c2920c287e7e947e *R/plot.LMbasic.R
 1192d59ca2edb35dcaa3bf5116ca042c *R/plot.LMbasiccont.R
 3b49bebecf6f6acbcf127afd4b2330bd *R/plot.LMlatent.R
@@ -70,7 +70,7 @@ b7634fe94c40efada2a778b95bf0dfb8 *R/prod_array.R
 6796980c5627d2e9e4c68d48e893a5c8 *R/rec1.R
 2b956a735744859c4a2034535a75a8df *R/rec3.R
 7f0e60f3e6c0b293b3fca8a74c0ca95c *R/recursions.R
-e80b242acfa1777e4a4b05fc10de0696 *R/se.R
+344d675605eade8a368584f27fa25d45 *R/se.R
 a397f9bf6e3b1b270363770db0d3a5a5 *R/search.model.LM.R
 e9bc902d1bc44e8c8c31ff76f0076bb5 *R/sq.R
 74530759565e6cf34871b6a97ca90c8e *R/stationary.R
@@ -102,7 +102,7 @@ f3319b4c8b32d0e2ce80b694c119f230 *data/data_market_sim.rda
 2dd9aab9d8b1a7c8ddfd650f79cfc642 *inst/CITATION
 920d05ec486946159b59ede30cbafc94 *inst/doc/vignetteLMest.R
 5e8cb96a4a04576e9b93c37dedfb3fc0 *inst/doc/vignetteLMest.Rmd
-9be59bc9af214e8dacc1406a3eedeab6 *inst/doc/vignetteLMest.html
+9ce844c728d52fb366dbb5de7d1c6d80 *inst/doc/vignetteLMest.html
 4f583e84e838237a4a978c9e21400fff *man/LMbasic-class.Rd
 7565f9fdbee41118cecfeecc144e702d *man/LMbasiccont-class.Rd
 ae4bccd771d162ac3b2d1d9a9ccc25bb *man/LMest-package.Rd
@@ -144,12 +144,12 @@ ffe7698a934178ae060866a3e27ed45d *man/est_lm_basic_cont.Rd
 20713879ff6a4a419f4cb94502621da3 *man/est_lm_mixed.Rd
 f95afdd2b04d3ac6d674ae6b3ba28b4b *man/est_mc_basic.Rd
 c15daa6bb50bf35996d1ec901c16131b *man/est_mc_cov.Rd
-5ef0ee4a4d4640db5c25148f984396b9 *man/lmest.Rd
+bb0a385c2b56cdef782e711e00f246f6 *man/lmest.Rd
 66696a49b31003dac25a39d9ac60de1a *man/lmestCont.Rd
 5fda7ae0f864970a22e00a7da87a7571 *man/lmestData.Rd
 4f5411afb16cd2ac3015d31fb4ff3656 *man/lmestDecoding.Rd
 a18e46f497dc8f7461af0d5611974e1d *man/lmestFormula.Rd
-8dd51d478e0cf70db6357e4ebef4566f *man/lmestMc.Rd
+aac0bfab164c2606b33a5cdbbe3c7dd6 *man/lmestMc.Rd
 04d47a6b09c84eb940ddd6ef23e52f4a *man/lmestMixed.Rd
 ec91279dc88ceaba39161cdd2040a047 *man/lmestSearch.Rd
 0522045a3b7d10cb219a23f23b6ecb80 *man/long2matrices.Rd

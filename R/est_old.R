@@ -1151,7 +1151,8 @@ est_lm_cov_latent_cont <-
       }
       if(k>2) {
         Ga = array(as.vector(Ga),c(nc2+1,k-1,k))
-        dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
+        dimnames(Ga) = list(nameGa,"column (without the row)"=1:(k-1),
+                            "row (of the transition matrix)"=1:k)
       }else if(k==2){
 
         dimnames(Ga) = 	list(nameGa,logit=1:k)
@@ -1162,7 +1163,8 @@ est_lm_cov_latent_cont <-
           dimnames(seGa) = list(nameGa,logit=1:k)
         }else if(k>2){
           seGa = array(as.vector(sega),c(nc2+1,k-1,k))
-          dimnames(seGa) = list(nameGa,logit=2:k,logit=1:k)
+          dimnames(seGa) = list(nameGa,"column (without the row)"=1:(k-1),
+                                "row (of the transition matrix)"=1:k)
         }
       }
     }else if(param=="difflogit"){
@@ -1872,7 +1874,8 @@ est_lm_cov_latent <-
       }
       if(k>2) {
         Ga = array(as.vector(Ga),c(nc2+1,k-1,k))
-        dimnames(Ga) = list(nameGa,logit=2:k,logit=1:k)
+        dimnames(Ga) = list(nameGa,"column (without the row)"=1:(k-1),
+                            "row (of the transition matrix)"=1:k)
       }else if(k==2){
 
         dimnames(Ga) = 	list(nameGa,logit=1:k)
@@ -1883,7 +1886,8 @@ est_lm_cov_latent <-
           dimnames(seGa) = list(nameGa,logit=1:k)
         }else if(k>2){
           seGa = array(as.vector(sega),c(nc2+1,k-1,k))
-          dimnames(seGa) = list(nameGa,logit=2:k,logit=1:k)
+          dimnames(seGa) = list(nameGa,"column (without the row)"=1:(k-1),
+                                "row (of the transition matrix)"=1:k)
         }
       }
     }else if(param=="difflogit"){
@@ -1899,20 +1903,20 @@ est_lm_cov_latent <-
       }
       if (k==2) {
         dimnames(Ga[[1]]) = list(intercept=1:k,logit=k)
-        dimnames(Ga[[2]])=list(nameGa2,logit=k)
+        dimnames(Ga[[2]]) = list(nameGa2,logit=k)
       } else if (k>2){
         dimnames(Ga[[1]]) = list(intercept=1:k,logit=2:k)
-        dimnames(Ga[[2]])=list(nameGa2,logit=2:k)
+        dimnames(Ga[[2]]) = list(nameGa2,logit=2:k)
       }
       if(out_se){
         seGa[[1]] = t(matrix(sega[1:(k*(k-1))],k-1,k))
         seGa[[2]] = matrix(sega[(k*(k-1))+(1:((k-1)*nc2))],nc2,k-1)
         if(k==2){
           dimnames(seGa[[1]]) = list(intercept=1:k,logit=k)
-          dimnames(seGa[[2]])=list(nameGa2,logit=k)
+          dimnames(seGa[[2]]) = list(nameGa2,logit=k)
         }else if (k>2){
           dimnames(seGa[[1]]) = list(intercept=1:k,logit=2:k)
-          dimnames(seGa[[2]])=list(nameGa2,logit=2:k)
+          dimnames(seGa[[2]]) = list(nameGa2,logit=2:k)
         }
       }
     }
@@ -3046,7 +3050,8 @@ est_mc_cov <-
     }
     if((b+1)>2) {
       Ga = array(as.vector(Ga),c(nc2+1,b,b+1))
-      dimnames(Ga) = list(nameGa,logit=2:(b+1),logit=1:(b+1))
+      dimnames(Ga) = list(nameGa,"column (without the row)"=1:b,
+                          "row (of the transition matrix)"=1:(b+1))
     }else if((b+1)==2){
       dimnames(Ga) = 	list(nameGa,logit=1:(b+1))
     }
@@ -3056,7 +3061,8 @@ est_mc_cov <-
         dimnames(seGa) = list(nameGa,logit=1:(b+1))
       }else if((b+1)>2){
         seGa = array(as.vector(sega),c(nc2+1,b,b+1))
-        dimnames(seGa) = list(nameGa,logit=2:(b+1),logit=1:(b+1))
+        dimnames(seGa) = list(nameGa,"column (without the row)"=1:b,
+                              "row (of the transition matrix)"=1:(b+1))
       }
     }
     # adjust output
