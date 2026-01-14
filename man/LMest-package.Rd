@@ -57,11 +57,14 @@ Maintainer: Francesco Bartolucci <francesco.bartolucci@unipg.it>
 }
 
 \references{
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.
+
 Bartolucci, F., Pandolfi, S. and Pennoni, F. (2017). LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data, \emph{Journal of Statistical Software}, \bold{81}, 1-38, doi:10.18637/jss.v081.i04.
 
-Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013). \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
-
 Bartolucci, F., Farcomeni, A., and Pennoni, F. (2014). Latent Markov models: A review of a general framework for the analysis of longitudinal data with covariates (with discussion). \emph{TEST}, \bold{23}, 433-465.
+
+Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013). \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
 
 
 }

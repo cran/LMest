@@ -27,7 +27,7 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
         }
         ylim1 =  min(c(object$Aic,object$Bic))
         ylim2 = max(c(object$Aic,object$Bic))*1.05
-        kv <-as.numeric(substr(names(object$Bic),3,3))
+        kv <-as.numeric(substr(names(object$Bic),3,4))
         matplot(kv,cbind(object$Bic,object$Aic),type="b",pch=1:2,lty=1,col=c(2,4),xaxt="n",xlab="Number of states",ylab="",ylim = c(ylim1,ylim2))
         axis(side=1,at=kv)
         legend("topright",legend=c("BIC","AIC"),col=c(2,4),lty=1,bty="n")
@@ -110,7 +110,7 @@ plot.LMbasiccont<-function(x,what = c("modSel", "density", "transitions","margin
       }
       ylim1 =  min(object$Aic,object$Bic)
       ylim2 = max(object$Aic,object$Bic)*1.05
-      kv <-as.numeric(substr(names(object$Bic),3,3))
+      kv <-as.numeric(substr(names(object$Bic),3,4))
       matplot(kv,cbind(object$Bic,object$Aic),type="b",pch=1:2,lty=1,col=c(2,4),xaxt="n",xlab="Number of states",ylab="",ylim = c(ylim1,ylim2))
       axis(side=1,at=kv)
       legend("topright",legend=c("BIC","AIC"),col=c(2,4),lty=1,bty="n")

@@ -53,6 +53,10 @@ Missing responses are allowed according to the model to be estimated.
 }
 
 \references{
+
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.
+
 %Bacci, S., Pandolfi, S., Pennoni, F. (2014). A comparison of some criteria for states selection in the latent Markov model for longitudinal data, \emph{Advances in Data Analysis and Classification}, \bold{8}, 125-145.
 Bartolucci F., Pandolfi S., Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.

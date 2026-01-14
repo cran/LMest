@@ -55,7 +55,12 @@ est_lm_cov_manifest(S, X, yv = rep(1,nrow(S)), k, q = NULL, mod = c("LM", "FM"),
 	\item{call}{command used to call the function}
 }
 
-\references{Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
+\references{
+
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.
+
+Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
 
 Bartolucci, F., Bacci, S. and Pennoni, F. (2014) Longitudinal analysis of the 	self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288}
 \author{Francesco Bartolucci, Silvia Pandolfi - University of Perugia (IT)}

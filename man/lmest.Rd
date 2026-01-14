@@ -88,10 +88,14 @@ Returns an object of class \code{'LMbasic'} for the model without covariates (se
 
 
 \references{
-Bartolucci, F., Bacci, S., and Pennoni, F. (2014). Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288.
+
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.
 
 Bartolucci F., Pandolfi S., and Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.
+
+Bartolucci, F., Bacci, S., and Pennoni, F. (2014). Longitudinal analysis of the self-reported health status by mixture latent autoregressive models, \emph{Journal of the Royal Statistical Society - series C}, \bold{63}, pp. 267-288.
 
 Bartolucci, F., Farcomeni, A., and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.
 

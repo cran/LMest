@@ -52,6 +52,10 @@ Returns an object of class \code{'MCbasic'} for the basic model without covariat
 }
 
 \references{
+
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.
+
 Bartolucci F., Pandolfi S., Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.
 

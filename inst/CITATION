@@ -1,21 +1,49 @@
-bibentry(bibtype = "Article",
-  title        = "{LMest}: An {R} Package for Latent Markov Models for Longitudinal Categorical Data",
-  author       = c(person(given = "Francesco",
-                          family = "Bartolucci",
-                          email = "francesco.bartolucci@unipg.it"),
-                   person(given = "Silvia",
-                          family = "Pandolfi",
-                          email = "silvia.pandolfi@unipg.it"),
-                   person(given = "Fulvia",
-                          family = "Pennoni",
-                          email = "fulvia.pennoni@unimib.it")),
-  journal      = "Journal of Statistical Software",
-  year         = "2017",
-  volume       = "81",
-  number       = "4",
-  pages        = "1--38",
-  doi          = "10.18637/jss.v081.i04",
 
-  header       = "To cite LMest in publications use:"
+bibentry(
+  bibtype = "Article",
+  title = "LMest: An R Package for Estimating Generalized Latent Markov Models",
+  author = c(
+    person("Fulvia", "Pennoni"),
+    person("Silvia", "Pandolfi"),
+    person("Francesco", "Bartolucci")
+  ),
+  journal = "The R Journal",
+  year = "2025",
+  volume = "16",
+  number = "4",
+  pages = "74--101",
+  doi = "10.32614/RJ-2024-036",
+  textVersion = paste(
+    "Pennoni F., Pandolfi S. and Bartolucci F. (2025).",
+    "LMest: An R Package for Estimating Generalized Latent Markov Models.",
+    "The R Journal, 16(4), 74--101.",
+    "doi:10.32614/RJ-2024-036"
+  ),
+  header = "To cite LMest in publications use:"
 )
+
+bibentry(
+  bibtype = "Article",
+  title = "LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data",
+  author = c(
+    person("Francesco", "Bartolucci"),
+    person("Silvia", "Pandolfi"),
+    person("Fulvia", "Pennoni")
+  ),
+  journal = "Journal of Statistical Software",
+  year = "2017",
+  volume = "81",
+  number = "4",
+  pages = "1--38",
+  doi = "10.18637/jss.v081.i04",
+  textVersion = paste(
+    "Bartolucci F., Pandolfi S. and Pennoni F. (2017).",
+    "LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data.",
+    "Journal of Statistical Software, 81(4), 1--38.",
+    "doi:10.18637/jss.v081.i04"
+  ),
+  header = "To cite LMest in publications use:"
+)
+
+
 

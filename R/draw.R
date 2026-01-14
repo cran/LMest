@@ -15,8 +15,8 @@ draw.LMbasic <- function(est, n = NULL, TT = NULL, format = c("long","matrices")
 # Preliminaries
   k = length(piv)
   dd = dim(Psi)
-  c = dim(Psi)[1]
-
+  #c = dim(Psi)[1]
+  c = apply(Psi, c(2,3), function(x) sum(!is.na(x)))[1,]
   if(is.null(n)) n = ifelse(is.null(est$ns), est$n, est$ns)
   if(is.null(TT)) TT = est$TT #TT = dim(Pi)[3]
   if(length(dd)>2) r = dd[3]
@@ -33,13 +33,15 @@ draw.LMbasic <- function(est, n = NULL, TT = NULL, format = c("long","matrices")
     ind = 0
     for(j in 1:r){
       ind = ind+1
-      Y[i,ind] = c-sum(runif(1)<cumsum(Psi[,u,j]))
+      #Y[i,ind] = c-sum(runif(1)<cumsum(Psi[,u,j]))
+      Y[i, ind] = c[j] - sum(runif(1) < cumsum(Psi[, u, j]), na.rm=T)
     }
     for(t in 2:TT){
       u = k+1-sum(runif(1)<cumsum(Pi[u,,t]))
       for(j in 1:r){
         ind = ind+1
-        Y[i,ind] = c-sum(runif(1)<cumsum(Psi[,u,j]))
+      #  Y[i,ind] = c-sum(runif(1)<cumsum(Psi[,u,j]))
+        Y[i, ind] = c[j] - sum(runif(1) < cumsum(Psi[,u, j]), na.rm=T)
       }
     }
   }

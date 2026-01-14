@@ -26,8 +26,9 @@
 }
 
 
-\references{Pennoni, F., Pandolfi, S. and Bartolucci, F. (2024), LMest: An R Package for Estimating Generalized Latent Markov Models, \emph{Submitted to the R Journal}, pp. 1-30.}
-
+\references{
+Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\emph{The R Journal}, \bold{16}(4) 74-101.}
 \examples{
 data(data_heart_sim)
 }
