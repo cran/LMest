@@ -7,8 +7,8 @@
 \description{The package \code{LMest} is a framework for specifying and fitting Latent (or Hidden) Markov (LM) models for the analysis of longitudinal continuous and categorical data. Covariates are also included in the model specification through suitable parameterizations.}
 
 \details{
-Different LM models are estimated through specific functions requiring a data frame in long format. Responses are mainly categorical, the functions referred to continous responses are specified with \code{Cont}. When responses are continuos, the (multivariate) Gaussian distribution, conditional to the latent process, is assumed. 
-The functions are the following:
+Different LM models are estimated using specific functions that require data in long format. Responses are mainly categorical; functions for continuous responses are identified by \code{Cont}. For continuous responses, a (multivariate) Gaussian distribution conditional on the latent process is assumed.
+The functions are as follows:
 \describe{
 \item{\code{\link{lmest}}}{Function to estimate LM models for categorical responses generating the following classes:
 \itemize{
@@ -37,7 +37,7 @@ Maximum likelihood estimation of model parameters is performed through the Expec
 
 Model selection is provided by \code{\link{lmest}} and \code{\link{lmestCont}} functions. In addition, function \code{\link{lmestSearch}} allows us to deal with both model selection and multimodality of the likelihood function. Two main criteria are provided to select the number of latent states: the Akaike Information Criterion and the Bayesian Information Criterion.
 
-Prediction of the latent states is performed by the function \code{\link{lmestDecoding}}: for local and global decoding (Viterbi algorithm) from the output of functions lmest, lmestCont and lmestMixed.
+Prediction of the latent states is performed using the function \code{\link{lmestDecoding}}, which implements local and global decoding (the Viterbi algorithm) based on the output of the \code{lmest}, \code{lmestCont}, and \code{lmestMixed} functions.
 
 The package allows us to deal with missing responses, including drop-out and non-monotonic missingness, under the missing-at-random assumption.
 
@@ -57,7 +57,7 @@ Maintainer: Francesco Bartolucci <francesco.bartolucci@unipg.it>
 }
 
 \references{
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.
 
 Bartolucci, F., Pandolfi, S. and Pennoni, F. (2017). LMest: An R Package for Latent Markov Models for Longitudinal Categorical Data, \emph{Journal of Statistical Software}, \bold{81}, 1-38, doi:10.18637/jss.v081.i04.

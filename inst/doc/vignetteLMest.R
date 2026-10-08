@@ -13,7 +13,6 @@ set.seed(1945)
 
 ## ----message = FALSE, echo=1--------------------------------------------------
 library(LMest)
-cat(LMest:::Startup.Message(), sep="")
 
 ## -----------------------------------------------------------------------------
 data("RLMSlong")
@@ -94,6 +93,35 @@ plot(mod2, what="transitions")
 plot(mod2, what="marginal")
 
 ## ----results='hide', warning=FALSE--------------------------------------------
+data("data_SRHS_long")
+
+fit_mc_basic <- mc_multinom(
+  srhs ~ 1,
+  data = data_SRHS_long,
+  baseline = "central",
+  output = TRUE)
+
+summary(fit_mc_basic)
+
+## ----results='hide', warning=FALSE--------------------------------------------
+fit_mc_cov <- mc_multinom(
+  srhs ~ gender + age,
+  data = data_SRHS_long,
+  baseline = "central",
+  model_int = "dist1",
+  model_cov = "dist1",
+  formula_init = srhs ~ 1,
+  output = TRUE
+)
+
+summary(fit_mc_cov)
+
+round(colMeans(fit_mc_cov$Piv), 3)
+
+round(apply(fit_mc_cov$PI[, , , 2:max(data_SRHS_long$t)], c(1, 2), mean),
+  3)
+
+## ----results='hide', warning=FALSE--------------------------------------------
 dt$data$id = as.numeric(dt$data$id)
 dt$data$time = as.numeric(dt$data$time)
 modc <- lmestCont(responsesFormula = anti + self  ~ NULL,
@@ -105,7 +133,7 @@ modc <- lmestCont(responsesFormula = anti + self  ~ NULL,
                   k = 1:3, 
                   modBasic=1,  
                   output = TRUE, 
-                  tol=10^-1)
+                  tol=10^-3)
 
 ## -----------------------------------------------------------------------------
 plot(modc,what="modSel")

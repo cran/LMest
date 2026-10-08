@@ -16,18 +16,18 @@
   \describe{
    \item{\code{id}}{subject id}
    \item{\code{time}}{occasion of observation}
-   \item{\code{sap}}{systolic arterial pressure in mmgh}
-   \item{\code{dap}}{diastolic arterial pressure in mmgh}
+   \item{\code{sap}}{systolic arterial pressure in mmHg}
+   \item{\code{dap}}{diastolic arterial pressure in mmHg}
    \item{\code{hr}}{heart rate in bpm}
    \item{\code{fluid}}{fluid administration in ml/kg/h}
-   \item{\code{gender}}{1 for male, 2 for females}
+   \item{\code{gender}}{1 for male, 2 for female patients}
    \item{\code{age}}{age in years}
   }
 }
 
 
 \references{
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.}
 \examples{
 data(data_heart_sim)

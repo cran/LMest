@@ -39,15 +39,13 @@
   \item{yv}{corresponding vector of frequencies when est is of class \code{LMbasic} or \code{LMmixed}}
   \item{piv}{vector of initial probabilities of the latent Markov chain when est is of class \code{LMbasic}}
   \item{Pi}{set of transition probabilities matrices (k x k x TT) when est is of class \code{LMbasic}}
-  \item{Psi}{array of conditional response probabitlies (mb x k x r)when est is of class \code{LMbasic}}
+  \item{Psi}{array of conditional response probabilities (mb x k x r)when est is of class \code{LMbasic}}
   \item{n}{sample size}
   \item{TT}{number of time occasions} 
   \item{est}{object of class \code{LMbasic}, \code{LMlatent}, \code{LMbasiccont}, \code{LMlatentcont}, or \code{LMmixed}}
   \item{U}{matrix containing the sequence of latent states (n x TT) when est is of class \code{LMlatent} or \code{LMlatentcont}}
-  \item{Psi}{array of conditional response probabilities (mb x k x r) when est is of class \code{LMlatent}}
   \item{Be}{parameters affecting the logit for the initial probabilities when est is of class \code{LMlatent} or \code{LMlatentcont}}
-  \item{Ga}{parametes affecting the logit for the transition probabilitieswhen est is of class \code{LMlatent} or \code{LMlatentcont}}
-  \item{latentFormula}{a symbolic description of the model to be fitted when est is of class \code{LMlatent}. Detailed description is given in \code{\link{lmest}}}
+  \item{Ga}{parameters affecting the logit for the transition probabilitieswhen est is of class \code{LMlatent} or \code{LMlatentcont}}
   \item{data}{a data frame in long format, with rows corresponding to observations and columns corresponding to variables, a column corresponding to time occasions and a column containing the unit identifier when est is of class \code{LMlatent} or \code{LMlatentcont}}
   \item{Mu}{array of conditional means for the response variables (r x k) when est is of class \code{LMlatentcont}}
   \item{Si}{var-cov matrix common to all states (r x r) when est is of class \code{LMlatentcont}}

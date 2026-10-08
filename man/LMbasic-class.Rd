@@ -12,7 +12,7 @@
   \item{Pi}{estimate of transition probability matrices (k x k x TT)}
   \item{Psi}{estimate of conditional response probabilities (mb x k x r)}
   \item{np}{number of free parameters}
-  \item{k}{optimal number of latent states}
+  \item{k}{number of latent states}
   \item{aic}{value of the Akaike Information Criterion for model selection}
   \item{bic}{value of the Bayesian Information Criterion for model selection}
   \item{lkv}{log-likelihood trace at every step}

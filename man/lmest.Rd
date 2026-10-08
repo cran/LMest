@@ -24,7 +24,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
     \item{index}{a character vector with two elements, the first indicating the name of the unit identifier, and the second the time occasions}
   \item{k}{an integer vector specifying the number of latent states (default: \code{1:4})}
   \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
-    \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion Criterion}
+    \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion}
   \item{modBasic}{model on the transition probabilities (0 for time-heterogeneity, 1 for time-homogeneity, from 2 to (TT-1) partial time-homogeneity of a certain order)}
   \item{modManifest}{ model for manifest distribution when covariates are included in the measurement model (\code{"LM"} = Latent Markov with stationary transition, \code{"FM"} = finite mixture model where a mixture of AR(1) processes is  estimated with common variance and specific correlation coefficients). }
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
@@ -46,7 +46,7 @@ lmest(responsesFormula = NULL, latentFormula = NULL,
 Covariates are allowed to affect manifest distribution (measurement model) or  the initial and transition probabilities (latent model). Two different formulas are employed to specify the different LM models, \code{responsesFormula} and \code{latentFormula}:
 
 \itemize{
-\item{\code{responsesFormula}} is used  to specify the measurament model:
+\item{\code{responsesFormula}} is used  to specify the measurement model:
 \itemize{
 \item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr  the LM model without covariates and two responses (\code{y1} and \code{y2}) is specified;
 \item{\code{responsesFormula = NULL}}\cr  all the columns in the data except the \code{"id"} and \code{"time"} columns are used as responses to estimate the LM model without covariates;
@@ -58,7 +58,7 @@ Covariates are allowed to affect manifest distribution (measurement model) or  t
 \itemize{
 \item{\code{responsesFormula = y1 + y2 ~ NULL}}  \cr
 \code{latentFormula = ~ x1 + x2 | x3 + x4} \cr the LM model with two responses (\code{y1} and \code{y2}) and  two covariates affecting the initial probabilities (\code{x1} and \code{x2}) and other two affecting the transition probabilities (\code{x3} and \code{x4}) is specified;
-\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ 1 | x1 + x2} \cr (or \code{latentFormula = ~ NULL | x1 + x2})  \cr the covariates affect only the transition probabilities and an intercept is specified for the intial probabilities;
+\item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ 1 | x1 + x2} \cr (or \code{latentFormula = ~ NULL | x1 + x2})  \cr the covariates affect only the transition probabilities and an intercept is specified for the initial probabilities;
 \item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ x1 + x2} \cr the LM model with two covariates (\code{x1} and \code{x2}) affecting both the initial and transition probabilities is specified;
 \item{\code{responsesFormula = y1 + y2 ~ NULL}} \cr \code{latentFormula = ~ NULL | NULL} \cr (or \code{latentFormula = ~ 1 | 1}) \cr the LM model with only an intercept on the initial and transition probabilities is specified.
 }}
@@ -89,7 +89,7 @@ Returns an object of class \code{'LMbasic'} for the model without covariates (se
 
 \references{
 
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.
 
 Bartolucci F., Pandolfi S., and Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical

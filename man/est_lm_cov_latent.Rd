@@ -22,9 +22,9 @@
   \item{tol}{tolerance level for checking convergence of the algorithm}
   \item{maxit}{maximum number of iterations of the algorithm}
   \item{param}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
- \item{Psi}{intial value of the array of the conditional response probabilities (mb x k x r)}
- \item{Be}{intial value of the parameters affecting the logit for the initial probabilities (if start=2)}
- \item{Ga}{intial value of the parametes affecting the logit for the transition probabilities (if start=2)}
+ \item{Psi}{initial value of the array of the conditional response probabilities (mb x k x r)}
+ \item{Be}{initial value of the parameters affecting the logit for the initial probabilities (if start=2)}
+ \item{Ga}{initial value of the parameters affecting the logit for the transition probabilities (if start=2)}
  \item{fort}{to use fortran routine when possible (FALSE for not use fortran)}
  \item{output}{to return additional output (V,PI,Piv,Ul)}
  \item{out_se}{to compute the information matrix and standard errors}

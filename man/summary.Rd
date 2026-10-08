@@ -8,6 +8,7 @@
 \alias{summary.MCbasic}
 \alias{summary.MCcov}
 \alias{summary.LMsearch}
+\alias{summary.mc_multinom}
 
 \title{Summary of LM fits}
 \description{Summary methods}
@@ -22,18 +23,19 @@
 \method{summary}{MCbasic}(object, ...)
 \method{summary}{MCcov}(object, ...)
 \method{summary}{LMsearch}(object,...)
-
+\method{summary}{mc_multinom}(object,...)
 }
 
 
 \arguments{
-\item{object}{output from \code{\link{lmest}},\code{\link{lmestCont}},\code{\link{lmestMixed}}, and \code{\link{lmestMc}}}
+\item{object}{output from \code{\link{lmest}},\code{\link{lmestCont}},\code{\link{lmestMixed}}, \code{\link{mc_multinom}}, and \code{\link{lmestMc}}}
 \item{...}{further arguments passed to or from other methods}
 }
 
 \author{Francesco Bartolucci,
   Silvia Pandolfi,
   Fulvia Pennoni,
+  Luca Brusa,
   Alessio Farcomeni,
   Alessio Serafini
 }

@@ -320,3 +320,29 @@ print.MCcov <-function(x,...){
     print(data.frame(LogLik=x$lk,np=x$np, AIC=x$aic, BIC=x$bic, n = x$n, TT = x$TT, row.names = " "))
   }
 }
+
+print.mc_multinom <-function(x,...){
+  cat("\nMarkov Chain model with constraints\n")
+  if(!is.null(x$call))
+  {
+    cat("Call:\n")
+    print(x$call)
+  }
+  cat("\nAvailable objects:\n")
+  print(names(x))
+  cat("\nConvergence info:\n")
+  print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
+}
+
+print.LM_cat_multinom <-function(x,...){
+  cat("\nMarkov Chain model with constraints\n")
+  if(!is.null(x$call))
+  {
+    cat("Call:\n")
+    print(x$call)
+  }
+  cat("\nAvailable objects:\n")
+  print(names(x))
+  cat("\nConvergence info:\n")
+  print(cbind(LogLik=x$lk,np=x$np,AIC=x$aic, BIC=x$bic))
+}

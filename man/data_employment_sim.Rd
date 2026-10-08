@@ -25,7 +25,7 @@
 
 
 \references{
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.}
 
 \examples{

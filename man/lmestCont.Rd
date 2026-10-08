@@ -26,7 +26,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
     \item{index}{a character vector with two elements, the first indicating the name of the unit identifier, and the second the time occasions}
   \item{k}{an integer vector specifying the number of latent states (default: \code{1:4})}
     \item{start}{type of starting values (0 = deterministic, 1 = random, 2 = initial values in input)}
-      \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion Criterion}
+      \item{modSel}{a string indicating the model selection criteria: "BIC" for Bayesian Information Criterion and "AIC" for Akaike Information Criterion}
   \item{modBasic}{model on the transition probabilities (0 for time-heter., 1 for time-homog., from 2 to (TT-1) partial homog. of that order)}
   \item{paramLatent}{type of parametrization for the transition probabilities ("multilogit" = standard multinomial logit for every row of the transition matrix, "difflogit" = multinomial logit based on the difference between two sets of parameters)}
   \item{weights}{vector of weights}
@@ -44,7 +44,7 @@ lmestCont(responsesFormula = NULL, latentFormula = NULL,
 
 The function \code{lmestCont} is a general function for estimating LM models for continuous responses. The function requires data in long format and two additional columns indicating the unit identifier and the time occasions.
 
-Covariates are allowed on the initial and transition probabilities (latent model). Two different formulas are employed to specify the different LM models, \code{responsesFormula} and \code{latentFormula}:
+Covariates are allowed on the initial and transition probabilities (latent model) and in the measurement model. Two different formulas are employed to specify the different LM models, \code{responsesFormula} and \code{latentFormula}:
 
 \itemize{
 \item{\code{responsesFormula}} is used to specify the measurament model:
@@ -85,10 +85,10 @@ Returns an object of class \code{'LMbasiccont'} for the model without covariates
 }
 
 \references{
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.
 
-Bartolucci F., Pandolfi S., Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
+Bartolucci F., Pandolfi S. and Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.
 
 Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.}

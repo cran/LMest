@@ -7,7 +7,7 @@
 
 \title{Parametric bootstrap}
 \description{
-Function that performs bootstrap parametric resampling to compute standard errors for the parameter estimates.
+Function that performs  parametric bootstrap resampling to compute standard errors for the parameter estimates.
 }
 \usage{
 bootstrap(est, ...)
@@ -19,7 +19,7 @@ bootstrap(est, ...)
 \arguments{
   \item{est}{an object obtained from a call to \code{\link{lmest}} and \code{\link{lmestCont}}}
   \item{B}{number of bootstrap samples}
-  \item{seed}{an integer value with the random number generator state}
+ \item{seed}{an integer specifying the state of the random number generator}
   \item{\dots}{further arguments}
 }
 
@@ -73,7 +73,7 @@ out2 <- lmest(responsesFormula = srhs ~ NULL,
 
 boot2 <- bootstrap(out2)
 
-# LM model for continous responses without covariates 
+# LM model for continuous responses without covariates 
 
 data(data_long_cont)
 

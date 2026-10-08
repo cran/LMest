@@ -88,8 +88,9 @@ res0 <- vector("list", 10)
 tol <- 10^-6;
 for(k in 1:10){
   res0[[k]] <- est_lm_cov_manifest(S, X, k, 1, mod = "LM", tol)
-   save.image("example_SRHS.RData")
 }
+tmp_file <- tempfile("example_SRHS_", fileext = ".RData")
+save(res0, file = tmp_file)
 
 # *** fit the mixture latent auto-regressive model
 tol <- 0.005

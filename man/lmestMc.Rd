@@ -25,7 +25,7 @@ lmestMc(responsesFormula = NULL,
 }
 
 \details{
-The function \code{lmestMc} estimates the basic MC model and the univariate MC model with covariates for categorical responses. The function requires data in long format and two additional column indicating the unit identifier and the time occasions.
+The function \code{lmestMc} estimates the basic MC model and the univariate MC model with covariates for categorical responses. The function requires data in long format and two additional columns indicating the unit identifier and the time occasions.
 
 \code{responsesFormula} is used to specify the basic MC models and the model with covariates:
 \itemize{
@@ -53,13 +53,13 @@ Returns an object of class \code{'MCbasic'} for the basic model without covariat
 
 \references{
 
-Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+Pennoni, F., Pandolfi, S. and Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.
 
-Bartolucci F., Pandolfi S., Pennoni F. (2017) LMest: An R Package for Latent Markov Models for Longitudinal Categorical
+Bartolucci F., Pandolfi S. and Pennoni, F. (2017). LMest: An R Package for Latent Markov Models for Longitudinal Categorical
 Data, \emph{Journal of Statistical Software}, \bold{81}(4), 1-38.
 
-Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.}
+Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013). \emph{Latent Markov Models for Longitudinal Data}, Chapman and Hall/CRC press.}
 
 \examples{
 \dontrun{
@@ -67,7 +67,7 @@ Bartolucci, F., Farcomeni, A. and Pennoni, F. (2013) \emph{Latent Markov Models 
 
 data("RLMSlong")
 
-# Categories  rescaled from 1 “absolutely unsatisfied” to  5 “absolutely satisfied”
+# Categories  rescaled from 0 “absolutely unsatisfied” to  4 “absolutely satisfied”
 
 RLMSlong$value <- 5 - RLMSlong$value
 

@@ -11,21 +11,21 @@
 \usage{data(data_market_sim)}
 
 \format{
-  A data frame with 200  observations on the following variables:
+  A data frame with 200 observations on the following variables:
   \describe{
    \item{\code{id}}{subject id.}
     \item{\code{time}}{occasion of observation.}
    \item{\code{brand}}{0 if the customer has purchased the product from brand A, 1 if brand B, 2 if brand C, 3 if brand D.}
    \item{\code{price}}{0 if the price of the
 transaction is in the range [0.1, 10], 1  if it is in (10, 30], 
-2  if it is in (30, 60], 3  if it is in (30, 100],  4  if it is in (100, 500] (in thousands of Euros).}
+2  if it is in (30, 60], 3  if it is in (60, 100],  4  if it is in (100, 500] (in thousands of Euros).}
    \item{\code{age}}{age of the customer in years}
    \item{\code{income}}{income declared by the customer at the time of the first purchase (in thousands of Euros).}
   }
 }
 
 
-\references{ Pennoni, F., Pandolfi, S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
+\references{ Pennoni, F., Pandolfi and S. Bartolucci, F. (2025). LMest: An R Package for Estimating Generalized Latent Markov Models, 
 \emph{The R Journal}, \bold{16}(4) 74-101.}
 
 \examples{data(data_market_sim)
