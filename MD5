@@ -1,4 +1,4 @@
-c14ff2456ffe5af2262f1537944ca45c *DESCRIPTION
+b9da68085ee6bf08cf783e6c383b7b47 *DESCRIPTION
 ca4241faaff28d7832741320aab578e1 *NAMESPACE
 9ac5981ac52e02ec88a2ca9d4ea446d2 *R/LMest-deprecated.R
 89970a3cb10e908af349791eb85eecb3 *R/backward_Multinom.R
@@ -24,7 +24,7 @@ fd2d9ea1979ffc71503a851e1450d739 *R/draw_lm_basic_cont.R
 dc27d74d3130f4689e8d000462aaafbd *R/draw_lm_cov_latent.R
 6d624b5f040b856fe0bd3d3b8aefeb8a *R/draw_lm_cov_latent_cont.R
 96f6708a67744c592bf39ca678f3c6a5 *R/draw_lm_mixed.R
-3676bff1dfb71e25868150b7d7585e14 *R/est_LM_cat_multinom.R
+4d8187331c36cb01abfea080dcec76ad *R/est_LM_cat_multinom.R
 26bcb6a8030525ba867dfc20499d883a *R/est_multilogit.R
 c8177bf15c86a80f9bfb54d459c53bc7 *R/est_old.R
 784081e31d1fcd3bceeb8c26f46f2398 *R/expit.R
@@ -44,7 +44,7 @@ f7110b2e79d7de3016447243f9f76d7a *R/lk_obs_latent.R
 79c31a6d7aff32b935e1f1ffd9501778 *R/lk_obs_manifest.R
 d5f404914f0143a942a6d5ec3765c10f *R/lk_obs_mixed.R
 c53cd84605a2a82fdc9b2a1013072e75 *R/lk_sta.R
-5b8739bae65f59f9e973cedfe14ed16f *R/lmbasic.R
+0098351007ed65affd936aaf2c5084df *R/lmbasic.R
 5fbf9fdfd89d82e553541dc456b63b1a *R/lmbasic.cont.R
 b1b5b10fc152c90deb1f60705e7f0c97 *R/lmcovlatent.R
 d47faa2b298624a921052196599ea00b *R/lmcovlatent.cont.R
@@ -57,7 +57,7 @@ dbd07620d4eec2db872cf0100012cabc *R/lmest.R
 34a58a47f7fa462a90e7e103ca8f952c *R/lmestFormula.R
 70bacbb64cd36cece482b5d01734d489 *R/lmestMc.R
 c9f32815bb887149f3b47933a4c2fe56 *R/lmestMixed.R
-ae660b106fb69be9a5b7e1578754f166 *R/lmestSearch.R
+42bab0671580bc02db7a1514605e1f32 *R/lmestSearch.R
 df97674e4e7cc071b8660882da7cd2d4 *R/lmmixed.R
 2bee9d7ceda39a57f80168e7bc0f0cda *R/logit1.R
 79072001409bc7e08a615b723c01ecea *R/long2matrices.R
@@ -113,7 +113,7 @@ f3319b4c8b32d0e2ce80b694c119f230 *data/data_market_sim.rda
 22186047f28530b1e343771262a8c416 *inst/CITATION
 0b344a2316bf814b679d472903f98c29 *inst/doc/vignetteLMest.R
 e15852bb221dc01b979dc68e10e74dce *inst/doc/vignetteLMest.Rmd
-002267b24dd0ca4858326ab0917a6090 *inst/doc/vignetteLMest.html
+725394e69671fe72984ae03ba552c885 *inst/doc/vignetteLMest.html
 30ca0f3c0925c4433800c64a6858b1bf *man/LMbasic-class.Rd
 7565f9fdbee41118cecfeecc144e702d *man/LMbasiccont-class.Rd
 8f6ff61635c1bed87d26325ba388a6f9 *man/LMest-package.Rd

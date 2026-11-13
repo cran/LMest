@@ -63,17 +63,21 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
 #---- When there is just 1 latent class ----
   if(k == 1){
     piv = 1; Pi = 1
-    P = matrix(NA,b+1,r)
+    P = Psi = matrix(NA,b+1,r)
     for(j in 1:r) P[1:(bv[j]+1),j] = 0
     for(t in 1:TT){
       for(j in 1:r){
         for(y in 0:b){
-          ind = which(S[,t,j]==y)
+          if(miss){
+            ind = which(S[,t,j]==y & R[,t,j]==1)
+          }else{
+            ind = which(S[,t,j]==y)
+          }
           P[y+1,j] = P[y+1,j]+sum(yv[ind])
         }
       }
     }
-    Psi = P/(n*TT)
+    for(j in 1:r) Psi[,j] = P[,j]/sum(P[,j],na.rm=TRUE)
     dimnames(Psi)=list(category=0:b,item=1:r)
     pm = rep(1,ns)
     for(t in 1:TT) for(j in 1:r) pm = pm*Psi[S[,t,j]+1,j]
@@ -420,7 +424,6 @@ lmbasic <- function(S,yv,k,start=0,modBasic=0,tol=10^-8,maxit=1000,out_se=FALSE,
       print(c(lk,lk0))
       print(round(cbind(sc,scn,sc0),5))
       print(round(cbind(diag(J),diag(J0),diag(J)-diag(J0)),4))
-      browser()
     }
   }
 

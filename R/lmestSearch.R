@@ -109,7 +109,7 @@ lmestSearch <- function(responsesFormula = NULL, latentFormula = NULL,
     if(any(is.na(Xtrans))) stop("missing data in the covariates affecting the transition probabilities are not allowed")
   }
 
-  miss = any(is.na(Y))
+#  miss = any(is.na(Y))
   if(miss & miss.imp){
     Yv = cbind(1,Y)
     pYv = prelim.mix(Yv,1)

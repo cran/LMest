@@ -31,6 +31,7 @@ est_LM_cat_multinom <- function(resp_name, formula, k, data, reltol = 10^-10,
       if(outr$lk>out$lk) out = outr
     }
     out$lkv = lkv
+    out$call = match.call()
     return(out)
   }
 
